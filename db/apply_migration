@@ -1,0 +1,54 @@
+#!/usr/local/bin/php
+<?php
+    $iniFile        = __DIR__."/../app/config.ini";
+    $migrationsDir  = __DIR__."/migrations";
+
+    $config = parse_ini_file($iniFile);
+
+    // Conect to DB
+    $dbHost = $config['db_host'];
+    if ($config['db_port']) {
+        $dbHost .= $dbHost.':'.$config['db_port'];
+    }
+    $dbName = $config['db_name'];
+    $dbUser = $config['db_user'];
+    $dbPassword = $config['db_password'];
+
+    $dbLink = mysqli_connect('p:'.$dbHost, $dbUser, $dbPassword, $dbName) or die("Could not connect to database.");
+    if (!$dbLink) {
+        // oops....
+        die("Could not connect to database.");
+    } else {
+        if ($config['db_character_set']) {
+            mysqli_set_charset($dbLink, $config['db_character_set']);
+        }
+    }
+    $version = 0;
+    $result = mysqli_query($dbLink, "select version from schema_info");
+    if ($result) {
+        $row = mysqli_fetch_array($result);
+        $version = $row[0];
+    }
+    echo "\nCurrent Version: ".$version."\n";
+    // Read migrations
+    $migrationsCount = 0;
+    if (false !== ($files = scandir($migrationsDir))) {
+        foreach ($files as $file) {
+            if (preg_match('/^(\d+)_(.*)\.sql/', $file, $matches)) {
+                if ($matches[1] <= $version) continue;
+                echo "Applying migration $matches[1] \"$matches[2]\"\n";
+                // apply migration
+                $content = file_get_contents($migrationsDir.'/'.$file, 1);
+                if ($content) {
+                    $querys = explode(';', $content);
+                    foreach ($querys as $query) {
+                        if (trim($query) and substr(trim($query), 0, 2)!='--') {
+                            mysqli_query($dbLink, $query) or die("MySQL error!\n".mysqli_error($dbLink)."\n$query\n");
+                        }
+                    }
+                }
+                $migrationsCount++;
+            }
+        }
+        echo $migrationsCount ? "$migrationsCount migrations successfully applied\n" : "Database is up-to-date\n";
+    } else die("Could not open migrations dir");
