@@ -250,6 +250,9 @@ class TestRunner {
         $this->exceptions     = array();
     }
 
+    // This function also return exit status to use in scripts
+    // 0 - if all tests passed
+    // 1 - if one of the tests failed
     public function run() {
         $app = Tipy::getInstance();
         $tests          = array();
@@ -309,6 +312,11 @@ class TestRunner {
         $app->db->query('DROP DATABASE '.$app->config->get('db_test_name'));
 
         $this->printSummary();
+        if (sizeof($this->failures) + sizeof($this->exceptions) == 0) {
+            return 0;
+        } else {
+            return 1;
+        }
     }
 
     public function updateSummary($summary) {
@@ -367,10 +375,6 @@ class TestRunner {
             var_export($call['args']);
             echo ")".PHP_EOL;
         }
-    }
-
-    public function allTestsPassed() {
-        return sizeof($this->failures) + sizeof($this->exceptions) == 0;
     }
 
 }
