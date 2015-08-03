@@ -16,4 +16,8 @@ $runner->fixtures  = array(__DIR__.'/fixtures/tipy/unit_fixtures');   // path to
 $runner->dirs      = array(__DIR__.'/unit/tipy');                     // path to test files folder or array of such pathes
 $runner->useDumper = false;                                           // If TRUE, use DB clone structure from production
 $runner->run();
-
+if ($runner->allTestsPassed()) {
+    exit(0);
+} else {
+    exit(1);
+}

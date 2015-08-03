@@ -354,6 +354,10 @@ class TestRunner {
         }
     }
 
+    public function allTestsPassed() {
+        return sizeof($this->failures) + sizeof($this->exceptions) == 0;
+    }
+
 }
 
 
