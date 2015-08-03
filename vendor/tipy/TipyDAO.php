@@ -30,7 +30,7 @@ class TipyDAO {
             $dbUser = $config->get('db_user');
             $dbPassword = $config->get('db_password');
 
-            $dbLink = @new mysqli('p:'.$dbHost, $dbUser, $dbPassword, $dbName);
+            $dbLink = new mysqli('p:'.$dbHost, $dbUser, $dbPassword, $dbName);
             if ($dbLink->connect_error) {
                 throw new TipyDaoException('DB connection error (' . $dbLink->connect_errno . ') '
                     . $dbLink->connect_error);
