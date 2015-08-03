@@ -49,6 +49,21 @@ $app->initDbConnection();
 require_once('TipyAutoloader.php');
 
 // -----------------------------------------------------
+// Override cliColors' getColoredString
+// This method returns colored string only for 
+// interactive terminals.
+// -----------------------------------------------------
+class TTYColors extends Colors {
+    public function getColoredString($string, $foreground_color = null, $background_color = null) {
+        if (posix_isatty(STDOUT)) {
+            return parent::getColoredString($string, $foreground_color, $background_color);
+        } else {
+            return $string;
+        }
+    }
+}
+
+// -----------------------------------------------------
 // Test suite with assertions kit
 // -----------------------------------------------------
 class TipyTestSuite {
@@ -82,7 +97,7 @@ class TipyTestSuite {
             } catch (Exception $e) {
                 $this->run = false;
                 array_push($this->exceptions, $e);
-                $colors = new Colors();
+                $colors = new TTYColors();
                 echo $colors->getColoredString("E", 'red');
             }
             $this->afterTest();
@@ -138,7 +153,7 @@ class TipyTestSuite {
             if (!$silent) {
                 $this->run = false;
                 array_push($this->exceptions, $e);
-                $colors = new Colors();
+                $colors = new TTYColors();
                 echo $colors->getColoredString("E", 'red');
             }
             return $e;
@@ -147,7 +162,7 @@ class TipyTestSuite {
 
     public function assertion($a, $b) {
         $this->assertions++;
-        $colors = new Colors();
+        $colors = new TTYColors();
         if ($a == $b) {
             echo $colors->getColoredString(".", 'green');
         } else {
@@ -309,7 +324,7 @@ class TestRunner {
     }
 
     public function printSummary() {
-        $colors = new Colors();
+        $colors = new TTYColors();
         echo PHP_EOL.PHP_EOL;
         echo "Tests: ".$this->tests;
         echo ", Assertions: ".$this->assertions;
@@ -344,7 +359,7 @@ class TestRunner {
     }
 
     private function printBacktrace($trace) {
-        $colors = new Colors();
+        $colors = new TTYColors();
         foreach($trace as $call) {
             echo basename($call['file']);
             echo " (".$colors->getColoredString($call['line'], 'cyan')."): ";
