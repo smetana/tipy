@@ -35,6 +35,11 @@ private $background_colors = array();
 
     // Returns colored string
     public function getColoredString($string, $foreground_color = null, $background_color = null) {
+
+        if (!posix_isatty(STDOUT)) {
+            return $string;
+        }
+
         $colored_string = "";
 
         // Check if given foreground color found
