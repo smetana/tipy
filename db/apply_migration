@@ -44,7 +44,7 @@
             if (preg_match('/^(\d+)_(.*)\.sql/', $file, $matches)) {
                 if ($matches[1] <= $version) continue;
                 echo $colors->getColoredString('Applying migration '.$matches[1].' "', 'light_gray')
-                    .$colors->getColoredString($matches[2], 'white').$colors->getColoredString('"', 'light_gray').PHP_EOL;
+                    .$colors->getColoredString($matches[2], 'white').$colors->getColoredString('"', 'light_gray');
                 // apply migration
                 $sql = file_get_contents($migrationsDir.'/'.$file, 1);
                 if ($sql) {
@@ -61,7 +61,8 @@
 
                     if ($dbLink->errno) {
                         die(
-                            PHP_EOL.$colors->getColoredString('Error:', 'red')
+                            $colors->getColoredString('   ✗', 'red')
+                           .PHP_EOL.PHP_EOL.$colors->getColoredString('Error:', 'red')
                            .$colors->getColoredString(' Query #' . ( $i + 1 ) . ' of ', 'light_red').$colors->getColoredString($file, 'red').PHP_EOL.PHP_EOL
                            .$colors->getColoredString($query_array[$i], 'light_gray') .PHP_EOL.PHP_EOL
                            .'' . $colors->getColoredString($dbLink->error, 'light_red') . PHP_EOL.PHP_EOL
@@ -69,6 +70,7 @@
                     }
                 }
                 $migrationsCount++;
+                echo $colors->getColoredString('   ✓', 'green').PHP_EOL;
             }
         }
         $message = $migrationsCount ? "$migrationsCount migrations successfully applied" : "Database is up-to-date";
