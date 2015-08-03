@@ -337,13 +337,13 @@ class TestRunner {
                 $i++;
                 echo $i.") ";
                 echo $colors->getColoredString($e->getMessage(), 'yellow').PHP_EOL;
-                echo self::printBacktrace($e->getTrace());
+                echo $this->printBacktrace($e->getTrace());
                 echo PHP_EOL.PHP_EOL;
             }
         }
     }
 
-    public static function printBacktrace($trace) {
+    private function printBacktrace($trace) {
         $colors = new Colors();
         foreach($trace as $call) {
             echo basename($call['file']);
