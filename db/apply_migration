@@ -1,4 +1,4 @@
-#!/usr/local/bin/php
+#!/usr/bin/env php
 <?php
     $iniFile        = __DIR__."/../app/config.ini";
     $migrationsDir  = __DIR__."/migrations";
