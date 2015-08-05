@@ -1,10 +1,17 @@
 <?php
+defined('SELF_TEST') || define('SELF_TEST', false);
 
-// sert include paths
-$includePath  = ini_get('include_path');
-$includePath .= ':'.__DIR__.'/../../app';
-$includePath .= ':'.__DIR__.'/../../vendor/tipy';
-ini_set('include_path', $includePath);
+// If no config provided yet check if this is a self test.
+// If so try to use config file from tests directory
+// If file not exist check if we are on CircleCI and use 
+// CircleCI's config file
+if (!defined('INI_FILE') and SELF_TEST) {
+    if (file_exists(__DIR__.'/../tests/config.ini')) {
+        define('INI_FILE', __DIR__.'/../tests/config.ini');
+    } else if (getenv("CIRCLECI")) {
+        define('INI_FILE', __DIR__.'/../tests/config.ini.ci');
+    }
+}
 
 //
 // Load modules
@@ -20,7 +27,7 @@ require_once('TipyInput.php');
 require_once('TipyOutput.php');
 require_once('TipyView.php');
 require_once('Inflector.php');
-require_once(__DIR__.'/../cliColors/CliColors.php');
+require_once(__DIR__.'/../vendor/cliColors/CliColors.php');
 
 //
 // Override application session for tests

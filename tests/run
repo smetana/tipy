@@ -7,8 +7,9 @@
  *
  *****************************************************************************************/
 define('TEST_MODE', true);
+define('SELF_TEST', true);
 
-require_once(__DIR__.'/../vendor/tipy/TipyTestSuite.php');
+require_once(__DIR__.'/../src/TipyTestSuite.php');
 
 array_shift($argv);
 $runner = new TestRunner($argv);
