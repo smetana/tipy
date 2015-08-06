@@ -26,7 +26,7 @@ require_once(__DIR__.'/../cliColors/CliColors.php');
 // Override application session for tests
 //
 class TipySession extends TipyBinder {
-    function close() {
+    public function close() {
         $this->binderData = array();
     }
 }
@@ -73,8 +73,10 @@ class TipyTestSuite {
         $this->clear();
         $className = get_class($this);
         $methods = get_class_methods($className);
-        foreach($methods as $testName) {
-            if (!preg_match("/^test/", $testName)) continue;
+        foreach ($methods as $testName) {
+            if (!preg_match("/^test/", $testName)) {
+                continue;
+            }
             $this->tests++;
             $this->beforeTest();
             try {
@@ -98,7 +100,8 @@ class TipyTestSuite {
         $this->run = true;
         // start transaction
         $app->db->select_db($app->config->get('db_test_name'));
-        $app->db->query('START TRANSACTION');
+        $dao = new TipyDAO();
+        $dao->startTransaction();
     }
 
     // do end oprations
@@ -106,7 +109,8 @@ class TipyTestSuite {
         $app = Tipy::getInstance();
         // rollback transaction
         $app->db->select_db($app->config->get('db_test_name'));
-        $app->db->query('ROLLBACK');
+        $dao = new TipyDAO();
+        $dao->rollback();
     }
 
     public static function applyFixture($db, $name) {
@@ -133,7 +137,7 @@ class TipyTestSuite {
             $controller->execute($methodName);
             $output = ob_get_clean();
             return null;
-        }  catch (Exception $e) {
+        } catch (Exception $e) {
             $output = ob_get_clean();
             if (!$silent) {
                 $this->run = false;
@@ -161,22 +165,26 @@ class TipyTestSuite {
     }
 
     public function assertEqual($a, $b) {
-        if (!$this->run) return;
+        if (!$this->run) {
+            return;
+        }
         $this->assertion($a, $b);
     }
 
     public function assertNotEqual($a, $b) {
-        if (!$this->run) return;
+        if (!$this->run) {
+            return;
+        }
         $this->assertion($a <> $b, true);
     }
 
     public function assertThrown($exceptionClass, $exceptionMessage, $closure, $messageSubstrLength = 0) {
         try {
             $closure();
-            $this->assertion(NULL, $exceptionClass.': '.$exceptionMessage);
+            $this->assertion(null, $exceptionClass.': '.$exceptionMessage);
         } catch (Exception $e) {
             $message = $messageSubstrLength ? substr($e->getMessage(), 0, $messageSubstrLength) : $e->getMessage();
-            $this->assertion(get_class($e).': '.$message , $exceptionClass.': '.$exceptionMessage);
+            $this->assertion(get_class($e).': '.$message, $exceptionClass.': '.$exceptionMessage);
         }
         $this->run = true;
     }
@@ -186,7 +194,7 @@ class TipyTestSuite {
             $closure();
             $this->assertion(true, true);
         } catch (Exception $e) {
-            $this->assertion(get_class($e).': '.$e->getMessage(), NULL);
+            $this->assertion(get_class($e).': '.$e->getMessage(), null);
         }
         $this->run = true;
     }
@@ -242,21 +250,21 @@ class TestRunner {
         $app = Tipy::getInstance();
         $tests          = array();
         $testFilepaths  = array();
-        if(sizeof($this->args)) {
-            foreach($this->args as $file) {
+        if (sizeof($this->args)) {
+            foreach ($this->args as $file) {
                 $testName                 = basename($file, '.php');
                 $tests[]                  = $testName;
                 $testFilepaths[$testName] = $file;
             }
         } else {
             if ($this->dirs) {
-                if(!is_array($this->dirs)) {
+                if (!is_array($this->dirs)) {
                     $this->dirs = array($this->dirs);
                 }
-                foreach($this->dirs as $dir) {
+                foreach ($this->dirs as $dir) {
                     if ($handle = opendir($dir)) {
                         while (false !== ($file = readdir($handle))) {
-                            if(substr($file, 0, 4) == 'test' && is_file($dir.'/'.$file)) {
+                            if (substr($file, 0, 4) == 'test' && is_file($dir.'/'.$file)) {
                                 $testName                 = basename($file, '.php');
                                 $tests[]                  = $testName;
                                 $testFilepaths[$testName] = $dir.'/'.$file;
@@ -278,17 +286,17 @@ class TestRunner {
 
         $app->db->select_db($app->config->get('db_test_name'));
         if ($this->fixtures) {
-            if(!is_array($this->fixtures)) {
+            if (!is_array($this->fixtures)) {
                 $this->fixtures = array($this->fixtures);
             }
-            foreach($this->fixtures as $fixture) {
+            foreach ($this->fixtures as $fixture) {
                 TipyTestSuite::applyFixture($app->db, $fixture);
             }
         }
 
-        echo "\n";
+        echo PHP_EOL;
 
-        foreach($tests as $test){
+        foreach ($tests as $test){
             require_once($testFilepaths[$test]);
             $test = new $test;
             $test->run();
@@ -307,10 +315,10 @@ class TestRunner {
     public function updateSummary($summary) {
         $this->tests += $summary['tests'];
         $this->assertions += $summary['assertions'];
-        foreach($summary['failures'] as $failure) {
+        foreach ($summary['failures'] as $failure) {
             array_push($this->failures, $failure);
         }
-        foreach($summary['exceptions'] as $exception) {
+        foreach ($summary['exceptions'] as $exception) {
             array_push($this->exceptions, $exception);
         }
         return $summary;
@@ -327,7 +335,7 @@ class TestRunner {
         if (sizeof($this->failures) > 0) {
             echo $colors->getColoredString('Failures:', 'red').PHP_EOL;
             $i = 0;
-            foreach($this->failures as $failure) {
+            foreach ($this->failures as $failure) {
                 $i++;
                 echo "$i) ".$colors->getColoredString($failure[2], 'yellow').": ";
                 echo $failure[3]." at line (".$colors->getColoredString($failure[4], 'cyan').")".PHP_EOL;
@@ -341,7 +349,7 @@ class TestRunner {
         if (sizeof($this->exceptions) > 0) {
             echo $colors->getColoredString('Exceptions:', 'red').PHP_EOL;
             $i = 0;
-            foreach($this->exceptions as $e) {
+            foreach ($this->exceptions as $e) {
                 $i++;
                 echo $i.") ";
                 echo $colors->getColoredString($e->getMessage(), 'yellow').PHP_EOL;
@@ -353,7 +361,7 @@ class TestRunner {
 
     private function printBacktrace($trace) {
         $colors = new Colors();
-        foreach($trace as $call) {
+        foreach ($trace as $call) {
             echo basename($call['file']);
             echo " (".$colors->getColoredString($call['line'], 'cyan')."): ";
             echo $call['function']."(";
@@ -361,9 +369,4 @@ class TestRunner {
             echo ")".PHP_EOL;
         }
     }
-
 }
-
-
-
-
