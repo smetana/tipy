@@ -1,0 +1,13 @@
+#!/usr/bin/env php
+<?php
+//
+//  Usage: ./bin/test [file_or_dir [file_or_dir [file_or_dir ...]]]
+//  Examples:
+//      ./bin/test ./tests
+//      ./bin/test tests/testModel.php tests/fixtures/
+//      ./bin/test tests/testModel.php tests/fixtures/tipy.sql
+//
+require_once(__DIR__.'/../src/TipyTestSuite.php');
+$runner = new TestRunner($argv);
+$exitStatus = $runner->run();
+exit($exitStatus);

@@ -1,15 +1,26 @@
 <?php
-defined('SELF_TEST') || define('SELF_TEST', false);
+defined('TEST_MODE') || define('TEST_MODE', true);
 
-// If no config provided yet check if this is a self test.
-// If so try to use config file from tests directory
-// If file not exist check if we are on CircleCI and use 
-// CircleCI's config file
-if (!defined('INI_FILE') and SELF_TEST) {
-    if (file_exists(__DIR__.'/../tests/config.ini')) {
+
+// If no config defined try to search trough arguments
+if (!defined('INI_FILE')) {
+    foreach($argv as $filename) {
+        if (preg_match('/config\.ini$/', $filename) && file_exists($filename)) {
+            define('INI_FILE', $filename);
+        }
+    }
+}
+// If still not defined try to use config file from tests directory
+// If even this fails check if we are on CircleCI and use CircleCI's config file
+if (!defined('INI_FILE')) {
+    if (file_exists(getcwd().'/config.ini')) {
+        define('INI_FILE', getcwd().'/config.ini');
+    } else if (file_exists(__DIR__.'/../tests/config.ini')) {
         define('INI_FILE', __DIR__.'/../tests/config.ini');
     } else if (getenv("CIRCLECI")) {
         define('INI_FILE', __DIR__.'/../tests/config.ini.ci');
+    } else {
+        exit("Please specify config file or put config.ini to current directory".PHP_EOL);
     }
 }
 
@@ -116,8 +127,8 @@ class TipyTestSuite {
         $app->db->query('ROLLBACK');
     }
 
-    public static function applyFixture($db, $name) {
-        $content = file_get_contents($name.'.sql', 1);
+    public static function applyFixture($db, $filename) {
+        $content = file_get_contents($filename, 1);
         if ($content) {
             $querys = explode(';', $content);
             foreach ($querys as $query) {
@@ -223,23 +234,49 @@ class TipyTestSuite {
 // -----------------------------------------------------
 class TestRunner {
 
-    public $args;
-    public $dir;
-    public $fixtures;
-    public $useDumper;
-    protected $exeptions;
     protected $tests;
-    protected $testFilepaths;
     protected $assertions;
     protected $failures;
-
+    protected $exeptions;
+    protected $testNames;
+    protected $testFiles;
+    protected $fixtureFiles;
+    
     public function __construct($args) {
-        $this->args           = $args;
-        $this->useDumper      = true;
         $this->tests          = 0;
         $this->assertions     = 0;
         $this->failures       = array();
         $this->exceptions     = array();
+        $this->testNames      = array();
+        $this->testFiles      = array();
+        $this->fixtureFiles   = array();
+        array_shift($args);
+        if (sizeof($args) == 0) { $args = array(getcwd()); };
+        foreach($args as $filename) {
+            $this->findTestsAndFixtures($filename);
+        }
+    }
+
+    // Find tests and fixtures recursively
+    private function findTestsAndFixtures($filename) {
+        if (is_dir($filename)) {
+            if ($handle = opendir($filename)) {
+                while (false !== ($f = readdir($handle))) {
+                    if (preg_match('/\.$/', $f)) {
+                        // skip . and ..
+                    } else {
+                        $this->findTestsAndFixtures($filename.'/'.$f);
+                    }
+                }
+                closedir($handle);
+            }
+        } else if (preg_match('/\.sql$/', $filename)) {
+            $this->fixtureFiles[] = $filename;
+        } else if (preg_match('/(test\w+)\.php$/', $filename, $matches)) {
+            $testName = $matches[1];
+            $this->testNames[] = $testName;        
+            $this->testFiles[$testName] = $filename;
+        }
     }
 
     // This function also return exit status to use in scripts
@@ -247,62 +284,20 @@ class TestRunner {
     // 1 - if one of the tests failed
     public function run() {
         $app = Tipy::getInstance();
-        $tests          = array();
-        $testFilepaths  = array();
-        if(sizeof($this->args)) {
-            foreach($this->args as $file) {
-                $testName                 = basename($file, '.php');
-                $tests[]                  = $testName;
-                $testFilepaths[$testName] = $file;
-            }
-        } else {
-            if ($this->dirs) {
-                if(!is_array($this->dirs)) {
-                    $this->dirs = array($this->dirs);
-                }
-                foreach($this->dirs as $dir) {
-                    if ($handle = opendir($dir)) {
-                        while (false !== ($file = readdir($handle))) {
-                            if(substr($file, 0, 4) == 'test' && is_file($dir.'/'.$file)) {
-                                $testName                 = basename($file, '.php');
-                                $tests[]                  = $testName;
-                                $testFilepaths[$testName] = $dir.'/'.$file;
-                            }
-                        }
-                        closedir($handle);
-                    }
-                }
-            }
-        }
-
         $app->db->query('DROP DATABASE IF EXISTS '.$app->config->get('db_test_name'));
-        if ($this->useDumper) {
-            require_once(__DIR__.'/../MysqlCloneDb/MysqlCloneDb.php');
-            new MysqlCloneDb($app->db, $app->config->get('db_name'), $app->config->get('db_test_name'), 'InnoDB');
-        } else {
-            $app->db->query('CREATE DATABASE '.$app->config->get('db_test_name'));
-        }
-
+        $app->db->query('CREATE DATABASE '.$app->config->get('db_test_name'));
         $app->db->select_db($app->config->get('db_test_name'));
-        if ($this->fixtures) {
-            if(!is_array($this->fixtures)) {
-                $this->fixtures = array($this->fixtures);
-            }
-            foreach($this->fixtures as $fixture) {
-                TipyTestSuite::applyFixture($app->db, $fixture);
-            }
+        foreach($this->fixtureFiles as $fixture) {
+            TipyTestSuite::applyFixture($app->db, $fixture);
         }
-
         echo "\n";
-
-        foreach($tests as $test){
-            require_once($testFilepaths[$test]);
+        foreach($this->testNames as $test){
+            require_once($this->testFiles[$test]);
             $test = new $test;
             $test->run();
             $this->updateSummary($test->getSummary());
         }
         $app->db->query('DROP DATABASE '.$app->config->get('db_test_name'));
-
         $this->printSummary();
         if (sizeof($this->failures) + sizeof($this->exceptions) == 0) {
             return 0;
@@ -370,7 +365,5 @@ class TestRunner {
     }
 
 }
-
-
 
 
