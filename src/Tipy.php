@@ -31,12 +31,13 @@ class Tipy {
         $this->session    = new TipySession();   // Session
         $this->db         = null;                       // DB resource
 
-        // Set path to application
-        $this->config->set('application_path', realpath(__DIR__.'/../../app'));
+        $cwd = getcwd();
         // Set path to document_root
-        $this->config->set('document_root', realpath(__DIR__.'/../../public'));
+        $this->config->set('document_root', $cwd);
+        // Set path to application
+        $this->config->set('application_path', realpath($cwd.'/../app'));
         // Set path to templates
-        $this->view->setTemplatePath(realpath(__DIR__.'/../../app/views'));
+        $this->view->setTemplatePath(realpath($cwd.'/../app/views'));
     }
 
     public static function getInstance() {
