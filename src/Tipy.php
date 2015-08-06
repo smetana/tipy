@@ -31,6 +31,8 @@ class Tipy {
         $this->session    = new TipySession();   // Session
         $this->db         = null;                       // DB resource
 
+        // dispatcher.php is called by Apache with current working dir 
+        // set to DocumentRoot. Use it to get all paths needed
         $cwd = getcwd();
         // Set path to document_root
         $this->config->set('document_root', $cwd);
