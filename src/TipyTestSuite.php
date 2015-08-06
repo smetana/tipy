@@ -261,6 +261,10 @@ class TestRunner {
         }
     }
 
+    public function __destruct() {
+        exit($this->run());
+    }
+
     // Find tests and fixtures recursively
     private function findTestsAndFixtures($filename) {
         if (is_dir($filename)) {
@@ -370,4 +374,4 @@ class TestRunner {
 
 }
 
-
+$runner = new TestRunner();
