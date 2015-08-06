@@ -10,7 +10,7 @@ class TipyDaoException extends Exception {}
 class TipyDAO {
 
     protected $dbLink;
-    protected static $nestedTransactionCount = 0;
+    protected static $isTransactionInProgress = false;
     public static $queryCount;
 
     // -----------------------------------------------------
@@ -54,11 +54,11 @@ class TipyDAO {
             $sql = str_replace('%', '%%', $sql);
             $sql = str_replace('?', '"%s"', $sql);
             $link = $this->dbLink;
-            array_walk($params, function (&$string) use ($link) {
+            array_walk($params, function(&$string) use ($link) { 
                 $string = $link->real_escape_string($string);
             });
-            array_unshift($params, $sql);
-            $query = call_user_func_array('sprintf', $params);
+            array_unshift($params,$sql);
+            $query = call_user_func_array('sprintf',$params);
         } else {
             $query = $sql;
         }
@@ -89,7 +89,7 @@ class TipyDAO {
     // -----------------------------------------------------
     // fetchRow
     // Need this method to do some common operations before
-    // returning fetchRow from query result
+    // returning fetchRow from query result 
     // -----------------------------------------------------
     public function fetchRow(&$result) {
         $result->field_seek(0);
@@ -125,7 +125,7 @@ class TipyDAO {
     // limit query and fetch
     // ----------------------------------------------------
     public function limitQueryAllRows($sql, $span, $step, $params = array()) {
-        $result = $this->limitQuery($sql, $span, $step, $params);
+        $result = $this->limitQuery($sql, $span, $step,  $params);
         if ($result) {
             return $this->fetchAllRows($result);
         } else {
@@ -163,23 +163,32 @@ class TipyDAO {
     // Start transaction with fallback mechanics
     // ----------------------------------------------------
     public function startTransaction() {
-        $result = true;
-        if (self::$nestedTransactionCount == 0) {
-            $result = $this->dbLink->begin_transaction();
+        if(self::$isTransactionInProgress) {
+            throw new TipyDaoException('Transaction alredy in progress');
         }
-        ++self::$nestedTransactionCount;
-        return $result;
+        self::$isTransactionInProgress = true;
+        register_shutdown_function(array($this, "shutdownCheck"));
+        return $this->dbLink->begin_transaction();
+    }
+
+    // ----------------------------------------------------
+    // Falback method for prevent locking DB
+    // ----------------------------------------------------
+    public function shutdownCheck() {
+        if (self::$isTransactionInProgress) {
+            $this->rollback();
+        }
     }
 
     // ----------------------------------------------------
     // Commit transaction
     // ----------------------------------------------------
     public function commit() {
-        $result = true;
-        if (self::$nestedTransactionCount === 1) {
-            $result = $this->dbLink->commit();
+        if(!self::$isTransactionInProgress) {
+            throw new TipyDaoException('No any transaction in progress');
         }
-        --self::$nestedTransactionCount;
+        $result = $this->dbLink->commit();
+        self::$isTransactionInProgress = false;
         return $result;
     }
 
@@ -187,11 +196,11 @@ class TipyDAO {
     // Rollback transaction
     // ----------------------------------------------------
     public function rollback() {
-        $result = true;
-        if (self::$nestedTransactionCount > 0) {
-            $result = $this->dbLink->rollback();
+        if(!self::$isTransactionInProgress) {
+            throw new TipyDaoException('No any transaction in progress');
         }
-        self::$nestedTransactionCount = 0;
+        $result = $this->dbLink->rollback();
+        self::$isTransactionInProgress = false;
         return $result;
     }
 
@@ -199,6 +208,8 @@ class TipyDAO {
     // Return true if any transaction in progress
     // ----------------------------------------------------
     public function isTransactionInProgress() {
-        return self::$nestedTransactionCount > 0;
+        return self::$isTransactionInProgress;
     }
+
 }
+
