@@ -8,6 +8,6 @@
 //      ./bin/test tests/testModel.php tests/fixtures/tipy.sql
 //
 require_once(__DIR__.'/../src/TipyTestSuite.php');
-$runner = new TestRunner($argv);
+$runner = new TestRunner();
 $exitStatus = $runner->run();
 exit($exitStatus);

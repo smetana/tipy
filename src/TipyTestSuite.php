@@ -242,7 +242,7 @@ class TestRunner {
     protected $testFiles;
     protected $fixtureFiles;
     
-    public function __construct($args) {
+    public function __construct() {
         $this->tests          = 0;
         $this->assertions     = 0;
         $this->failures       = array();
@@ -250,6 +250,10 @@ class TestRunner {
         $this->testNames      = array();
         $this->testFiles      = array();
         $this->fixtureFiles   = array();
+        if (!isset($_SERVER['argv'])) {
+            exit("Tests should be run from command line.");
+        }
+        $args = $_SERVER['argv'];
         array_shift($args);
         if (sizeof($args) == 0) { $args = array(getcwd()); };
         foreach($args as $filename) {
