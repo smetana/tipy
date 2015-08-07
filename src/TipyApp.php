@@ -6,7 +6,7 @@ class TipyException extends Exception {}
 // Application
 // Class to store Application context
 // ==================================================================
-class Tipy {
+class TipyApp {
 
     private static $instance = null;
 

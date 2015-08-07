@@ -25,7 +25,7 @@ require_once('TipyAutoloader.php');
 srand((double)microtime()*1000000);
 
 // Run application
-$app = Tipy::getInstance();
+$app = TipyApp::getInstance();
 $app->run();
 
 // Flush output bufer

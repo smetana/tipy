@@ -1,6 +1,6 @@
 <?php
 require_once('ErrorHandler.php');
-require_once('Tipy.php');
+require_once('TipyApp.php');
 require_once('TipyDAO.php');
 require_once('TipyModel.php');
 require_once('TipyConfig.php');
@@ -32,7 +32,7 @@ if (!function_exists('apache_request_headers')) {
 //
 // Start Application
 //
-$app = Tipy::getInstance();
+$app = TipyApp::getInstance();
 $app->initDbConnection();
 
 // load Autoload function
@@ -81,7 +81,7 @@ class TipyTestSuite {
 
     // do start test operations
     public function beforeTest() {
-        $app = Tipy::getInstance();
+        $app = TipyApp::getInstance();
         // clear session and input
         $app->in->clear();
         $app->session->clear();
@@ -93,7 +93,7 @@ class TipyTestSuite {
 
     // do end oprations
     public function afterTest() {
-        $app = Tipy::getInstance();
+        $app = TipyApp::getInstance();
         // rollback transaction
         $app->db->select_db($app->config->get('db_test_name'));
         $app->db->query('ROLLBACK');
@@ -112,7 +112,7 @@ class TipyTestSuite {
     }
 
     public function execute($controllerName, $methodName, &$output, $silent = false) {
-        $app = Tipy::getInstance();
+        $app = TipyApp::getInstance();
         $app->out->clear();
         $output = "";
         try {
@@ -259,7 +259,7 @@ class TestRunner {
     // 0 - if all tests passed
     // 1 - if one of the tests failed
     public function run() {
-        $app = Tipy::getInstance();
+        $app = TipyApp::getInstance();
         $app->db->query('DROP DATABASE IF EXISTS '.$app->config->get('db_test_name'));
         $app->db->query('CREATE DATABASE '.$app->config->get('db_test_name'));
         $app->db->select_db($app->config->get('db_test_name'));
