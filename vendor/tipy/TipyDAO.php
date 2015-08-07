@@ -62,7 +62,7 @@ class TipyDAO {
             });
             array_unshift($params, $sql);
             $query = call_user_func_array('sprintf', $params);
-            $query = str_replace('"TIPY_REAL_NULL_VALUE"', 'TIPY_REAL_NULL_VALUE', $query);
+            $query = str_replace('"TIPY_REAL_NULL_VALUE"', 'NULL', $query);
         } else {
             $query = $sql;
         }
