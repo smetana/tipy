@@ -405,7 +405,11 @@ class TipyModel extends TipyDAO {
     // --------------------------------------------------------------
     public static function deleteById($id) {
         $obj = self::load($id);
-        return $obj->delete();
+        if ($obj) {
+            return $obj->delete();
+        } else {
+            return false;
+        }
     }
 
     // --------------------------------------------------------------
