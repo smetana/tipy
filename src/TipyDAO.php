@@ -54,11 +54,15 @@ class TipyDAO {
             $sql = str_replace('%', '%%', $sql);
             $sql = str_replace('?', '"%s"', $sql);
             $link = $this->dbLink;
-            array_walk($params, function(&$string) use ($link) { 
+            array_walk($params, function (&$string) use ($link) {
+                if ($string === null) {
+                    $string = 'TIPY_REAL_NULL_VALUE';
+                }
                 $string = $link->real_escape_string($string);
             });
-            array_unshift($params,$sql);
-            $query = call_user_func_array('sprintf',$params);
+            array_unshift($params, $sql);
+            $query = call_user_func_array('sprintf', $params);
+            $query = str_replace('"TIPY_REAL_NULL_VALUE"', 'NULL', $query);
         } else {
             $query = $sql;
         }

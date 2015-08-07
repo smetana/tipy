@@ -399,16 +399,6 @@ class TipyModel extends TipyDAO {
     }
 
     // --------------------------------------------------------------
-    // Static version of delete
-    // Usage:
-    //     BlogPost::delete(123);
-    // --------------------------------------------------------------
-    public static function deleteById($id) {
-        $obj = self::load($id);
-        return $obj->delete();
-    }
-
-    // --------------------------------------------------------------
     // Usage:
     //     $post = BlogPost::count(array(
     //          'conditions' => "title =?",
