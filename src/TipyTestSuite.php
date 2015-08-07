@@ -1,32 +1,4 @@
 <?php
-defined('TEST_MODE') || define('TEST_MODE', true);
-
-
-// If no config defined try to search trough arguments
-if (!defined('INI_FILE')) {
-    foreach($argv as $filename) {
-        if (preg_match('/config\.ini$/', $filename) && file_exists($filename)) {
-            define('INI_FILE', $filename);
-        }
-    }
-}
-// If still not defined try to use config file from tests directory
-// If even this fails check if we are on CircleCI and use CircleCI's config file
-if (!defined('INI_FILE')) {
-    if (file_exists(getcwd().'/config.ini')) {
-        define('INI_FILE', getcwd().'/config.ini');
-    } else if (file_exists(__DIR__.'/../tests/config.ini')) {
-        define('INI_FILE', __DIR__.'/../tests/config.ini');
-    } else if (getenv("CIRCLECI")) {
-        define('INI_FILE', __DIR__.'/../tests/config.ini.ci');
-    } else {
-        exit("Please specify config file or put config.ini to current directory".PHP_EOL);
-    }
-}
-
-//
-// Load modules
-//
 require_once('ErrorHandler.php');
 require_once('Tipy.php');
 require_once('TipyDAO.php');
@@ -261,10 +233,6 @@ class TestRunner {
         }
     }
 
-    public function __destruct() {
-        exit($this->run());
-    }
-
     // Find tests and fixtures recursively
     private function findTestsAndFixtures($filename) {
         if (is_dir($filename)) {
@@ -373,5 +341,3 @@ class TestRunner {
     }
 
 }
-
-$runner = new TestRunner();
