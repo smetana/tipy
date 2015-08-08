@@ -29,7 +29,7 @@ class TipyApp {
         $this->out        = new TipyOutput();    // Output data holder
         $this->view       = new TipyView();      // Template renderer
         $this->session    = new TipySession();   // Session
-        $this->db         = null;                       // DB resource
+        $this->db         = null;                // DB resource
 
         // dispatcher.php is called by Apache with current working dir 
         // set to DocumentRoot. Use it to get all paths needed
@@ -56,20 +56,16 @@ class TipyApp {
 
     public function run() {
         try {
-            //
             // Get controller and method name
-            //
             $controllerName = $this->in->get('controller');
             $methodName     = $this->in->get('method');
-            //
+            
             // Some basic checking
-            //
             if ( !$controllerName || !$methodName || preg_match("/\W/", $controllerName) || preg_match("/\W/", $methodName) ) {
                 throw new TipyException("Wrong or insufficient params.");
             }
-            //
+            
             // Create controller and call method
-            //
             $controllerFile = $this->config->get('application_path') .'/controllers/'.$controllerName.'.php';
             if(file_exists($controllerFile)) {
                 require_once ($controllerFile);
