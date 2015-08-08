@@ -1,11 +1,4 @@
-;
 ; This is a config file to use with CircleCI.
-; See circle.yml for details
-;
-
-[General]
-debug_mode = true
-
 [DB] 
 db_host = localhost
 db_port =
