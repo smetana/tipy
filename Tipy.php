@@ -25,8 +25,6 @@ require_once('src/TipyController.php');
 require_once('src/TipyRouter.php');
 require_once('src/TipyApp.php');
 
-srand((double)microtime()*1000000);
-
 if (!CLI_MODE) {
     $app = TipyApp::getInstance();
     $app->run();
