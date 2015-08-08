@@ -4,8 +4,6 @@
 // Just require classes needed.
 define('CLI_MODE', php_sapi_name() == 'cli');
 
-CLI_MODE || ob_start();
-
 require_once('src/ErrorHandler.php');
 require_once('src/TipyBinder.php');
 require_once('src/TipyConfig.php');
@@ -25,8 +23,12 @@ require_once('src/TipyController.php');
 require_once('src/TipyRouter.php');
 require_once('src/TipyApp.php');
 
-if (!CLI_MODE) {
-    $app = TipyApp::getInstance();
-    $app->run();
-    ob_end_flush();
+class Tipy {
+    public static function run() {
+        CLI_MODE && die("TipyApp cannot be run in CLI mode\n");
+        ob_start();
+        $app = TipyApp::getInstance();
+        $app->run();
+        ob_end_flush();
+    }
 }
