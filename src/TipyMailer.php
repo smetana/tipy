@@ -29,7 +29,7 @@
 // $mail->send();
 
 
-require_once(__DIR__.'/../PHPMailer/class.phpmailer.php');
+require_once(__DIR__.'/../vendor/PHPMailer/class.phpmailer.php');
 
 class TipyMailer extends PHPMailer {
 
