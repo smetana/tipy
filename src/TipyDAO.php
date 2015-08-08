@@ -17,7 +17,7 @@ class TipyDAO {
     // Constructor
     // -----------------------------------------------------
     public function __construct() {
-        $app = Tipy::getInstance();
+        $app = TipyApp::getInstance();
         // If not yet connected then connect.
         if (!$app->db) {
             // Get  connection string

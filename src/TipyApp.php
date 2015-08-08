@@ -6,7 +6,7 @@ class TipyException extends Exception {}
 // Application
 // Class to store Application context
 // ==================================================================
-class Tipy {
+class TipyApp {
 
     private static $instance = null;
 
@@ -31,12 +31,15 @@ class Tipy {
         $this->session    = new TipySession();   // Session
         $this->db         = null;                       // DB resource
 
-        // Set path to application
-        $this->config->set('application_path', realpath(__DIR__.'/../../app'));
+        // dispatcher.php is called by Apache with current working dir 
+        // set to DocumentRoot. Use it to get all paths needed
+        $cwd = getcwd();
         // Set path to document_root
-        $this->config->set('document_root', realpath(__DIR__.'/../../public'));
+        $this->config->set('document_root', $cwd);
+        // Set path to application
+        $this->config->set('application_path', realpath($cwd.'/../app'));
         // Set path to templates
-        $this->view->setTemplatePath(realpath(__DIR__.'/../../app/views'));
+        $this->view->setTemplatePath(realpath($cwd.'/../app/views'));
     }
 
     public static function getInstance() {

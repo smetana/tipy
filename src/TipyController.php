@@ -18,7 +18,7 @@ class TipyController {
 
     // Application Constructor
     public function __construct() {
-        $app = Tipy::getInstance();
+        $app = TipyApp::getInstance();
         $this->config     = $app->config;
         $this->in         = $app->in;
         $this->out        = $app->out;

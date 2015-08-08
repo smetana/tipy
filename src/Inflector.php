@@ -5,7 +5,7 @@
 //
 // ==================================================================
 
-require_once(__DIR__.'/../Inflect/Inflect.php');
+require_once(__DIR__.'/../vendor/Inflect/Inflect.php');
 
 class Inflector extends Inflect {
     public static function underscore($str) {

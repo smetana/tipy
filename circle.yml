@@ -2,10 +2,6 @@ machine:
   php:
     version: 5.5.9
 
-database:
-  override:
-    - mv app/config.ini.ci app/config.ini
-
 test:
   override:
-    - ./tests/run
+    - ./bin/test

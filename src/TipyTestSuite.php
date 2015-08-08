@@ -1,26 +1,6 @@
 <?php
-
-// sert include paths
-$includePath  = ini_get('include_path');
-$includePath .= ':'.__DIR__.'/../../app';
-$includePath .= ':'.__DIR__.'/../../vendor/tipy';
-ini_set('include_path', $includePath);
-
-//
-// Load modules
-//
-require_once('ErrorHandler.php');
-require_once('Tipy.php');
-require_once('TipyDAO.php');
-require_once('TipyModel.php');
-require_once('TipyConfig.php');
-require_once('TipyEnv.php');
-require_once('TipyCookie.php');
-require_once('TipyInput.php');
-require_once('TipyOutput.php');
-require_once('TipyView.php');
-require_once('Inflector.php');
-require_once(__DIR__.'/../cliColors/CliColors.php');
+require_once(__DIR__.'/../Tipy.php');
+require_once(__DIR__.'/../vendor/cliColors/CliColors.php');
 
 //
 // Override application session for tests
@@ -42,7 +22,7 @@ if (!function_exists('apache_request_headers')) {
 //
 // Start Application
 //
-$app = Tipy::getInstance();
+$app = TipyApp::getInstance();
 $app->initDbConnection();
 
 // load Autoload function
@@ -91,7 +71,7 @@ class TipyTestSuite {
 
     // do start test operations
     public function beforeTest() {
-        $app = Tipy::getInstance();
+        $app = TipyApp::getInstance();
         // clear session and input
         $app->in->clear();
         $app->session->clear();
@@ -103,14 +83,14 @@ class TipyTestSuite {
 
     // do end oprations
     public function afterTest() {
-        $app = Tipy::getInstance();
+        $app = TipyApp::getInstance();
         // rollback transaction
         $app->db->select_db($app->config->get('db_test_name'));
         $app->db->query('ROLLBACK');
     }
 
-    public static function applyFixture($db, $name) {
-        $content = file_get_contents($name.'.sql', 1);
+    public static function applyFixture($db, $filename) {
+        $content = file_get_contents($filename, 1);
         if ($content) {
             $querys = explode(';', $content);
             foreach ($querys as $query) {
@@ -122,7 +102,7 @@ class TipyTestSuite {
     }
 
     public function execute($controllerName, $methodName, &$output, $silent = false) {
-        $app = Tipy::getInstance();
+        $app = TipyApp::getInstance();
         $app->out->clear();
         $output = "";
         try {
@@ -216,86 +196,74 @@ class TipyTestSuite {
 // -----------------------------------------------------
 class TestRunner {
 
-    public $args;
-    public $dir;
-    public $fixtures;
-    public $useDumper;
-    protected $exeptions;
     protected $tests;
-    protected $testFilepaths;
     protected $assertions;
     protected $failures;
-
-    public function __construct($args) {
-        $this->args           = $args;
-        $this->useDumper      = true;
+    protected $exeptions;
+    protected $testNames;
+    protected $testFiles;
+    protected $fixtureFiles;
+    
+    public function __construct() {
         $this->tests          = 0;
         $this->assertions     = 0;
         $this->failures       = array();
         $this->exceptions     = array();
+        $this->testNames      = array();
+        $this->testFiles      = array();
+        $this->fixtureFiles   = array();
+        if (!isset($_SERVER['argv'])) {
+            exit("Tests should be run from command line.");
+        }
+        $args = $_SERVER['argv'];
+        array_shift($args);
+        if (sizeof($args) == 0) { $args = array(getcwd()); };
+        foreach($args as $filename) {
+            $this->findTestsAndFixtures($filename);
+        }
+    }
+
+    // Find tests and fixtures recursively
+    private function findTestsAndFixtures($filename) {
+        if (is_dir($filename)) {
+            if ($handle = opendir($filename)) {
+                while (false !== ($f = readdir($handle))) {
+                    if (preg_match('/\.$/', $f)) {
+                        // skip . and ..
+                    } else {
+                        $this->findTestsAndFixtures($filename.'/'.$f);
+                    }
+                }
+                closedir($handle);
+            }
+        } else if (preg_match('/\.sql$/', $filename)) {
+            $this->fixtureFiles[] = $filename;
+        } else if (preg_match('/(test\w+)\.php$/', $filename, $matches)) {
+            $testName = $matches[1];
+            $this->testNames[] = $testName;        
+            $this->testFiles[$testName] = $filename;
+        }
     }
 
     // This function also return exit status to use in scripts
     // 0 - if all tests passed
     // 1 - if one of the tests failed
     public function run() {
-        $app = Tipy::getInstance();
-        $tests          = array();
-        $testFilepaths  = array();
-        if(sizeof($this->args)) {
-            foreach($this->args as $file) {
-                $testName                 = basename($file, '.php');
-                $tests[]                  = $testName;
-                $testFilepaths[$testName] = $file;
-            }
-        } else {
-            if ($this->dirs) {
-                if(!is_array($this->dirs)) {
-                    $this->dirs = array($this->dirs);
-                }
-                foreach($this->dirs as $dir) {
-                    if ($handle = opendir($dir)) {
-                        while (false !== ($file = readdir($handle))) {
-                            if(substr($file, 0, 4) == 'test' && is_file($dir.'/'.$file)) {
-                                $testName                 = basename($file, '.php');
-                                $tests[]                  = $testName;
-                                $testFilepaths[$testName] = $dir.'/'.$file;
-                            }
-                        }
-                        closedir($handle);
-                    }
-                }
-            }
-        }
-
+        $app = TipyApp::getInstance();
         $app->db->query('DROP DATABASE IF EXISTS '.$app->config->get('db_test_name'));
-        if ($this->useDumper) {
-            require_once(__DIR__.'/../MysqlCloneDb/MysqlCloneDb.php');
-            new MysqlCloneDb($app->db, $app->config->get('db_name'), $app->config->get('db_test_name'), 'InnoDB');
-        } else {
-            $app->db->query('CREATE DATABASE '.$app->config->get('db_test_name'));
-        }
-
+        $app->db->query('CREATE DATABASE '.$app->config->get('db_test_name'));
         $app->db->select_db($app->config->get('db_test_name'));
-        if ($this->fixtures) {
-            if(!is_array($this->fixtures)) {
-                $this->fixtures = array($this->fixtures);
-            }
-            foreach($this->fixtures as $fixture) {
-                TipyTestSuite::applyFixture($app->db, $fixture);
-            }
+        foreach($this->fixtureFiles as $fixture) {
+            TipyTestSuite::applyFixture($app->db, $fixture);
         }
-
         echo "\n";
-
-        foreach($tests as $test){
-            require_once($testFilepaths[$test]);
+        foreach($this->testNames as $test){
+            require_once($this->testFiles[$test]);
             $test = new $test;
             $test->run();
             $this->updateSummary($test->getSummary());
         }
         $app->db->query('DROP DATABASE '.$app->config->get('db_test_name'));
-
         $this->printSummary();
         if (sizeof($this->failures) + sizeof($this->exceptions) == 0) {
             return 0;
@@ -363,7 +331,3 @@ class TestRunner {
     }
 
 }
-
-
-
-

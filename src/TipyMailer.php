@@ -29,7 +29,7 @@
 // $mail->send();
 
 
-require_once(__DIR__.'/../PHPMailer/class.phpmailer.php');
+require_once(__DIR__.'/../vendor/PHPMailer/class.phpmailer.php');
 
 class TipyMailer extends PHPMailer {
 
@@ -37,7 +37,7 @@ class TipyMailer extends PHPMailer {
         // call PHPMailer constructor with throw exceptions param
         parent::__construct(true);
         // set sendmail as default mailer
-        $app = Tipy::getInstance();
+        $app = TipyApp::getInstance();
         $path = $app->config->get('mail_sendmail_path');
         ini_set('sendmail_path', $path);
         $this->isSendmail();
