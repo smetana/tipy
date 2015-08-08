@@ -1,10 +1,4 @@
 <?php
-/**
- *
- *  Load tipy classes and start application
- *
- */
-
 // If tipy run in 'cli' SAPI then we don't need to
 // initialize outout buffer and run application.
 // Just require classes needed.
