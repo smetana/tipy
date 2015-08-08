@@ -98,30 +98,6 @@ class TipyTestSuite {
         }
     }
 
-    public function execute($controllerName, $methodName, &$output, $silent = false) {
-        $app = TipyApp::getInstance();
-        $app->out->clear();
-        $output = "";
-        try {
-            ob_start();
-            $controllerFile = 'controller/'.$controllerName.'.php';
-            include_once($controllerFile);
-            $controller = new $controllerName;
-            $controller->execute($methodName);
-            $output = ob_get_clean();
-            return null;
-        }  catch (Exception $e) {
-            $output = ob_get_clean();
-            if (!$silent) {
-                $this->run = false;
-                array_push($this->exceptions, $e);
-                $colors = new Colors();
-                echo $colors->getColoredString("E", 'red');
-            }
-            return $e;
-        }
-    }
-
     public function assertion($a, $b) {
         $this->assertions++;
         $colors = new Colors();
@@ -168,14 +144,15 @@ class TipyTestSuite {
         $this->run = true;
     }
 
-    public function assertResponse($controllerName, $methodName, &$output, $response) {
-        $e = $this->execute($controllerName, $methodName, $output, 'silent');
-        if (get_class($e) != 'Exception') {
-            $this->assertion(true, false);
-        } else {
-            $this->assertion($e->getMessage(), $response);
-        }
-        $this->run = true;
+    public function execute($controllerName, $methodName, &$output) {
+        $app = TipyApp::getInstance();
+        $app->in->set('controller', $controllerName);
+        $app->in->set('method', $methodName);
+        $app->out->clear();
+        $output = "";
+        ob_start();
+        $app->run();
+        $output = ob_get_clean();
     }
 
     public function getSummary() {
