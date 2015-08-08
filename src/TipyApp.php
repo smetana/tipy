@@ -86,7 +86,5 @@ class TipyApp {
             // TODO: implement debug mode output
             throw new TipyException($exception->getMessage());
         }
-
-        unset($controller);
     }
 }
