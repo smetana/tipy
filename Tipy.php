@@ -24,7 +24,6 @@ require_once('src/TipyFlash.php');
 require_once('src/TipyController.php');
 require_once('src/TipyRouter.php');
 require_once('src/TipyApp.php');
-require_once('src/TipyAutoloader.php');
 
 srand((double)microtime()*1000000);
 

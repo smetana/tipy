@@ -25,9 +25,6 @@ if (!function_exists('apache_request_headers')) {
 $app = TipyApp::getInstance();
 $app->initDbConnection();
 
-// load Autoload function
-require_once('TipyAutoloader.php');
-
 // -----------------------------------------------------
 // Test suite with assertions kit
 // -----------------------------------------------------
