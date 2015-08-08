@@ -1,12 +1,6 @@
 <?php
 
-require_once(__DIR__."/models/TipyTestUser.php");
-require_once(__DIR__."/models/TipyTestBlogPost.php");
-require_once(__DIR__."/models/TipyTestBlogComment.php");
-require_once(__DIR__."/models/TipyTestGroup.php");
-require_once(__DIR__."/models/TipyTestUserAndGroupRelation.php");
-require_once(__DIR__."/models/TipyTestProfile.php");
-require_once(__DIR__."/models/TipyTestFriend.php");
+require_once 'autoload.php';
 
 class testModel extends TipyTestSuite {
 
