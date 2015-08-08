@@ -123,6 +123,11 @@ class TipyTestSuite {
         $this->assertion($a <> $b, true);
     }
 
+    public function assertSame($a, $b) {
+        if (!$this->run) return;
+        $this->assertion($a === $b, true);
+    }
+
     public function assertThrown($exceptionClass, $exceptionMessage, $closure, $messageSubstrLength = 0) {
         try {
             $closure();
