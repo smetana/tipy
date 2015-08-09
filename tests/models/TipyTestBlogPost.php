@@ -2,13 +2,13 @@
 
 class TipyTestBlogPost extends TipyModel {
 
-    protected $hasMany = array(
-        'comments' => array('class' => 'TipyTestBlogComment', 'foreign_key' => 'blog_post_id', 'dependent' => 'delete')
-    );
+    protected $hasMany = [
+        'comments' => ['class' => 'TipyTestBlogComment', 'foreign_key' => 'blog_post_id', 'dependent' => 'delete']
+    ];
 
-    protected $belongsTo = array(
-        'user' => array('class' => 'TipyTestUser', 'foreign_key' => 'user_id')
-    );
+    protected $belongsTo = [
+        'user' => ['class' => 'TipyTestUser', 'foreign_key' => 'user_id']
+    ];
 
     public function validate() {
         if (!$this->title) {

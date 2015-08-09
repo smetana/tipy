@@ -7,11 +7,11 @@ require_once(__DIR__.'/../vendor/cliColors/CliColors.php');
 //
 class TipySession extends TipyBinder {
     public function close() {
-        $this->binderData = array();
+        $this->binderData = [];
     }
 }
 
-$request_headers = array();
+$request_headers = [];
 if (!function_exists('apache_request_headers')) {
     function apache_request_headers() {
         global $request_headers;
@@ -42,8 +42,8 @@ class TipyTestSuite {
     public function clear() {
         $this->tests = 0;
         $this->assertions = 0;
-        $this->failures = array();
-        $this->exceptions = array();
+        $this->failures = [];
+        $this->exceptions = [];
     }
 
     public function run() {
@@ -60,7 +60,7 @@ class TipyTestSuite {
                 $this->$testName();
             } catch (Exception $e) {
                 $this->run = false;
-                array_push($this->exceptions, $e);
+                $this->exceptions[] = $e;
                 $colors = new Colors();
                 echo $colors->getColoredString("E", 'red');
             }
@@ -111,7 +111,7 @@ class TipyTestSuite {
             $trace = $e->getTrace();
             $test = $trace[2];
             $testBody = $trace[1];
-            array_push($this->failures, array($a, $b, $test['function'], $testBody['file'], $testBody['line']));
+            $this->failures[] = [$a, $b, $test['function'], $testBody['file'], $testBody['line']];
         }
     }
 
@@ -169,12 +169,12 @@ class TipyTestSuite {
     }
 
     public function getSummary() {
-        return array(
+        return [
             "tests"      => $this->tests,
             "assertions" => $this->assertions,
             "failures"   => $this->failures,
             "exceptions" => $this->exceptions
-        );
+        ];
     }
 }
 
@@ -190,22 +190,22 @@ class TestRunner {
     protected $testNames;
     protected $testFiles;
     protected $fixtureFiles;
-    
+
     public function __construct() {
         $this->tests          = 0;
         $this->assertions     = 0;
-        $this->failures       = array();
-        $this->exceptions     = array();
-        $this->testNames      = array();
-        $this->testFiles      = array();
-        $this->fixtureFiles   = array();
+        $this->failures       = [];
+        $this->exceptions     = [];
+        $this->testNames      = [];
+        $this->testFiles      = [];
+        $this->fixtureFiles   = [];
         if (!isset($_SERVER['argv'])) {
             exit("Tests should be run from command line.");
         }
         $args = $_SERVER['argv'];
         array_shift($args);
         if (sizeof($args) == 0) {
-            $args = array(getcwd());
+            $args = [getcwd()];
         }
         foreach ($args as $filename) {
             $this->findTestsAndFixtures($filename);
@@ -265,10 +265,10 @@ class TestRunner {
         $this->tests += $summary['tests'];
         $this->assertions += $summary['assertions'];
         foreach ($summary['failures'] as $failure) {
-            array_push($this->failures, $failure);
+            $this->failures[] = $failure;
         }
         foreach ($summary['exceptions'] as $exception) {
-            array_push($this->exceptions, $exception);
+            $this->exceptions[] = $exception;
         }
         return $summary;
     }

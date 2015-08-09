@@ -1,20 +1,20 @@
 <?php
 class TipyTestUser extends TipyModel {
 
-    protected $hasMany = array(
-        'posts' => array('class' => 'TipyTestBlogPost', 'foreign_key' => 'user_id', 'dependent' => 'delete'),
-        'userAndGroupRelations' => array('class' => 'TipyTestUserAndGroupRelation', 'foreign_key' => 'user_id', 'dependent' => 'delete'),
-        'friendRelations' => array('class' => 'TipyTestFriend', 'foreign_key' => 'person_id', 'dependent' => 'delete')
-    );
+    protected $hasMany = [
+        'posts' => ['class' => 'TipyTestBlogPost', 'foreign_key' => 'user_id', 'dependent' => 'delete'],
+        'userAndGroupRelations' => ['class' => 'TipyTestUserAndGroupRelation', 'foreign_key' => 'user_id', 'dependent' => 'delete'],
+        'friendRelations' => ['class' => 'TipyTestFriend', 'foreign_key' => 'person_id', 'dependent' => 'delete']
+    ];
 
-    protected $hasManyThrough = array(
-        'groups' => array('class' => 'TipyTestGroup', 'through' => 'TipyTestUserAndGroupRelation', 'foreign_key' => 'user_id', 'through_key' => 'group_id'),
-        'friends' => array('class' => 'TipyTestUser', 'through' => 'TipyTestFriend', 'foreign_key' => 'person_id', 'through_key' => 'friend_id')
-    );
+    protected $hasManyThrough = [
+        'groups' => ['class' => 'TipyTestGroup', 'through' => 'TipyTestUserAndGroupRelation', 'foreign_key' => 'user_id', 'through_key' => 'group_id'],
+        'friends' => ['class' => 'TipyTestUser', 'through' => 'TipyTestFriend', 'foreign_key' => 'person_id', 'through_key' => 'friend_id']
+    ];
 
-    protected $hasOne = array(
-        'profile' => array('class' => 'TipyTestProfile', 'foreign_key' => 'user_id', 'dependent' => 'nullify')
-    );
+    protected $hasOne = [
+        'profile' => ['class' => 'TipyTestProfile', 'foreign_key' => 'user_id', 'dependent' => 'nullify']
+    ];
 
     public function validate() {
         if (!$this->login) {

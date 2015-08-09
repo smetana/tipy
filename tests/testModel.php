@@ -103,11 +103,11 @@ class TestModel extends TipyTestSuite {
     }
 
     public function testNewWithAttributes() {
-        $post = new TipyTestBlogPost(array(
+        $post = new TipyTestBlogPost([
             'userId' => 2,
             'title' => 'This is a title',
             'message' => 'This is a message!'
-        ));
+        ]);
         $this->assertEqual($post->isNewRecord(), true);
         $this->assertEqual($post->userId, 2);
         $this->assertEqual($post->title, "This is a title");
@@ -115,11 +115,11 @@ class TestModel extends TipyTestSuite {
     }
 
     public function testCreate() {
-        $post = TipyTestBlogPost::create(array(
+        $post = TipyTestBlogPost::create([
             'userId' => 2,
             'title' => 'This is a title',
             'message' => 'This is a message!'
-        ));
+        ]);
         $this->assertEqual($post->isNewRecord(), false);
         $this->assertEqual($post->userId, 2);
         $this->assertEqual($post->title, "This is a title");
@@ -128,16 +128,16 @@ class TestModel extends TipyTestSuite {
     }
 
     public function testFind() {
-        TipyTestBlogPost::create(array(
+        TipyTestBlogPost::create([
             'userId' => 2,
             'title' => 'This is a title',
             'message' => 'This is a message!'
-        ));
-        TipyTestBlogPost::create(array(
+        ]);
+        TipyTestBlogPost::create([
             'userId' => 2,
             'title' => 'This is another title',
             'message' => 'This is another  message!'
-        ));
+        ]);
 
         // Test find all
         $result = TipyTestBlogPost::find();
@@ -148,28 +148,28 @@ class TestModel extends TipyTestSuite {
         $this->assertEqual($post->title, 'This is another title');
 
         for ($i=1; $i<=10; $i++) {
-            TipyTestBlogPost::create(array(
+            TipyTestBlogPost::create([
                 'userId' => $i,
                 'title' => "Title $i",
                 'message' => "This is a message $i!"
-            ));
+            ]);
         }
         $count = TipyTestBlogPost::count();
         $this->assertEqual($count, 12);
 
         // Test find by condition
-        $result = TipyTestBlogPost::find(array(
+        $result = TipyTestBlogPost::find([
             "conditions" => "user_id >=?",
-            "values" => array(7)
-        ));
+            "values" => [7]
+        ]);
         $this->assertEqual(sizeof($result), 4);
 
         // Test order
-        $result = TipyTestBlogPost::find(array(
+        $result = TipyTestBlogPost::find([
             "conditions" => "user_id >=?",
-            "values" => array(7),
+            "values" => [7],
             "order" => "title desc"
-        ));
+        ]);
         $this->assertEqual(sizeof($result), 4);
         $this->assertEqual($result[0]->title, "Title 9");
         $this->assertEqual($result[1]->title, "Title 8");
@@ -177,24 +177,24 @@ class TestModel extends TipyTestSuite {
         $this->assertEqual($result[3]->title, "Title 10");
 
         // Test limit
-        $result = TipyTestBlogPost::find(array(
+        $result = TipyTestBlogPost::find([
             "conditions" => "user_id >=?",
-            "values" => array(7),
+            "values" => [7],
             "order" => "title desc",
             "limit" => 2
-        ));
+        ]);
         $this->assertEqual(sizeof($result), 2);
         $this->assertEqual($result[0]->title, "Title 9");
         $this->assertEqual($result[1]->title, "Title 8");
 
         // Test offset
-        $result = TipyTestBlogPost::find(array(
+        $result = TipyTestBlogPost::find([
             "conditions" => "user_id >=?",
-            "values" => array(7),
+            "values" => [7],
             "order" => "title desc",
             "limit" => 2,
             "offset" => 1
-        ));
+        ]);
         $this->assertEqual(sizeof($result), 2);
         $this->assertEqual($result[0]->title, "Title 8");
         $this->assertEqual($result[1]->title, "Title 7");
@@ -212,10 +212,10 @@ class TestModel extends TipyTestSuite {
 
     public function testValidationOnCreate() {
         $this->assertThrown('TipyValidationException', "Post should belongs to user", function () {
-            $post = TipyTestBlogPost::create(array(
+            $post = TipyTestBlogPost::create([
                 'title' => 'This is a title',
                 'message' => 'This is a message!'
-            ));
+            ]);
             $this->assertNotEqual($post, null);
             $this->assertEqual($post->isNewRecord(), true);
             $this->assertEqual($post->id, null);
@@ -261,9 +261,9 @@ class TestModel extends TipyTestSuite {
         $this->assertEqual(TipyTestFriend::count(), 45);
 
         // Get last user
-        $user = TipyTestUser::findFirst(array(
+        $user = TipyTestUser::findFirst([
             "order" => "id desc"
-        ));
+        ]);
         // Check assocs
         $this->assertEqual($user->login, 'login_10');
         $this->assertEqual(sizeof($user->friends), 9);
@@ -303,34 +303,34 @@ class TestModel extends TipyTestSuite {
     // methods that have names not starting whith 'test' are for seeding DB
     public function createUsersWithAsocs($count) {
         for ($i=1; $i<=$count; $i++) {
-            $user = TipyTestUser::create(array(
+            $user = TipyTestUser::create([
                 'login' => 'login_'.$i,
                 'password' => 'password_'.$i,
                 'email' => 'email_'.$i.'@example.com'
-            ));
-            $profile = TipyTestProfile::create(array(
+            ]);
+            $profile = TipyTestProfile::create([
                 'userId' => $user->id,
                 'sign' => 'signature of user '.$user->id
-            ));
+            ]);
             for ($j=1; $j<=$count; $j++) {
-                $relation = TipyTestUserAndGroupRelation::create(array(
+                $relation = TipyTestUserAndGroupRelation::create([
                     'userId' => $user->id,
                     'groupId' => $j
-                ));
-                $post = TipyTestBlogPost::create(array(
+                ]);
+                $post = TipyTestBlogPost::create([
                 'userId' => $user->id,
                 'title' => "Post $i",
                 'message' => "This is a message $i!",
                 'createdAt' => time() + $i
-                ));
+                ]);
                 for ($k=1; $k<=$count; $k++) {
-                    $comment = TipyTestBlogComment::create(array(
+                    $comment = TipyTestBlogComment::create([
                         'userId' => $user->id,
                         'blogPostId' => $post->id,
                         'title' => "Comment $j to post $i",
                         'message' => "This is a comment message $i:$j!",
                         'createdAt' => time()+$j
-                    ));
+                    ]);
                 }
             }
         }
@@ -338,19 +338,19 @@ class TestModel extends TipyTestSuite {
 
     // methods that have names not starting whith 'test' are for seeding DB
     public function createUsersWithFriends($count) {
-        $ids = array();
+        $ids = [];
         for ($i=1; $i<=$count; $i++) {
-            $user = TipyTestUser::create(array(
+            $user = TipyTestUser::create([
                 'login' => 'login_'.$i,
                 'password' => 'password_'.$i,
                 'email' => 'email_'.$i.'@example.com'
-            ));
+            ]);
             $ids[$i] = $user->id;
             for ($j = 1; $j < $i; $j++) {
-                $friend = TipyTestFriend::create(array(
+                $friend = TipyTestFriend::create([
                     'personId' => $user->id,
                     'friendId' => $ids[$j]
-                ));
+                ]);
             }
         }
     }

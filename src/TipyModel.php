@@ -36,20 +36,20 @@
 //
 // class User extends TipyModel {
 //
-//    protected $hasMany = array(
-//        'posts' => array('class' => 'BlogPost', 'dependent' => 'nullify'),
-//        'positive_posts' => array('class' => 'BlogPost', 'conditions' => 'rating > 0', 'dependent' => 'nullify'),
-//        'relations' => array('class' => 'UserGroup', 'dependent' => 'delete')
+//    protected $hasMany = [
+//        'posts' => ['class' => 'BlogPost', 'dependent' => 'nullify'],
+//        'positive_posts' => ['class' => 'BlogPost', 'conditions' => 'rating > 0', 'dependent' => 'nullify'],
+//        'relations' => ['class' => 'UserGroup', 'dependent' => 'delete']
 //    );
 //
-//    protected $hasManyThrough = array(
-//        'groups' => array('class' => 'Group', 'through' => 'UserGroup'),
-//        'friends' => array('class' => 'User', 'through' => 'Friend', 'foreign_key' => 'person_id', 'through_key' => 'friend_id')
-//    );
+//    protected $hasManyThrough = [
+//        'groups' => ['class' => 'Group', 'through' => 'UserGroup'],
+//        'friends' => ['class' => 'User', 'through' => 'Friend', 'foreign_key' => 'person_id', 'through_key' => 'friend_id')
+//    ];
 //
-//    protected $hasOne = array(
-//        'profile' => array('class' => 'Profile', 'dependent' => 'delete', 'foreign_key' => 'user_id')
-//    );
+//    protected $hasOne = [
+//        'profile' => ['class' => 'Profile', 'dependent' => 'delete', 'foreign_key' => 'user_id']
+//    ];
 //
 //    public function validate() {
 //        if (!$this->login) throw new TipyValidtionException('Login should not be blank!');
@@ -60,9 +60,9 @@
 //
 // class Profile extends TipyModel {
 //
-//    protected $belongsTo = array(
-//        'user' => array('class' => 'User')
-//    );
+//    protected $belongsTo = [
+//        'user' => ['class' => 'User']
+//    ];
 //
 // }
 // ==================================================================
@@ -83,7 +83,7 @@
 // To reset associations cache use $post->reload()
 //
 // Associations with queries are not cached. This means that
-// $post->comments(array('order' => 'created_at desc'))
+// $post->comments(['order' => 'created_at desc'])
 // will allways execute query
 //
 // In short always look for parethesis:
@@ -98,7 +98,7 @@ class TipyModel extends TipyDAO {
     const CREATED_AT = 'created_at';
     const UPDATED_AT = 'updated_at';
 
-    protected static $globalReflections = array();
+    protected static $globalReflections = [];
 
     public $className;
     public $table;
@@ -120,7 +120,7 @@ class TipyModel extends TipyDAO {
         $this->table = $this->classNameToTableName($this->className);
         $this->makeReflection();
         $this->isDeletedRecord = false;
-        $this->associationsCache = array();
+        $this->associationsCache = [];
         if ($attrs) {
             if (array_key_exists('id', $attrs)) {
                 $this->id = $attrs["id"];
@@ -145,8 +145,8 @@ class TipyModel extends TipyDAO {
     }
 
     public function __get($attr) {
-        if (method_exists($this, $attr) and is_callable(array($this, $attr))) {
-            return call_user_func(array($this, $attr));
+        if (method_exists($this, $attr) and is_callable([$this, $attr])) {
+            return call_user_func([$this, $attr]);
         }
         if ($this->belongsTo && array_key_exists($attr, $this->belongsTo)) {
             return $this->findBelongsTo($attr);
@@ -184,25 +184,25 @@ class TipyModel extends TipyDAO {
     // Asks table about model attributes
     // --------------------------------------------------------------
     protected function makeReflection() {
-        $this->data = array();
+        $this->data = [];
         if (array_key_exists($this->className, self::$globalReflections)) {
             $this->fields = self::$globalReflections[$this->className]["fields"];
             $this->attributes = self::$globalReflections[$this->className]["attributes"];
             $this->reflections = self::$globalReflections[$this->className]["reflections"];
         } else {
-            $this->fields = array();
-            $this->attributes = array();
-            $this->reflections = array();
+            $this->fields = [];
+            $this->attributes = [];
+            $this->reflections = [];
             $fields = $this->queryAllRows("show columns from ".$this->table);
             foreach ($fields as $field) {
                 $fieldName = $field["Field"];
                 $attrName = $this->fieldNameToAttrName($fieldName);
-                array_push($this->fields, $fieldName);
-                array_push($this->attributes, $attrName);
+                $this->fields[] = $fieldName;
+                $this->attributes[] = $attrName;
                 $this->reflections[$fieldName] = $attrName;
             }
             // Store reflections for future use of this class
-            self::$globalReflections[$this->className] = array();
+            self::$globalReflections[$this->className] = [];
             self::$globalReflections[$this->className]["fields"] = $this->fields;
             self::$globalReflections[$this->className]["attributes"] = $this->attributes;
             self::$globalReflections[$this->className]["reflections"] = $this->reflections;
@@ -221,7 +221,7 @@ class TipyModel extends TipyDAO {
         $instance = new $className;
         $result =  $instance->queryRow(
             "select * from ".$instance->table." where id=?",
-            array($id)
+            [$id]
         );
         if (!$result) {
             return null;
@@ -280,7 +280,7 @@ class TipyModel extends TipyDAO {
         }
         $reloadedModel = $this->load($this->id);
         $this->data = $reloadedModel->data;
-        $this->associationsCache = array();
+        $this->associationsCache = [];
     }
 
     // --------------------------------------------------------------
@@ -298,16 +298,16 @@ class TipyModel extends TipyDAO {
     // --------------------------------------------------------------
     protected function createNewRecord() {
         $this->beforeCreate();
-        $fields = array();
-        $questions = array();
-        $values = array();
+        $fields = [];
+        $questions = [];
+        $values = [];
         foreach ($this->reflections as $field => $attr) {
             // No need to create id
             // Skip attrs that doesn't set
             if ($field != "id" && array_key_exists($attr, $this->data)) {
-                array_push($fields, $field);
-                array_push($questions, "?");
-                array_push($values, $this->data[$attr]);
+                $fields[] = $field;
+                $questions[] = "?";
+                $values[] = $this->data[$attr];
             }
         }
         $fieldList = implode(",", $fields);
@@ -328,18 +328,18 @@ class TipyModel extends TipyDAO {
         }
         $this->beforeUpdate();
         $query = "update ".$this->table." set ";
-        $values = array();
-        $updatePart = array();
+        $values = [];
+        $updatePart = [];
         foreach ($this->reflections as $field => $attr) {
             // No need to update id
             // Skip attrs that doesn't set
             if ($field != "id" && array_key_exists($attr, $this->data)) {
-                array_push($updatePart, "$field=?");
-                array_push($values, $this->$attr);
+                $updatePart[] = "$field=?";
+                $values[] = $this->$attr;
             }
         }
         $query .= implode(", ", $updatePart)." where id = ?";
-        array_push($values, $this->id);
+        $values[] = $this->id;
         $result = $this->query($query, $values);
         $this->afterUpdate();
         return $result;
@@ -362,7 +362,7 @@ class TipyModel extends TipyDAO {
             throw new TipyModelException("Cannot delete unsaved model");
         }
         $this->beforeDelete();
-        $result = $this->query("delete from ".$this->table." where id=?", array($this->id));
+        $result = $this->query("delete from ".$this->table." where id=?", [$this->id]);
         if ($this->hasOne) {
             foreach ($this->hasOne as $name => $properties) {
                 if (array_key_exists('dependent', $properties)) {
@@ -392,7 +392,7 @@ class TipyModel extends TipyDAO {
             }
         }
         $this->isDeletedRecord = true;
-        $this->associationsCache = array();
+        $this->associationsCache = [];
         $result = true;
         $this->afterDelete();
         return $result;
@@ -400,12 +400,12 @@ class TipyModel extends TipyDAO {
 
     // --------------------------------------------------------------
     // Usage:
-    //     $post = BlogPost::count(array(
+    //     $post = BlogPost::count([
     //          'conditions' => "title =?",
-    //          'values' => array('Hello')
-    //     ));
+    //          'values' => ['Hello']
+    //     ]);
     // --------------------------------------------------------------
-    public static function count($options = array('values' => array())) {
+    public static function count($options = ['values' => []]) {
         $className = get_called_class();
         $instance = new $className;
         $sql = "select count(id) as quantity from ".$instance->table;
@@ -420,15 +420,15 @@ class TipyModel extends TipyDAO {
 
     // --------------------------------------------------------------
     // Usage:
-    //     $post = BlogPost::find(array(
+    //     $post = BlogPost::find([
     //          'conditions' => "title =?",
-    //          'values' => array('Hello'),
+    //          'values' => ['Hello'],
     //          'limit' => 2.
     //          'offset' => 3,
     //          'order' => 'user_id asc'
-    //     ));
+    //     ]);
     // --------------------------------------------------------------
-    public static function find($options = array('values' => array())) {
+    public static function find($options = ['values' => []]) {
         $className = get_called_class();
         $instance = new $className;
         $sql = "select * from ".$instance->table;
@@ -440,7 +440,7 @@ class TipyModel extends TipyDAO {
         $order = " order by ".(isset($options["order"]) ? $options["order"] : "id");
         $sql = $sql.$where.$order;
         if (!array_key_exists('values', $options)) {
-            $options["values"] = array();
+            $options["values"] = [];
         }
         if (array_key_exists('limit', $options)) {
             if (!array_key_exists('offset', $options)) {
@@ -450,11 +450,11 @@ class TipyModel extends TipyDAO {
         } else {
             $result =  $instance->queryAllRows($sql, $options["values"]);
         }
-        $instances = array();
+        $instances = [];
         foreach ($result as $record) {
             $instance = new $className;
             $instance = self::instanceFromResult($instance, $record);
-            array_push($instances, $instance);
+            $instances[] = $instance;
         }
         return $instances;
     }
@@ -462,7 +462,7 @@ class TipyModel extends TipyDAO {
     // --------------------------------------------------------------
     // Usage: the same as find but returns only one record
     // --------------------------------------------------------------
-    public static function findFirst($options = array()) {
+    public static function findFirst($options = []) {
         $options["limit"] = 1;
         $result = self::find($options);
         if (sizeof($result) > 0) {
@@ -496,10 +496,10 @@ class TipyModel extends TipyDAO {
             return $this->associationsCache[$name];
         } elseif (!$options) {
             $cacheAssoc = true;
-            $options = array();
+            $options = [];
         }
         if (!isset($options["values"])) {
-            $options["values"] = array();
+            $options["values"] = [];
         }
         $assocClass = $this->hasMany[$name]["class"];
         $parentKey = array_key_exists('foreign_key', $this->hasMany[$name]) ? $this->hasMany[$name]["foreign_key"] : $this->tableForeignKeyFieldName($this->table);
@@ -512,9 +512,9 @@ class TipyModel extends TipyDAO {
         } else {
             $options["conditions"] = $conditions;
         }
-        array_push($options["values"], $this->id);
+        $options["values"][] = $this->id;
         if (array_key_exists('values', $this->hasMany[$name])) {
-            array_push($options["values"], $this->hasMany[$name]["values"]);
+            $options["values"][] = $this->hasMany[$name]["values"];
         }
         $result = call_user_func($assocClass .'::find', $options);
         if ($cacheAssoc) {
@@ -530,7 +530,7 @@ class TipyModel extends TipyDAO {
         $assocClass = $this->hasOne[$name]["class"];
         $parentKey = array_key_exists('foreign_key', $this->hasOne[$name]) ? $this->hasOne[$name]["foreign_key"] : $this->tableForeignKeyFieldName($this->table);
         $conditions = "$parentKey=?";
-        $options = array("conditions" => $conditions, "values" => array($this->id));
+        $options = ["conditions" => $conditions, "values" => [$this->id]];
         $assoc = call_user_func($assocClass .'::findFirst', $options);
         $this->associationsCache[$name] = $assoc;
         return $assoc;
@@ -556,25 +556,25 @@ class TipyModel extends TipyDAO {
         }
         $throughClass = $this->hasManyThrough[$name]["through"];
         $parentKey = array_key_exists('foreign_key', $this->hasManyThrough[$name]) ? $this->hasManyThrough[$name]["foreign_key"] : $this->tableForeignKeyFieldName($this->table);
-        $throughOptions = array(
+        $throughOptions = [
             "conditions" => "$parentKey=?",
-            "values"     => array($this->id)
-        );
+            "values"     => [$this->id]
+        ];
         $result = call_user_func($throughClass .'::find', $throughOptions);
         if (!$result) {
-            return array();
+            return [];
         }
-        $ids = array();
+        $ids = [];
         $targetKey = array_key_exists('through_key', $this->hasManyThrough[$name]) ? $this->fieldNameToAttrName($this->hasManyThrough[$name]["through_key"]) : $this->classForeignKeyAttr($this->hasManyThrough[$name]["class"]);
         foreach ($result as $row) {
-            array_push($ids, "'".$row->$targetKey."'");
+            $ids[] = "'" . $row->$targetKey . "'";
         }
         $conditions = "id in (".implode(', ', $ids).")";
         if (!$options) {
-            $options = array();
+            $options = [];
         }
         if (!isset($options["values"])) {
-            $options["values"] = array();
+            $options["values"] = [];
         }
         $assocClass = $this->hasManyThrough[$name]["class"];
 
@@ -599,7 +599,7 @@ class TipyModel extends TipyDAO {
         if (!$this->isTransactionInProgress()) {
             throw new TipyDaoException('No any transaction in progress');
         }
-        return $this->query('select id from '.$this->table.' where id=? for update', array($this->id));
+        return $this->query('select id from '.$this->table.' where id=? for update', [$this->id]);
     }
 
     // Hooks for Create, Update and Save

@@ -21,8 +21,8 @@ class TipyView {
     // --------------------------------------------------------------
     public function __construct() {
         $this->binder           = new TipyBinder();
-        $this->contentStack     = array();
-        $this->templateStack    = array();
+        $this->contentStack     = [];
+        $this->templateStack    = [];
     }
 
     // --------------------------------------------------------------
@@ -92,7 +92,7 @@ class TipyView {
     // --------------------------------------------------------------
     private function applyTemplateStart($templateName) {
         // Put template name into stack. We will use it
-        array_push($this->templateStack, $templateName);
+        $this->templateStack[] = $templateName;
         // And start processing
         ob_start();
     }
@@ -103,7 +103,7 @@ class TipyView {
     // --------------------------------------------------------------
     private function applyTemplateEnd() {
         // Get what we have processed and put it into stack
-        array_push($this->contentStack, ob_get_contents());
+        $this->contentStack[] = ob_get_contents();
         ob_end_clean();
         // Get template name from stack and process it
         $output = $this->processTemplate(array_pop($this->templateStack));

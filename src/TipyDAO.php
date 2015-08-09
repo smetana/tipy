@@ -74,7 +74,7 @@ class TipyDAO {
     // ----------------------------------------------------
     // limitQuery
     // ----------------------------------------------------
-    public function limitQuery($sql, $span, $step, $params = array()) {
+    public function limitQuery($sql, $span, $step, $params = []) {
         $sql = $sql." limit ".$span.",".$step;
         return $this->query($sql, $params);
     }
@@ -107,7 +107,7 @@ class TipyDAO {
     // queryRow
     // query & fetch in one flakon
     // ----------------------------------------------------
-    public function queryRow($sql, $params = array()) {
+    public function queryRow($sql, $params = []) {
         $result = $this->query($sql, $params);
         return $this->fetchRow($result);
     }
@@ -116,7 +116,7 @@ class TipyDAO {
     // queryRows
     // query and fetch all rows in one flakon
     // ----------------------------------------------------
-    public function queryAllRows($sql, $params = array()) {
+    public function queryAllRows($sql, $params = []) {
         $result = $this->query($sql, $params);
         return $this->fetchAllRows($result);
     }
@@ -124,7 +124,7 @@ class TipyDAO {
     // ----------------------------------------------------
     // limit query and fetch
     // ----------------------------------------------------
-    public function limitQueryAllRows($sql, $span, $step, $params = array()) {
+    public function limitQueryAllRows($sql, $span, $step, $params = []) {
         $result = $this->limitQuery($sql, $span, $step, $params);
         if ($result) {
             return $this->fetchAllRows($result);
@@ -147,7 +147,7 @@ class TipyDAO {
         return $this->dbLink->affected_rows;
     }
 
-    public function queryErrno($sql, $params = array()) {
+    public function queryErrno($sql, $params = []) {
         $this->query($sql, $params, true);
         return $this->dbLink->errno;
     }
@@ -167,7 +167,7 @@ class TipyDAO {
             throw new TipyDaoException('Transaction alredy in progress');
         }
         self::$isTransactionInProgress = true;
-        register_shutdown_function(array($this, "shutdownCheck"));
+        register_shutdown_function([$this, "shutdownCheck"]);
         return $this->dbLink->begin_transaction();
     }
 

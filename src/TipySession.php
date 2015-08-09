@@ -30,7 +30,7 @@ class TipySession {
     // Close session
     // --------------------------------------------------------------
     public function close() {
-        $_SESSION = array();
+        $_SESSION = [];
         // If it's desired to kill the session, also delete the session cookie.
         // Note: This will destroy the session, and not just the session data!
         if (isset($_COOKIE[session_name()])) {

@@ -10,7 +10,7 @@ class TipyBinder {
     private $binderData;
 
     public function __construct() {
-        $this->binderData = array();
+        $this->binderData = [];
     }
 
     // --------------------------------------------------------------
@@ -45,6 +45,6 @@ class TipyBinder {
     // Clear binder data
     // --------------------------------------------------------------
     public function clear() {
-        $this->binderData = array();
+        $this->binderData = [];
     }
 }

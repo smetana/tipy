@@ -10,7 +10,7 @@ class TipyRouter {
     protected $routes;
 
     public function __construct() {
-        $this->routes = array();
+        $this->routes = [];
         $this->defineRoutes();
     }
 
