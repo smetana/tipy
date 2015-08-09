@@ -76,16 +76,16 @@ class TipyTestSuite {
         $app->session->clear();
         $this->run = true;
         // start transaction
-        $app->db->select_db($app->config->get('db_test_name'));
-        $app->db->query('START TRANSACTION');
+        $dao = new TipyDAO();
+        $dao->startTransaction();
     }
 
     // do end oprations
     public function afterTest() {
         $app = TipyApp::getInstance();
         // rollback transaction
-        $app->db->select_db($app->config->get('db_test_name'));
-        $app->db->query('ROLLBACK');
+        $dao = new TipyDAO();
+        $dao->rollback();
     }
 
     public static function applyFixture($db, $filename) {

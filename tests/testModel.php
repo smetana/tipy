@@ -276,11 +276,6 @@ class TestModel extends TipyTestSuite {
     public function testTransactions() {
         $this->createUsersWithFriends(10);
         $this->assertEqual(TipyTestUser::count(), 10);
-        $this->assertEqual(TipyTestFriend::count(), 45);
-        $this->assertThrown('TipyDaoException', 'No any transaction in progress', function () {
-            $user = TipyTestUser::findFirst();
-            $user->lockForUpdate();
-        });
         $instance = new TipyDAO();
         $instance->startTransaction();
         $this->createUsersWithFriends(10);
