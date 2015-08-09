@@ -184,6 +184,8 @@ class TestRunner {
     protected $testNames;
     protected $testFiles;
     protected $fixtureFiles;
+    protected $workingDir;
+    protected $args;
 
     public function __construct() {
         $this->tests          = 0;
@@ -201,8 +203,44 @@ class TestRunner {
         if (sizeof($args) == 0) {
             $args = [getcwd()];
         }
+        $this->args = $args;
+        $this->findWorkingDir();
+        echo '(in '.$this->workingDir.')'.PHP_EOL;
+        $this->findConfig();
         foreach ($args as $filename) {
             $this->findTestsAndFixtures($filename);
+        }
+    }
+
+    private function findWorkingDir() {
+        foreach ($this->args as $filename) {
+            // check for /tests first
+            if (preg_match('/^(.*tests)(\/|$)/', realpath($filename), $matches) && is_dir($matches[1])) {
+                $this->workingDir = $matches[1];
+                return;
+            }
+            if (is_dir($filename.'/tests')) {
+                return $this->workingDir = realpath($filename.'/tests');
+            }
+        }
+        exit('No tests found.'.PHP_EOL);
+    }
+
+    private function findConfig() {
+        if (defined('INI_FILE')) {
+            return;
+        }
+        if (getenv('CIRCLECI') && file_exists($this->workingDir.'/config.ini.ci')) {
+            define('INI_FILE', $this->workingDir.'/config.ini.ci');
+            return;
+        }
+        if (file_exists($this->workingDir.'/config.ini')) {
+            define('INI_FILE', $this->workingDir.'/config.ini');
+            return;
+        }
+        if (file_exists($this->workingDir.'/../config.ini')) {
+            define('INI_FILE', realpath($this->workingDir.'/../config.ini'));
+            return;
         }
     }
 
