@@ -11,21 +11,21 @@ class TipyCookie {
     // --------------------------------------------------------------
     // Constructor
     // --------------------------------------------------------------
-    function __construct() {
+    public function __construct() {
         $this->cookies = $_COOKIE;
     }
 
     // --------------------------------------------------------------
     // Get session variable, default value or null
     // --------------------------------------------------------------
-    function get($varname) {
+    public function get($varname) {
         if (isset($this->cookies[$varname])) {
             return $this->cookies[$varname];
         } else {
             if (func_num_args() > 1) {
                 return func_get_arg(1);
             } else {
-                return NULL;
+                return null;
             }
         }
     }
@@ -33,7 +33,7 @@ class TipyCookie {
     // --------------------------------------------------------------
     // Set cookie variable
     // --------------------------------------------------------------
-    function set($varname, $value, $expire = 0) {
+    public function set($varname, $value, $expire = 0) {
         setcookie($varname, $value, $expire, '/');
         $this->cookies[$varname] = $value;
     }
@@ -41,8 +41,7 @@ class TipyCookie {
     // --------------------------------------------------------------
     // Get all cookies
     // --------------------------------------------------------------
-    function getAll() {
+    public function getAll() {
         return $this->cookies;
     }
 }
-

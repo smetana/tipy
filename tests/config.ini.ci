@@ -1,11 +1,11 @@
 ; This is a config file to use with CircleCI.
-[DB] 
+[DB]
 db_host = localhost
 db_port =
 db_name = circle_test
 db_test_name = circle_test
 db_user = ubuntu
-db_password = 
+db_password =
 db_character_set = utf8
 
 [Mail]

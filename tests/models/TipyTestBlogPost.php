@@ -11,8 +11,11 @@ class TipyTestBlogPost extends TipyModel {
     );
 
     public function validate() {
-        if (!$this->title) throw new TipyValidationException('Title should not be blank!');
-        if (!$this->userId) throw new TipyValidationException('Post should belongs to user');
+        if (!$this->title) {
+            throw new TipyValidationException('Title should not be blank!');
+        }
+        if (!$this->userId) {
+            throw new TipyValidationException('Post should belongs to user');
+        }
     }
-
 }

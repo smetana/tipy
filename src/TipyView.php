@@ -19,7 +19,7 @@ class TipyView {
     // --------------------------------------------------------------
     // Contrustor
     // --------------------------------------------------------------
-    function __construct() {
+    public function __construct() {
         $this->binder           = new TipyBinder();
         $this->contentStack     = array();
         $this->templateStack    = array();
@@ -28,14 +28,14 @@ class TipyView {
     // --------------------------------------------------------------
     // Bind data to internal param binder
     // --------------------------------------------------------------
-    function bind($data) {
+    public function bind($data) {
         $this->binder->bind($data);
     }
 
     // --------------------------------------------------------------
     // Get variable from binder
     // --------------------------------------------------------------
-    function get($varname) {
+    public function get($varname) {
         if (func_num_args() > 1) {
             return $this->binder->get($varname, $func_get_arg(1));
         } else {
@@ -46,28 +46,28 @@ class TipyView {
     // --------------------------------------------------------------
     // Set binder variable
     // --------------------------------------------------------------
-    function set($varname, $value) {
+    public function set($varname, $value) {
         $this->binder->set($varname, $value);
     }
 
     // --------------------------------------------------------------
     // Get all binder variables
     // --------------------------------------------------------------
-    function getAll() {
+    public function getAll() {
         return $this->binder->getAll();
     }
 
     // --------------------------------------------------------------
     // Set path to templates
     // --------------------------------------------------------------
-    function setTemplatePath($path) {
+    public function setTemplatePath($path) {
         $this->templatePath = $path;
     }
 
     // --------------------------------------------------------------
-    // Process template with internal binder vars 
+    // Process template with internal binder vars
     // --------------------------------------------------------------
-    function processTemplate($templateName) {
+    public function processTemplate($templateName) {
         $templateName = $this->templateName($templateName);
         $vars = $this->binder->getAll();
         extract($vars);
@@ -126,7 +126,7 @@ class TipyView {
     }
 
     // --------------------------------------------------------------
-    // include template 
+    // include template
     // --------------------------------------------------------------
     private function includeTemplate($templateName) {
         $templateName = $this->templateName($templateName);
@@ -134,5 +134,4 @@ class TipyView {
         extract($vars);
         include($templateName);
     }
-
 }

@@ -1,8 +1,8 @@
 <?php
 
 class Colors {
-private $foreground_colors = array();
-private $background_colors = array();
+    private $foreground_colors = array();
+    private $background_colors = array();
 
     public function __construct() {
         // Set up shell colors
@@ -67,4 +67,3 @@ private $background_colors = array();
         return array_keys($this->background_colors);
     }
 }
- 

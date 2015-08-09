@@ -22,5 +22,4 @@ class TipyRouter {
     public function getRoute($route) {
 
     }
-
 }

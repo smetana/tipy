@@ -17,10 +17,14 @@ class TipyTestUser extends TipyModel {
     );
 
     public function validate() {
-        if (!$this->login) throw new TipyValidationException('Login should not be blank!');
-        if (!$this->password) throw new TipyValidationException('Password should not be blank!');
-        if (!$this->email) throw new TipyValidationException('Email should not be blank!');
+        if (!$this->login) {
+            throw new TipyValidationException('Login should not be blank!');
+        }
+        if (!$this->password) {
+            throw new TipyValidationException('Password should not be blank!');
+        }
+        if (!$this->email) {
+            throw new TipyValidationException('Email should not be blank!');
+        }
     }
-
 }
-

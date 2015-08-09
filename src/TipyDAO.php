@@ -54,11 +54,11 @@ class TipyDAO {
             $sql = str_replace('%', '%%', $sql);
             $sql = str_replace('?', '"%s"', $sql);
             $link = $this->dbLink;
-            array_walk($params, function(&$string) use ($link) { 
+            array_walk($params, function (&$string) use ($link) {
                 $string = $link->real_escape_string($string);
             });
-            array_unshift($params,$sql);
-            $query = call_user_func_array('sprintf',$params);
+            array_unshift($params, $sql);
+            $query = call_user_func_array('sprintf', $params);
         } else {
             $query = $sql;
         }
@@ -89,7 +89,7 @@ class TipyDAO {
     // -----------------------------------------------------
     // fetchRow
     // Need this method to do some common operations before
-    // returning fetchRow from query result 
+    // returning fetchRow from query result
     // -----------------------------------------------------
     public function fetchRow(&$result) {
         $result->field_seek(0);
@@ -125,7 +125,7 @@ class TipyDAO {
     // limit query and fetch
     // ----------------------------------------------------
     public function limitQueryAllRows($sql, $span, $step, $params = array()) {
-        $result = $this->limitQuery($sql, $span, $step,  $params);
+        $result = $this->limitQuery($sql, $span, $step, $params);
         if ($result) {
             return $this->fetchAllRows($result);
         } else {
@@ -163,7 +163,7 @@ class TipyDAO {
     // Start transaction with fallback mechanics
     // ----------------------------------------------------
     public function startTransaction() {
-        if(self::$isTransactionInProgress) {
+        if (self::$isTransactionInProgress) {
             throw new TipyDaoException('Transaction alredy in progress');
         }
         self::$isTransactionInProgress = true;
@@ -184,7 +184,7 @@ class TipyDAO {
     // Commit transaction
     // ----------------------------------------------------
     public function commit() {
-        if(!self::$isTransactionInProgress) {
+        if (!self::$isTransactionInProgress) {
             throw new TipyDaoException('No any transaction in progress');
         }
         $result = $this->dbLink->commit();
@@ -196,7 +196,7 @@ class TipyDAO {
     // Rollback transaction
     // ----------------------------------------------------
     public function rollback() {
-        if(!self::$isTransactionInProgress) {
+        if (!self::$isTransactionInProgress) {
             throw new TipyDaoException('No any transaction in progress');
         }
         $result = $this->dbLink->rollback();
@@ -210,6 +210,4 @@ class TipyDAO {
     public function isTransactionInProgress() {
         return self::$isTransactionInProgress;
     }
-
 }
-

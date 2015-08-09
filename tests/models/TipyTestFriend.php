@@ -3,4 +3,3 @@
 class TipyTestFriend extends TipyModel {
 
 }
-

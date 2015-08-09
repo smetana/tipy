@@ -6,21 +6,21 @@
 
 class TipySession {
 
-    function __construct() {
+    public function __construct() {
         $this->start();
     }
 
     // --------------------------------------------------------------
     // Start session
     // --------------------------------------------------------------
-    function start() {
-        if ( !session_id() ) {
+    public function start() {
+        if (!session_id()) {
             session_set_cookie_params($this->get('sessionExpires', 0), '/');
             session_start();
         }
     }
 
-    function setLifetime($time = 0) {
+    public function setLifetime($time = 0) {
         $this->set('sessionExpires', $time);
         session_set_cookie_params($this->get('sessionExpires', 0), '/');
         session_regenerate_id();
@@ -29,7 +29,7 @@ class TipySession {
     // --------------------------------------------------------------
     // Close session
     // --------------------------------------------------------------
-    function close() {
+    public function close() {
         $_SESSION = array();
         // If it's desired to kill the session, also delete the session cookie.
         // Note: This will destroy the session, and not just the session data!
@@ -43,21 +43,21 @@ class TipySession {
     // --------------------------------------------------------------
     // Set session data
     // --------------------------------------------------------------
-    function bind($data) {
+    public function bind($data) {
         $_SESSION = $data;
     }
 
     // --------------------------------------------------------------
     // Get session variable, default value or null
     // --------------------------------------------------------------
-    function get($varname) {
+    public function get($varname) {
         if (isset($_SESSION[$varname])) {
             return $_SESSION[$varname];
         } else {
             if (func_num_args() > 1) {
                 return func_get_arg(1);
             } else {
-                return NULL;
+                return null;
             }
         }
     }
@@ -65,14 +65,14 @@ class TipySession {
     // --------------------------------------------------------------
     // Set session variable
     // --------------------------------------------------------------
-    function set($varname, $value) {
+    public function set($varname, $value) {
         $_SESSION[$varname] = $value;
     }
 
     // --------------------------------------------------------------
     // Get all session vars
     // --------------------------------------------------------------
-    function getAll() {
+    public function getAll() {
         return $_SESSION;
     }
 }

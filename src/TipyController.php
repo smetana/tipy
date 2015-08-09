@@ -75,7 +75,7 @@ class TipyController {
     // exit function wrapper for tests compability
     // --------------------------------------------------------------
     public function safeExit($message) {
-        if(defined('TEST_MODE') and TEST_MODE) {
+        if (defined('TEST_MODE') and TEST_MODE) {
             throw new TipyException($msg);
         } else {
             exit;
@@ -86,7 +86,8 @@ class TipyController {
     // Redirect
     // --------------------------------------------------------------
     public function redirect($path) {
-        while (@ob_end_clean());
+        while (@ob_end_clean()) {
+        }
         header('HTTP/1.0 302 Moved Temporarily');
         header('Location: '.$path);
         $this->safeExit('Redirected to '.$path);
@@ -96,7 +97,8 @@ class TipyController {
     // 404
     // --------------------------------------------------------------
     public function pageNotFound() {
-        while (@ob_end_clean());
+        while (@ob_end_clean()) {
+        }
         header('HTTP/1.0 404 Not Found');
         $this->safeExit('Status: 404 Not Found');
     }
@@ -116,5 +118,4 @@ class TipyController {
     public function executeAfter() {
         // override this
     }
-
 }

@@ -3,4 +3,3 @@
 class TipyTestUserAndGroupRelation extends TipyModel {
 
 }
-

@@ -6,7 +6,7 @@
 
 class TipyEnv extends TipyBinder {
 
-    function __construct() {
+    public function __construct() {
         parent::__construct();
         // little hack to autocreate $_SERVER if
         // auto_globals_jit is on
@@ -14,6 +14,4 @@ class TipyEnv extends TipyBinder {
         // So be it! For now....
         $this->bind($_SERVER);
     }
-
 }
-

@@ -11,12 +11,11 @@ class TipyFlash {
         $this->session->set('flashMessage', null);
     }
 
-    function set($value) {
+    public function set($value) {
         $this->session->set('flashMessage', $value);
     }
 
-    function get() {
+    public function get() {
         return $this->currentMessage;
     }
-
 }

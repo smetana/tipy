@@ -11,7 +11,7 @@ defined('TEST_MODE') || define('TEST_MODE', true);
 
 // If no config defined try to search trough arguments
 if (!defined('INI_FILE')) {
-    foreach($argv as $filename) {
+    foreach ($argv as $filename) {
         if (preg_match('/config\.ini$/', $filename) && file_exists($filename)) {
             define('INI_FILE', $filename);
         }

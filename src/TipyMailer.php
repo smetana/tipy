@@ -33,7 +33,7 @@ require_once(__DIR__.'/../vendor/PHPMailer/class.phpmailer.php');
 
 class TipyMailer extends PHPMailer {
 
-    function __construct() {
+    public function __construct() {
         // call PHPMailer constructor with throw exceptions param
         parent::__construct(true);
         // set sendmail as default mailer
@@ -42,6 +42,4 @@ class TipyMailer extends PHPMailer {
         ini_set('sendmail_path', $path);
         $this->isSendmail();
     }
-
 }
-

@@ -2,9 +2,9 @@
 
 require_once 'autoload.php';
 
-class testAssociations extends TipyTestSuite {
+class TestAssociations extends TipyTestSuite {
 
-    function testHasMany() {
+    public function testHasMany() {
         $this->createPostsWithComments(5, 10);
         $this->assertEqual(TipyTestBlogPost::count(), 5);
         $this->assertEqual(TipyTestBlogComment::count(), 50);
@@ -44,8 +44,7 @@ class testAssociations extends TipyTestSuite {
         $this->assertNotEqual($comments, $post->associationsCache["comments"]);
     }
 
-    
-    function testBelongTo() {
+    public function testBelongTo() {
         $this->createPostsWithComments(5, 10);
         $this->assertEqual(TipyTestBlogPost::count(), 5);
         $this->assertEqual(TipyTestBlogComment::count(), 50);
@@ -54,7 +53,6 @@ class testAssociations extends TipyTestSuite {
             'values' => array('Comment 4 to Post 3')
         ));
         $this->assertEqual($comment->message, 'This is a comment message 3:4!');
-
 
         // Test belongsTo collection
         $queryCount =  TipyDAO::$queryCount;
@@ -77,8 +75,8 @@ class testAssociations extends TipyTestSuite {
         $this->assertEqual($post, $postAgain);
     }
 
-    function testHasManyThrough() {
-        $this->createUsersWithGroups(10,5);
+    public function testHasManyThrough() {
+        $this->createUsersWithGroups(10, 5);
         $this->assertEqual(TipyTestUser::count(), 10);
         $this->assertEqual(TipyTestGroup::count(), 5);
         $this->assertEqual(TipyTestUserAndGroupRelation::count(), 14);
@@ -113,10 +111,10 @@ class testAssociations extends TipyTestSuite {
         $this->assertEqual($groups[0]->name, 'name_5');
         // Test queries association is not cached
         $this->assertNotEqual($groups, $user->associationsCache["groups"]);
-                
+
     }
 
-    function testHasOne() {
+    public function testHasOne() {
         $this->createUsersWithProfiles(10);
         $this->assertEqual(TipyTestUser::count(), 10);
         $this->assertEqual(TipyTestProfile::count(), 10);
@@ -148,16 +146,16 @@ class testAssociations extends TipyTestSuite {
     }
 
     // methods that have names not starting whith 'test' are for seeding DB
-    function createPostsWithComments($postsCount, $commentsCount) {
+    public function createPostsWithComments($postsCount, $commentsCount) {
         $userId = 2;
-        for ($i=1; $i<=$postsCount; $i++) {  
+        for ($i=1; $i<=$postsCount; $i++) {
             $post = TipyTestBlogPost::create(array(
                 'userId' => $userId,
                 'title' => "Post $i",
                 'message' => "This is a message $i!",
                 'createdAt' => time() + $i
             ));
-            for ($j=1; $j<=$commentsCount; $j++) {        
+            for ($j=1; $j<=$commentsCount; $j++) {
                 $comment = TipyTestBlogComment::create(array(
                     'userId' => $userId,
                     'blogPostId' => $post->id,
@@ -170,7 +168,7 @@ class testAssociations extends TipyTestSuite {
     }
 
     // methods that have names not starting whith 'test' are for seeding DB
-    function createUsersWithGroups($usersCount, $groupsCount) {
+    public function createUsersWithGroups($usersCount, $groupsCount) {
         // user with id =1 in all groups
         // group with id = 1 contains all users
 
@@ -180,7 +178,7 @@ class testAssociations extends TipyTestSuite {
                 'password' => 'password_'.$i,
                 'email' => 'email_'.$i.'@example.com'
             ));
-            
+
             $relation = TipyTestUserAndGroupRelation::create(array(
                 'userId' => $user->id,
                 'groupId' => 1
@@ -202,7 +200,7 @@ class testAssociations extends TipyTestSuite {
     }
 
     // methods that have names not starting whith 'test' are for seeding DB
-    function createUsersWithProfiles($count) {
+    public function createUsersWithProfiles($count) {
         for ($i=1; $i<=$count; $i++) {
             $user = TipyTestUser::create(array(
                 'login' => 'login_'.$i,
@@ -216,5 +214,4 @@ class testAssociations extends TipyTestSuite {
 
         }
     }
-
 }
