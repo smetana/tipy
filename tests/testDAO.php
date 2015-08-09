@@ -5,8 +5,8 @@ require_once 'autoload.php';
 class TipyTestRecord extends TipyModel { }
 
 class TestDAO extends TipyTestSuite {
- 
-    // Rewrite beforTest and afterTest to disable transactional fixtures
+
+    // Rewrite beforeTest and afterTest to disable transactional fixtures
     // Also we need separate table to test transactions behaviour without
     // affecting other tests
     public function beforeTest() {
@@ -20,7 +20,7 @@ class TestDAO extends TipyTestSuite {
             ) ENGINE = InnoDB DEFAULT CHARSET=utf8
         ");
     }
-    
+
     public function afterTest() {
         $app = TipyApp::getInstance();
         $app->db->query('DROP TABLE tipy_test_records');
