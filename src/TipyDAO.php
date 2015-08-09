@@ -152,7 +152,19 @@ class TipyDAO {
     }
 
     protected static function savepointName($number) {
-        return 'tipy_savepoint_'.$number;
+        return 'tipy_savepoint_'.($number - 1);
+    }
+
+    public static function currentSavepointName() {
+        if (self::$openTransactionsCount <= 1) {
+            return null;
+        } else {
+            return self::savepointName(self::$openTransactionsCount);
+        }
+    }
+
+    public static function newSavepointName() {
+        return self::savepointName(self::$openTransactionsCount + 1);
     }
 
     // ----------------------------------------------------
@@ -165,8 +177,7 @@ class TipyDAO {
                 register_shutdown_function([$this, "shutdownCheck"]);
             }
         } else {
-            $newSavepoint = self::savepointName(self::$openTransactionsCount + 1);
-            $result = $this->dbLink->query('SAVEPOINT '.$newSavepoint);
+            $result = $this->dbLink->query('SAVEPOINT '.self::newSavepointName());
         }
         if ($result) {
             register_shutdown_function([$this, "shutdownCheck"]);
@@ -198,8 +209,7 @@ class TipyDAO {
             }
             return $result;
         } else if (self::$openTransactionsCount > 1) {
-            $currentSavepointName = self::savepointName(self::$openTransactionsCount);
-            $result = $this->dbLink->query('RELEASE SAVEPOINT '.$currentSavepointName);
+            $result = $this->dbLink->query('RELEASE SAVEPOINT '.self::currentSavepointName());
             if ($result) {
                 self::$openTransactionsCount--;
             }
@@ -231,8 +241,7 @@ class TipyDAO {
             }
             return $result;
         } else if (self::$openTransactionsCount > 1) {
-            $currentSavepointName = self::savepointName(self::$openTransactionsCount);
-            $result = $this->dbLink->query('ROLLBACK TO SAVEPOINT '.$currentSavepointName);
+            $result = $this->dbLink->query('ROLLBACK TO SAVEPOINT '.self::currentSavepointName());
             if ($result) {
                 self::$openTransactionsCount--;
             }
