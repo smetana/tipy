@@ -161,6 +161,9 @@ class TipyDAO {
     public function startTransaction() {
         if (self::$openTransactionsCount == 0) {
             $result = $this->dbLink->query('BEGIN');
+            if ($result) {
+                register_shutdown_function([$this, "shutdownCheck"]);
+            }
         } else {
             $newSavepoint = self::savepointName(self::$openTransactionsCount + 1);
             $result = $this->dbLink->query('SAVEPOINT '.$newSavepoint);
