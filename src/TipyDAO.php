@@ -179,8 +179,8 @@ class TipyDAO {
     // Rollback all opened transaction on fatal errors or
     // script stop
     // ----------------------------------------------------
-    public function shutdowncheck() {
-        if (self::istransactioninprogress()) {
+    public function shutdownCheck() {
+        if (self::isTransactionInProgress()) {
             $this->rollback('hard');
         }
     }
