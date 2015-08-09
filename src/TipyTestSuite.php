@@ -19,12 +19,6 @@ if (!function_exists('apache_request_headers')) {
     }
 }
 
-//
-// Start Application
-//
-$app = TipyApp::getInstance();
-$app->initDbConnection();
-
 // -----------------------------------------------------
 // Test suite with assertions kit
 // -----------------------------------------------------
@@ -239,6 +233,7 @@ class TestRunner {
     // 1 - if one of the tests failed
     public function run() {
         $app = TipyApp::getInstance();
+        $app->initDbConnection();
         $app->db->query('DROP DATABASE IF EXISTS '.$app->config->get('db_test_name'));
         $app->db->query('CREATE DATABASE '.$app->config->get('db_test_name'));
         $app->db->select_db($app->config->get('db_test_name'));
