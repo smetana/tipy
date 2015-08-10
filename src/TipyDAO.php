@@ -165,14 +165,14 @@ class TipyDAO {
         }
     }
 
-    public static function newSavepointName() {
+    protected static function newSavepointName() {
         return self::savepointName(self::$openTransactionsCount + 1);
     }
 
     // ----------------------------------------------------
     // Start transaction with fallback mechanics
     // ----------------------------------------------------
-    public static function startTransaction() {
+    protected static function startTransaction() {
         $app = TipyApp::getInstance();
         if (self::$openTransactionsCount == 0) {
             $result = $app->db->query('BEGIN');
@@ -198,7 +198,7 @@ class TipyDAO {
     // ----------------------------------------------------
     // Commit transaction
     // ----------------------------------------------------
-    public static function commit() {
+    protected static function commit() {
         $app = TipyApp::getInstance();
         if (self::$openTransactionsCount == 0) {
             throw new TipyDaoException('No transaction in progress');
@@ -225,7 +225,7 @@ class TipyDAO {
     // ----------------------------------------------------
 
 
-    public static function rollback($kind = 'soft') {
+    protected static function rollback($kind = 'soft') {
         $app = TipyApp::getInstance();
         if (self::$openTransactionsCount == 0) {
             throw new TipyDaoException('No transaction in progress');
