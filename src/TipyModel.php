@@ -405,7 +405,7 @@ class TipyModel extends TipyDAO {
     //          'values' => ['Hello']
     //     ]);
     // --------------------------------------------------------------
-    public static function count($options = ['values' => []]) {
+    public static function count($options = []) {
         $className = get_called_class();
         $instance = new $className;
         $sql = "select count(id) as quantity from ".$instance->table;
@@ -414,6 +414,9 @@ class TipyModel extends TipyDAO {
             $where = " where ".$options["conditions"];
         }
         $sql = $sql.$where;
+        if (!isset($options['values'])) {
+            $options['values'] = [];
+        }
         $result = $instance->queryRow($sql, $options["values"]);
         return $result['quantity'];
     }
