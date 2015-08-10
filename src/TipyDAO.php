@@ -40,6 +40,8 @@ class TipyDAO {
                 }
                 $app->db = $dbLink;
             }
+
+            register_shutdown_function([$this, "shutdownCheck"]);
         }
         $this->dbLink = $app->db;
     }
@@ -173,14 +175,10 @@ class TipyDAO {
     public function startTransaction() {
         if (self::$openTransactionsCount == 0) {
             $result = $this->dbLink->query('BEGIN');
-            if ($result) {
-                register_shutdown_function([$this, "shutdownCheck"]);
-            }
         } else {
             $result = $this->dbLink->query('SAVEPOINT '.self::newSavepointName());
         }
         if ($result) {
-            register_shutdown_function([$this, "shutdownCheck"]);
             self::$openTransactionsCount++;
         }
         return $result;
@@ -202,13 +200,13 @@ class TipyDAO {
     public function commit() {
         if (self::$openTransactionsCount == 0) {
             throw new TipyDaoException('No transaction in progress');
-        } else if (self::$openTransactionsCount == 1) {
+        } elseif (self::$openTransactionsCount == 1) {
             $result = $this->dbLink->query('COMMIT');
             if ($result) {
                 self::$openTransactionsCount = 0;
             }
             return $result;
-        } else if (self::$openTransactionsCount > 1) {
+        } elseif (self::$openTransactionsCount > 1) {
             $result = $this->dbLink->query('RELEASE SAVEPOINT '.self::currentSavepointName());
             if ($result) {
                 self::$openTransactionsCount--;
@@ -228,19 +226,19 @@ class TipyDAO {
     public function rollback($kind = 'soft') {
         if (self::$openTransactionsCount == 0) {
             throw new TipyDaoException('No transaction in progress');
-        } else if ($kind == 'hard') {
+        } elseif ($kind == 'hard') {
             // rollback parent transaction with all nested savepoints
             $result = $this->dbLink->rollback();
             if ($result) {
                 self::$openTransactionsCount = 0;
             }
-        } else if (self::$openTransactionsCount == 1) {
+        } elseif (self::$openTransactionsCount == 1) {
             $result = $this->dbLink->rollback();
             if ($result) {
                 self::$openTransactionsCount = 0;
             }
             return $result;
-        } else if (self::$openTransactionsCount > 1) {
+        } elseif (self::$openTransactionsCount > 1) {
             $result = $this->dbLink->query('ROLLBACK TO SAVEPOINT '.self::currentSavepointName());
             if ($result) {
                 self::$openTransactionsCount--;

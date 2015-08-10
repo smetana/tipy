@@ -26,6 +26,29 @@ class TestDAO extends TipyTestSuite {
         $app->db->query('DROP TABLE tipy_test_records');
     }
 
+    public function run() {
+        $this->clear();
+        $className = get_class($this);
+        $methods = get_class_methods($className);
+        $dao = new TipyDAO();
+        foreach ($methods as $testName) {
+            if (!preg_match("/^test/", $testName)) {
+                continue;
+            }
+            $this->tests++;
+            $this->beforeTest();
+            try {
+                $this->$testName();
+            } catch (Exception $e) {
+                $this->run = false;
+                $this->exceptions[] = $e;
+                $colors = new Colors();
+                echo $colors->getColoredString("E", 'red');
+            }
+            $this->afterTest();
+        }
+    }
+
     public function testTransactionCommit() {
         $dao = new TipyDAO();
         $this->assertEqual(TipyTestRecord::count(), 0);
