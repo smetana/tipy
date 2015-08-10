@@ -276,21 +276,21 @@ class TestModel extends TipyTestSuite {
     public function testTransactions() {
         $this->createUsersWithFriends(10);
         $this->assertEqual(TipyTestUser::count(), 10);
-        $instance = new TipyDAO();
-        $instance->startTransaction();
-        $this->createUsersWithFriends(10);
-        $user = TipyTestUser::findFirst();
-        $user->lockForUpdate();
-        $this->assertEqual(TipyTestUser::count(), 20);
-        $this->assertEqual(TipyTestFriend::count(), 90);
-        $instance->rollback();
+        TipyModel::transaction(function() {
+            $this->createUsersWithFriends(10);
+            $user = TipyTestUser::findFirst();
+            $user->lockForUpdate();
+            $this->assertEqual(TipyTestUser::count(), 20);
+            $this->assertEqual(TipyTestFriend::count(), 90);
+            return false;
+        });
         $this->assertEqual(TipyTestUser::count(), 10);
         $this->assertEqual(TipyTestFriend::count(), 45);
-        $instance->startTransaction();
-        $this->createUsersWithFriends(10);
-        $this->assertEqual(TipyTestUser::count(), 20);
-        $this->assertEqual(TipyTestFriend::count(), 90);
-        $instance->commit();
+        TipyModel::transaction(function() {
+            $this->createUsersWithFriends(10);
+            $this->assertEqual(TipyTestUser::count(), 20);
+            $this->assertEqual(TipyTestFriend::count(), 90);
+        });
         $this->assertEqual(TipyTestUser::count(), 20);
         $this->assertEqual(TipyTestFriend::count(), 90);
     }

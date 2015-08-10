@@ -40,6 +40,8 @@ class TipyDAO {
                 }
                 $app->db = $dbLink;
             }
+
+            register_shutdown_function([$this, "shutdownCheck"]);
         }
         $this->dbLink = $app->db;
     }
@@ -163,24 +165,21 @@ class TipyDAO {
         }
     }
 
-    public static function newSavepointName() {
+    protected static function newSavepointName() {
         return self::savepointName(self::$openTransactionsCount + 1);
     }
 
     // ----------------------------------------------------
     // Start transaction with fallback mechanics
     // ----------------------------------------------------
-    public function startTransaction() {
+    protected static function startTransaction() {
+        $app = TipyApp::getInstance();
         if (self::$openTransactionsCount == 0) {
-            $result = $this->dbLink->query('BEGIN');
-            if ($result) {
-                register_shutdown_function([$this, "shutdownCheck"]);
-            }
+            $result = $app->db->query('BEGIN');
         } else {
-            $result = $this->dbLink->query('SAVEPOINT '.self::newSavepointName());
+            $result = $app->db->query('SAVEPOINT '.self::newSavepointName());
         }
         if ($result) {
-            register_shutdown_function([$this, "shutdownCheck"]);
             self::$openTransactionsCount++;
         }
         return $result;
@@ -192,24 +191,25 @@ class TipyDAO {
     // ----------------------------------------------------
     public function shutdownCheck() {
         if (self::isTransactionInProgress()) {
-            $this->rollback('hard');
+            self::rollback('hard');
         }
     }
 
     // ----------------------------------------------------
     // Commit transaction
     // ----------------------------------------------------
-    public function commit() {
+    protected static function commit() {
+        $app = TipyApp::getInstance();
         if (self::$openTransactionsCount == 0) {
             throw new TipyDaoException('No transaction in progress');
-        } else if (self::$openTransactionsCount == 1) {
-            $result = $this->dbLink->query('COMMIT');
+        } elseif (self::$openTransactionsCount == 1) {
+            $result = $app->db->query('COMMIT');
             if ($result) {
                 self::$openTransactionsCount = 0;
             }
             return $result;
-        } else if (self::$openTransactionsCount > 1) {
-            $result = $this->dbLink->query('RELEASE SAVEPOINT '.self::currentSavepointName());
+        } elseif (self::$openTransactionsCount > 1) {
+            $result = $app->db->query('RELEASE SAVEPOINT '.self::currentSavepointName());
             if ($result) {
                 self::$openTransactionsCount--;
             }
@@ -225,23 +225,24 @@ class TipyDAO {
     // ----------------------------------------------------
 
 
-    public function rollback($kind = 'soft') {
+    protected static function rollback($kind = 'soft') {
+        $app = TipyApp::getInstance();
         if (self::$openTransactionsCount == 0) {
             throw new TipyDaoException('No transaction in progress');
-        } else if ($kind == 'hard') {
+        } elseif ($kind == 'hard') {
             // rollback parent transaction with all nested savepoints
-            $result = $this->dbLink->rollback();
+            $result = $app->db->query('ROLLBACK');
             if ($result) {
                 self::$openTransactionsCount = 0;
             }
-        } else if (self::$openTransactionsCount == 1) {
-            $result = $this->dbLink->rollback();
+        } elseif (self::$openTransactionsCount == 1) {
+            $result = $app->db->query('ROLLBACK');
             if ($result) {
                 self::$openTransactionsCount = 0;
             }
             return $result;
-        } else if (self::$openTransactionsCount > 1) {
-            $result = $this->dbLink->query('ROLLBACK TO SAVEPOINT '.self::currentSavepointName());
+        } elseif (self::$openTransactionsCount > 1) {
+            $result = $app->db->query('ROLLBACK TO SAVEPOINT '.self::currentSavepointName());
             if ($result) {
                 self::$openTransactionsCount--;
             }
@@ -253,10 +254,44 @@ class TipyDAO {
         return $result;
     }
 
+    //   TipyDAO::transaction(function() {
+    //      $this->save();
+    //   });
+    //
+    //   To rollback transaction return false
+    //
+    //   TipyDAO::transaction(function() {
+    //      $this->save();
+    //      return false; // rollback
+    //   });
+    //
+    //   To use variable from upper scope
+    //
+    //   $a = 1;
+    //   $b = 2;
+    //   TipyDAO::transaction(function() use ($a, $b) {
+    //      echo $a + $b;
+    //   });
+    public static function transaction($closure) {
+        try {
+            self::startTransaction();
+            if ($closure() === false) {
+                self::rollback();
+            } else {
+                self::commit();
+            }
+        } catch (Exception $e) {
+            if (self::isTransactionInProgress()) {
+                self::rollback();
+            }
+            throw $e;
+        }
+    }
+
     // ----------------------------------------------------
     // Return true if any transaction in progress
     // ----------------------------------------------------
-    public function isTransactionInProgress() {
+    public static function isTransactionInProgress() {
         return self::$openTransactionsCount > 0;
     }
 }

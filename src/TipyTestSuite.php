@@ -44,20 +44,24 @@ class TipyTestSuite {
         $this->clear();
         $className = get_class($this);
         $methods = get_class_methods($className);
+        $dao = new TipyDAO();
         foreach ($methods as $testName) {
             if (!preg_match("/^test/", $testName)) {
                 continue;
             }
             $this->tests++;
             $this->beforeTest();
-            try {
-                $this->$testName();
-            } catch (Exception $e) {
-                $this->run = false;
-                $this->exceptions[] = $e;
-                $colors = new Colors();
-                echo $colors->getColoredString("E", 'red');
-            }
+            TipyDAO::transaction(function() use ($testName) {
+                try {
+                    $this->$testName();
+                } catch (Exception $e) {
+                    $this->run = false;
+                    $this->exceptions[] = $e;
+                    $colors = new Colors();
+                    echo $colors->getColoredString("E", 'red');
+                }
+                return false;
+            });
             $this->afterTest();
         }
     }
@@ -69,17 +73,11 @@ class TipyTestSuite {
         $app->in->clear();
         $app->session->clear();
         $this->run = true;
-        // start transaction
-        $dao = new TipyDAO();
-        $dao->startTransaction();
     }
 
     // do end oprations
     public function afterTest() {
-        $app = TipyApp::getInstance();
-        // rollback transaction
-        $dao = new TipyDAO();
-        $dao->rollback();
+        // nothing here
     }
 
     public static function applyFixture($db, $filename) {
