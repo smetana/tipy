@@ -51,19 +51,17 @@ class TipyTestSuite {
             }
             $this->tests++;
             $this->beforeTest();
-            try {
-                // start transaction
-                $dao->startTransaction();
-                $this->$testName();
-            } catch (Exception $e) {
-                $this->run = false;
-                $this->exceptions[] = $e;
-                $colors = new Colors();
-                echo $colors->getColoredString("E", 'red');
-            } finally {
-                // rollback transaction
-                $dao->rollback();
-            }
+            TipyDAO::transaction(function() use ($testName) {
+                try {
+                    $this->$testName();
+                } catch (Exception $e) {
+                    $this->run = false;
+                    $this->exceptions[] = $e;
+                    $colors = new Colors();
+                    echo $colors->getColoredString("E", 'red');
+                }
+                return false;
+            });
             $this->afterTest();
         }
     }

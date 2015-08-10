@@ -172,11 +172,12 @@ class TipyDAO {
     // ----------------------------------------------------
     // Start transaction with fallback mechanics
     // ----------------------------------------------------
-    public function startTransaction() {
+    public static function startTransaction() {
+        $app = TipyApp::getInstance();
         if (self::$openTransactionsCount == 0) {
-            $result = $this->dbLink->query('BEGIN');
+            $result = $app->db->query('BEGIN');
         } else {
-            $result = $this->dbLink->query('SAVEPOINT '.self::newSavepointName());
+            $result = $app->db->query('SAVEPOINT '.self::newSavepointName());
         }
         if ($result) {
             self::$openTransactionsCount++;
@@ -190,24 +191,25 @@ class TipyDAO {
     // ----------------------------------------------------
     public function shutdownCheck() {
         if (self::isTransactionInProgress()) {
-            $this->rollback('hard');
+            self::rollback('hard');
         }
     }
 
     // ----------------------------------------------------
     // Commit transaction
     // ----------------------------------------------------
-    public function commit() {
+    public static function commit() {
+        $app = TipyApp::getInstance();
         if (self::$openTransactionsCount == 0) {
             throw new TipyDaoException('No transaction in progress');
         } elseif (self::$openTransactionsCount == 1) {
-            $result = $this->dbLink->query('COMMIT');
+            $result = $app->db->query('COMMIT');
             if ($result) {
                 self::$openTransactionsCount = 0;
             }
             return $result;
         } elseif (self::$openTransactionsCount > 1) {
-            $result = $this->dbLink->query('RELEASE SAVEPOINT '.self::currentSavepointName());
+            $result = $app->db->query('RELEASE SAVEPOINT '.self::currentSavepointName());
             if ($result) {
                 self::$openTransactionsCount--;
             }
@@ -223,23 +225,24 @@ class TipyDAO {
     // ----------------------------------------------------
 
 
-    public function rollback($kind = 'soft') {
+    public static function rollback($kind = 'soft') {
+        $app = TipyApp::getInstance();
         if (self::$openTransactionsCount == 0) {
             throw new TipyDaoException('No transaction in progress');
         } elseif ($kind == 'hard') {
             // rollback parent transaction with all nested savepoints
-            $result = $this->dbLink->rollback();
+            $result = $app->db->query('ROLLBACK');
             if ($result) {
                 self::$openTransactionsCount = 0;
             }
         } elseif (self::$openTransactionsCount == 1) {
-            $result = $this->dbLink->rollback();
+            $result = $app->db->query('ROLLBACK');
             if ($result) {
                 self::$openTransactionsCount = 0;
             }
             return $result;
         } elseif (self::$openTransactionsCount > 1) {
-            $result = $this->dbLink->query('ROLLBACK TO SAVEPOINT '.self::currentSavepointName());
+            $result = $app->db->query('ROLLBACK TO SAVEPOINT '.self::currentSavepointName());
             if ($result) {
                 self::$openTransactionsCount--;
             }
@@ -251,10 +254,44 @@ class TipyDAO {
         return $result;
     }
 
+    //   TipyDAO::transaction(function() {
+    //      $this->save();
+    //   });
+    //
+    //   To rollback transaction return false
+    //
+    //   TipyDAO::transaction(function() {
+    //      $this->save();
+    //      return false; // rollback
+    //   });
+    //
+    //   To use variable from upper scope
+    //
+    //   $a = 1;
+    //   $b = 2;
+    //   TipyDAO::transaction(function() use ($a, $b) {
+    //      echo $a + $b;
+    //   });
+    public static function transaction($closure) {
+        try {
+            self::startTransaction();
+            if ($closure() === false) {
+                self::rollback();
+            } else {
+                self::commit();
+            }
+        } catch (Exception $e) {
+            if (self::isTransactionInProgress()) {
+                self::rollback();
+            }
+            throw $e;
+        }
+    }
+
     // ----------------------------------------------------
     // Return true if any transaction in progress
     // ----------------------------------------------------
-    public function isTransactionInProgress() {
+    public static function isTransactionInProgress() {
         return self::$openTransactionsCount > 0;
     }
 }

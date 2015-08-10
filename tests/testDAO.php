@@ -50,28 +50,25 @@ class TestDAO extends TipyTestSuite {
     }
 
     public function testTransactionCommit() {
-        $dao = new TipyDAO();
         $this->assertEqual(TipyTestRecord::count(), 0);
-        $dao = new TipyDAO();
-        $dao->startTransaction();
-        $this->createRecord(1);
-        $this->createRecord(2);
-        $this->createRecord(3);
-        $this->assertEqual(TipyTestRecord::count(), 3);
-        $dao->commit();
+        TipyModel::transaction(function() {
+            $this->createRecord(1);
+            $this->createRecord(2);
+            $this->createRecord(3);
+            $this->assertEqual(TipyTestRecord::count(), 3);
+        });
         $this->assertEqual(TipyTestRecord::count(), 3);
     }
 
     public function testTransactionRollback() {
-        $dao = new TipyDAO();
         $this->assertEqual(TipyTestRecord::count(), 0);
-        $dao = new TipyDAO();
-        $dao->startTransaction();
-        $this->createRecord(1);
-        $this->createRecord(2);
-        $this->createRecord(3);
-        $this->assertEqual(TipyTestRecord::count(), 3);
-        $dao->rollback();
+        TipyModel::transaction(function() {
+            $this->createRecord(1);
+            $this->createRecord(2);
+            $this->createRecord(3);
+            $this->assertEqual(TipyTestRecord::count(), 3);
+            return false;
+        });
         $this->assertEqual(TipyTestRecord::count(), 0);
     }
 
@@ -88,40 +85,43 @@ class TestDAO extends TipyTestSuite {
         $dao = new TipyDAO();
         $this->assertEqual($dao->currentSavepointName(), null);
         $this->assertEqual(TipyTestRecord::count(), 0);
-        $dao->startTransaction();
+        TipyModel::transaction(function() use ($dao){
             $this->createRecord(1);
             $this->createRecord(2);
             $this->createRecord(3);
             $this->assertEqual(TipyTestRecord::count(), 3);
             $this->assertEqual($dao->currentSavepointName(), null);
-            $dao->startTransaction();
+            TipyModel::transaction(function() use ($dao){
                 $this->createRecord(4);
                 $this->createRecord(5);
                 $this->assertEqual(TipyTestRecord::count(), 5);
                 $this->assertEqual($dao->currentSavepointName(), 'tipy_savepoint_1');
-            $dao->rollback();
+                return false;
+            });
             $this->assertEqual($dao->currentSavepointName(), null);
             $this->assertEqual(TipyTestRecord::count(), 3);
             $this->createRecord(4);
             $this->assertEqual(TipyTestRecord::count(), 4);
-            $dao->startTransaction();
+            TipyModel::transaction(function() use ($dao) {
                 $this->assertEqual($dao->currentSavepointName(), 'tipy_savepoint_1');
                 $this->createRecord(5);
                 $this->createRecord(6);
                 $this->assertEqual(TipyTestRecord::count(), 6);
-                $dao->startTransaction();
+                TipyModel::transaction(function() use ($dao) {
                     $this->assertEqual($dao->currentSavepointName(), 'tipy_savepoint_2');
                     $this->createRecord(7);
                     $this->createRecord(8);
                     $this->assertEqual(TipyTestRecord::count(), 8);
-                $dao->rollback();
+                    return false;
+                });
                 $this->assertEqual($dao->currentSavepointName(), 'tipy_savepoint_1');
-            $dao->commit();
+            });
             $this->assertEqual(TipyTestRecord::count(), 6);
             $this->assertEqual($dao->currentSavepointName(), null);
-        $dao->commit();
+        });
         $this->assertEqual(TipyTestRecord::count(), 6);
     }
+
 
     private function createRecord($i) {
         $user = TipyTestRecord::create([
