@@ -175,6 +175,7 @@ class TipyTestSuite {
 // -----------------------------------------------------
 class TestRunner {
 
+    public $fixtures;
     protected $tests;
     protected $assertions;
     protected $failures;
@@ -192,6 +193,7 @@ class TestRunner {
         $this->exceptions     = [];
         $this->testNames      = [];
         $this->testFiles      = [];
+        $this->fixtures       = [];
         $this->fixtureFiles   = [];
         if (!isset($_SERVER['argv'])) {
             exit("Tests should be run from command line.");
@@ -206,7 +208,7 @@ class TestRunner {
         echo '(in '.$this->workingDir.')'.PHP_EOL;
         $this->findConfig();
         foreach ($args as $filename) {
-            $this->findTestsAndFixtures($filename);
+            $this->findTests($filename);
         }
     }
 
@@ -242,21 +244,46 @@ class TestRunner {
         }
     }
 
-    // Find tests and fixtures recursively
-    private function findTestsAndFixtures($filename) {
+    private function findFixtures() {
+        if (sizeof($this->fixtures) == 0) {
+            $searchDirs = $this->args;
+        } else {
+            $searchDirs = $this->fixtures;
+        }
+        foreach($searchDirs as $filename) {
+            $this->findFixtureFiles($filename);
+        }
+        if (sizeof($this->fixtureFiles) == 0) {
+             $this->findFixtureFiles($this->workingDir);
+        }
+    }
+
+    private function findFixtureFiles($filename) {
         if (is_dir($filename)) {
             if ($handle = opendir($filename)) {
                 while (false !== ($f = readdir($handle))) {
-                    if (preg_match('/\.$/', $f)) {
-                        // skip . and ..
-                    } else {
-                        $this->findTestsAndFixtures($filename.'/'.$f);
+                    if (!preg_match('/\.$/', $f)) {
+                        $this->findFixtureFiles($filename.'/'.$f);
                     }
                 }
                 closedir($handle);
             }
         } else if (preg_match('/\.sql$/', $filename)) {
             $this->fixtureFiles[] = $filename;
+        }
+    }
+
+    // Find tests and fixtures recursively
+    private function findTests($filename) {
+        if (is_dir($filename)) {
+            if ($handle = opendir($filename)) {
+                while (false !== ($f = readdir($handle))) {
+                    if (!preg_match('/\.$/', $f)) {
+                        $this->findTests($filename.'/'.$f);
+                    }
+                }
+                closedir($handle);
+            }
         } else if (preg_match('/(test\w+)\.php$/', $filename, $matches)) {
             $testName = $matches[1];
             $this->testNames[] = $testName;
@@ -268,6 +295,7 @@ class TestRunner {
     // 0 - if all tests passed
     // 1 - if one of the tests failed
     public function run() {
+        $this->findFixtures();
         $app = TipyApp::getInstance();
         $app->initDbConnection();
         $app->db->query('DROP DATABASE IF EXISTS '.$app->config->get('db_test_name'));
