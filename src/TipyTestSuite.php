@@ -128,6 +128,34 @@ class TipyTestSuite {
         $this->assertion($a === $b, true);
     }
 
+    public function assertNull($a) {
+        if (!$this->run) {
+            return;
+        }
+        $this->assertion($a === null, true);
+    }
+
+    public function assertNotNull($a) {
+        if (!$this->run) {
+            return;
+        }
+        $this->assertion($a !== null, true);
+    }
+
+    public function assertTrue($a) {
+        if (!$this->run) {
+            return;
+        }
+        $this->assertion($a === true, true);
+    }
+
+    public function assertFalse($a) {
+        if (!$this->run) {
+            return;
+        }
+        $this->assertion($a === false, true);
+    }
+
     public function assertThrown($exceptionClass, $exceptionMessage, $closure, $messageSubstrLength = 0) {
         try {
             $closure();
