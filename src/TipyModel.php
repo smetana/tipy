@@ -242,18 +242,18 @@ class TipyModel extends TipyDAO {
             throw new TipyModelException('Unable to save deleted model');
         }
         $time = $this->getCurrentTime();
-        if (in_array(static::CREATED_AT, $this->fields)) {
-            if (!$this->createdAt) {
-                $this->createdAt = $time;
-            }
-        }
-        if (in_array(static::UPDATED_AT, $this->fields)) {
-            $this->updatedAt = $time;
-        }
         $this->validate();
         if ($this->isNewRecord()) {
+            if (in_array(static::CREATED_AT, $this->fields)) {
+                if (!$this->createdAt) {
+                    $this->createdAt = $this->getCurrentTime();
+                }
+            }
             $result = $this->createNewRecord();
         } else {
+            if (in_array(static::UPDATED_AT, $this->fields)) {
+                $this->updatedAt = $this->getCurrentTime();
+            }
             $result = $this->updateRecord();
         }
         return $result;

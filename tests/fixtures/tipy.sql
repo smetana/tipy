@@ -10,6 +10,7 @@ CREATE TABLE `tipy_test_blog_posts` (
 `id` BIGINT( 20 ) NOT NULL AUTO_INCREMENT ,
 `user_id` BIGINT( 20 ) NOT NULL,
 `created_at` BIGINT( 20 ) NULL,
+`updated_at` BIGINT( 20 ) NULL,
 `title` VARCHAR( 255 ) NULL ,
 `message` text,
 PRIMARY KEY ( `id` )

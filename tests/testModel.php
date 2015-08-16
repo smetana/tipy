@@ -295,6 +295,29 @@ class TestModel extends TipyTestSuite {
         $this->assertEqual(TipyTestFriend::count(), 90);
     }
 
+    public function testCreatedUpdatedAt() {
+        $user = TipyTestUser::create([
+            'login' => 'some login',
+            'password' => 'some password',
+            'email' => 'some_email@example.com'
+        ]);
+        $time1 = time();
+        $post = TipyTestBlogPost::create([
+                'userId' => $user->id,
+                'title' => "Post",
+                'message' => "This is a message!",
+        ]);
+        $time2 = time();
+        $createdAt = $post->createdAt;
+        $this->assertTrue($post->createdAt >= $time1 && $post->createdAt <= $time2);
+        $this->assertNull($post->updatedAt);
+        $post->title = 'New title';
+        $post->save();
+        $time3 = time();
+        $this->assertTrue($post->updatedAt >= $time2 && $post->updatedAt <= $time3);
+        $this->assertEqual($post->createdAt, $createdAt);
+    }
+
     // methods that have names not starting whith 'test' are for seeding DB
     public function createUsersWithAsocs($count) {
         for ($i=1; $i<=$count; $i++) {
