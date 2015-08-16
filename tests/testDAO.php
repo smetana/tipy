@@ -122,6 +122,19 @@ class TestDAO extends TipyTestSuite {
         $this->assertEqual(TipyTestRecord::count(), 6);
     }
 
+    public function testNull() {
+        $profile = TipyTestProfile::create([
+            'userId' => 1,
+            'sign' => null
+        ]);
+        $this->assertNull($profile->sign);
+        $profile->sign = 'sign';
+        $profile->save();
+        $this->assertNotNull($profile->sign);
+        $profile->sign = null;
+        $profile->save();
+        $this->assertNull($profile->sign);
+    }
 
     private function createRecord($i) {
         $user = TipyTestRecord::create([
