@@ -1,6 +1,5 @@
 <?php
 require_once(__DIR__.'/../Tipy.php');
-require_once(__DIR__.'/../vendor/cliColors/CliColors.php');
 
 //
 // Override application session for tests
@@ -57,8 +56,7 @@ class TipyTestSuite {
                 } catch (Exception $e) {
                     $this->run = false;
                     $this->exceptions[] = $e;
-                    $colors = new Colors();
-                    echo $colors->getColoredString("E", 'red');
+                    echo TipyCli::red('E');
                 }
                 return false;
             });
@@ -94,11 +92,10 @@ class TipyTestSuite {
 
     public function assertion($a, $b) {
         $this->assertions++;
-        $colors = new Colors();
         if ($a == $b) {
-            echo $colors->getColoredString(".", 'green');
+            echo TipyCli::green('.');
         } else {
-            echo $colors->getColoredString("F", 'purple');
+            echo TipyCli::purple('F');
             $e = new Exception();
             $trace = $e->getTrace();
             $test = $trace[2];
@@ -361,7 +358,6 @@ class TestRunner {
     }
 
     public function printSummary() {
-        $colors = new Colors();
         echo PHP_EOL.PHP_EOL;
         echo "Tests: ".$this->tests;
         echo ", Assertions: ".$this->assertions;
@@ -369,12 +365,12 @@ class TestRunner {
         echo ", Exceptions: ".sizeof($this->exceptions);
         echo PHP_EOL.PHP_EOL;
         if (sizeof($this->failures) > 0) {
-            echo $colors->getColoredString('Failures:', 'red').PHP_EOL;
+            echo TipyCli::red('Failures:').PHP_EOL;
             $i = 0;
             foreach ($this->failures as $failure) {
                 $i++;
-                echo "$i) ".$colors->getColoredString($failure[2], 'yellow').": ";
-                echo $failure[3]." at line (".$colors->getColoredString($failure[4], 'cyan').")".PHP_EOL;
+                echo "$i) ".TipyCli::yellow($failure[2]).": ";
+                echo $failure[3]." at line (".TipyCli::cyan($failure[4]).")".PHP_EOL;
                 var_dump($failure[1]);
                 echo " expected but was ".PHP_EOL;
                 var_dump($failure[0]);
@@ -383,12 +379,12 @@ class TestRunner {
             echo PHP_EOL.PHP_EOL;
         }
         if (sizeof($this->exceptions) > 0) {
-            echo $colors->getColoredString('Exceptions:', 'red').PHP_EOL;
+            echo TipyCli::red('Exceptions:').PHP_EOL;
             $i = 0;
             foreach ($this->exceptions as $e) {
                 $i++;
                 echo $i.") ";
-                echo $colors->getColoredString($e->getMessage(), 'yellow').PHP_EOL;
+                echo TipyCli::yellow($e->getMessage()).PHP_EOL;
                 echo $this->printBacktrace($e->getTrace());
                 echo PHP_EOL.PHP_EOL;
             }
@@ -396,10 +392,9 @@ class TestRunner {
     }
 
     private function printBacktrace($trace) {
-        $colors = new Colors();
         foreach ($trace as $call) {
             echo basename($call['file']);
-            echo " (".$colors->getColoredString($call['line'], 'cyan')."): ";
+            echo " (".TipyCli::cyan($call['line'])."): ";
             echo $call['function']."(";
             var_export($call['args']);
             echo ")".PHP_EOL;

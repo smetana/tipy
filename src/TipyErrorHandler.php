@@ -50,3 +50,4 @@ class StrictException             extends ErrorException {}
 class RecoverableErrorException   extends ErrorException {}
 class DeprecatedException         extends ErrorException {}
 class UserDeprecatedException     extends ErrorException {}
+class NoMethodException           extends ErrorException {}
