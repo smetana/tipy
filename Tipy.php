@@ -4,7 +4,7 @@
 // Just require classes needed.
 define('CLI_MODE', php_sapi_name() == 'cli');
 
-require_once('src/ErrorHandler.php');
+require_once('src/TipyErrorHandler.php');
 require_once('src/TipyBinder.php');
 require_once('src/TipyConfig.php');
 require_once('src/TipyEnv.php');
