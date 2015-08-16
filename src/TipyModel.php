@@ -128,7 +128,7 @@ class TipyModel extends TipyDAO {
             }
             foreach ($attrs as $name => $value) {
                 if (!in_array($name, $this->attributes)) {
-                    continue;
+                    throw new TipyModelException("Unknown property '".$name."' for ".$this->className);
                 }
                 $this->data[$name] = $value;
             }

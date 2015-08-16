@@ -318,6 +318,17 @@ class TestModel extends TipyTestSuite {
         $this->assertEqual($post->createdAt, $createdAt);
     }
 
+    public function testUnknownAttribute() {
+        $this->assertThrown('TipyModelException', "Unknown property 'name' for TipyTestUser", function () {
+            $user = TipyTestUser::create([
+                'name' => 'James Bond',
+                'login' => 'some login',
+                'password' => 'some password',
+                'email' => 'some_email@example.com'
+            ]);
+        });
+    }
+
     // methods that have names not starting whith 'test' are for seeding DB
     public function createUsersWithAsocs($count) {
         for ($i=1; $i<=$count; $i++) {
