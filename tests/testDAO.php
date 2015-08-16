@@ -123,17 +123,20 @@ class TestDAO extends TipyTestSuite {
     }
 
     public function testNull() {
-        $profile = TipyTestProfile::create([
-            'userId' => 1,
-            'sign' => null
-        ]);
-        $this->assertNull($profile->sign);
-        $profile->sign = 'sign';
-        $profile->save();
-        $this->assertNotNull($profile->sign);
-        $profile->sign = null;
-        $profile->save();
-        $this->assertNull($profile->sign);
+        TipyModel::transaction(function() {
+            $profile = TipyTestProfile::create([
+                'userId' => 1,
+                'sign' => null
+            ]);
+            $this->assertNull($profile->sign);
+            $profile->sign = 'sign';
+            $profile->save();
+            $this->assertNotNull($profile->sign);
+            $profile->sign = null;
+            $profile->save();
+            $this->assertNull($profile->sign);
+            return false;
+        });
     }
 
     private function createRecord($i) {
