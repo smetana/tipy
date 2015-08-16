@@ -1,10 +1,5 @@
 <?php
 
-// ==================================================================
-// Inflection library for camel case conversions added
-//
-// ==================================================================
-
 require_once(__DIR__.'/../vendor/Inflect/Inflect.php');
 
 class Inflector extends Inflect {
