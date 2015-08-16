@@ -4,6 +4,9 @@ require_once 'autoload.php';
 
 class TipyTestRecord extends TipyModel { }
 
+
+// WARNING: This testcase does not use transactional fixtures automatically
+
 class TestDAO extends TipyTestSuite {
 
     // Rewrite beforeTest and afterTest to disable transactional fixtures
