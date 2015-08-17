@@ -659,16 +659,16 @@ class TipyModel extends TipyDAO {
 // ------------------------------------------------------------------
 
     protected static function classNameToTableName($className) {
-        $className = Inflector::pluralize($className);
-        return Inflector::underscore($className);
+        $className = TipyInflector::pluralize($className);
+        return TipyInflector::underscore($className);
     }
 
     protected static function fieldNameToAttrName($fieldName) {
-        return Inflector::camelCase($fieldName);
+        return TipyInflector::camelCase($fieldName);
     }
 
     protected static function tableForeignKeyFieldName($tableName) {
-        return Inflector::singularize($tableName)."_id";
+        return TipyInflector::singularize($tableName)."_id";
     }
 
     protected static function classForeignKeyAttr($className) {

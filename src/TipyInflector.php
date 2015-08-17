@@ -2,7 +2,7 @@
 
 require_once(__DIR__.'/../vendor/Inflect/Inflect.php');
 
-class Inflector extends Inflect {
+class TipyInflector extends Inflect {
     public static function underscore($str) {
         $str = preg_replace("/([a-z0-9])([A-Z])/", "$1_$2", $str);
         return strtolower($str);

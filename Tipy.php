@@ -15,7 +15,7 @@ require_once('src/TipyOutput.php');
 CLI_MODE || require_once('src/TipySession.php');
 require_once('src/TipyMailer.php');
 require_once('src/TipyDAO.php');
-require_once('src/Inflector.php');
+require_once('src/TipyInflector.php');
 require_once('src/TipyModel.php');
 require_once('src/TipyView.php');
 require_once('src/TipyFlash.php');
