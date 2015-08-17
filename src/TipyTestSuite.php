@@ -220,8 +220,8 @@ class TestRunner {
         $this->testFiles      = [];
         $this->fixtures       = [];
         $this->fixtureFiles   = [];
-        if (!isset($_SERVER['argv'])) {
-            exit("Tests should be run from command line.");
+        if (!CLI_MODE) {
+            die("Tests should be run from command line.".PHP_EOL);
         }
         $args = $_SERVER['argv'];
         array_shift($args);
@@ -248,7 +248,7 @@ class TestRunner {
                 return $this->workingDir = realpath($filename.'/tests');
             }
         }
-        exit('No tests found.'.PHP_EOL);
+        die('No tests found.'.PHP_EOL);
     }
 
     private function findConfig() {
