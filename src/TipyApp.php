@@ -23,6 +23,7 @@ class TipyApp {
     private function __wakeup()    {}
     private function __construct() {
         $this->config     = new TipyConfig();    // Config
+        $this->request    = new TipyRequest();   // Request wrapper
         $this->env        = new TipyEnv();       // Environment wrapper
         $this->cookie     = new TipyCookie();    // Cookie wrapper
         $this->in         = new TipyInput();     // Input wrapper

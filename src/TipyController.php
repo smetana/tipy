@@ -20,6 +20,7 @@ class TipyController {
     public function __construct() {
         $app = TipyApp::getInstance();
         $this->config     = $app->config;
+        $this->request    = $app->request;
         $this->in         = $app->in;
         $this->out        = $app->out;
         $this->env        = $app->env;
