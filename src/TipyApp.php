@@ -63,7 +63,14 @@ class TipyApp {
 
             // Some basic checking
             if (!$controllerName || preg_match('/^\W*$/', $controllerName)) {
-                throw new TipyException('Controller name is missing');
+                // If we did not get controller and method from param try match some defaults
+                if (TipyRouter::match($this->request, $controllerName, $methodName, $id)) {
+                    if ($id && !$this->in->get('id')) {
+                        $this->in->set('id', $id);
+                    }
+                } else {
+                    throw new TipyException('Controller name is missing');
+                }
             }
             if (!$methodName || preg_match('/^\W*$/', $methodName)) {
                 throw new TipyException('Method name is missing');
