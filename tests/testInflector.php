@@ -6,6 +6,7 @@ class TestInflector extends TipyTestSuite {
 
     public function testClassify() {
         $this->assertEqual(TipyInflector::classify('welcome'), 'Welcome');
+        $this->assertEqual(TipyInflector::classify('wELcOme'), 'WELcOme');
         $this->assertEqual(TipyInflector::classify('welcomes'), 'Welcome');
         $this->assertEqual(TipyInflector::classify('welcome_home'), 'WelcomeHome');
         $this->assertEqual(TipyInflector::classify('welcome_homes'), 'WelcomeHome');
@@ -35,5 +36,17 @@ class TestInflector extends TipyTestSuite {
         $this->assertEqual(TipyInflector::tableize('Mouse'), 'mice');
     }
 
+    public function testControllerize() {
+        $this->assertEqual(TipyInflector::controllerize('welcome'), 'Welcome');
+        $this->assertEqual(TipyInflector::controllerize('wELcOmE'), 'Welcome');
+        $this->assertEqual(TipyInflector::controllerize('welcomes'), 'Welcomes');
+        $this->assertEqual(TipyInflector::controllerize('welcome_home'), 'WelcomeHome');
+        $this->assertEqual(TipyInflector::controllerize('welcome_homes'), 'WelcomeHomes');
+        $this->assertEqual(TipyInflector::controllerize('welcomehomes'), 'Welcomehomes');
+        $this->assertEqual(TipyInflector::controllerize('123welcomes'), '123welcomes');
+        $this->assertEqual(TipyInflector::controllerize('projects'), 'Projects');
+        $this->assertEqual(TipyInflector::controllerize('big_projects'), 'BigProjects');
+        $this->assertEqual(TipyInflector::controllerize('mice'), 'Mice');
+    }
 
 }

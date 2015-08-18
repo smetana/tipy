@@ -26,5 +26,13 @@ class TipyInflector extends Inflect {
         return self::underscore($str);
     }
 
+    public static function controllerize($str) {
+        $str = strtolower($str);
+        $str = str_replace("_", " ", $str);
+        $str = ucwords($str);
+        $str = str_replace(" ", "", $str);
+        return $str;
+    }
+
 
 }
