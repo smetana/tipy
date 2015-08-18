@@ -20,4 +20,11 @@ class TipyInflector extends Inflect {
         $str = Inflect::singularize($str);
         return ucfirst($str);
     }
+
+    public static function tableize($str) {
+        $str = self::pluralize($str);
+        return self::underscore($str);
+    }
+
+
 }

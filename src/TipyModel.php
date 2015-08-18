@@ -659,8 +659,7 @@ class TipyModel extends TipyDAO {
 // ------------------------------------------------------------------
 
     protected static function classNameToTableName($className) {
-        $className = TipyInflector::pluralize($className);
-        return TipyInflector::underscore($className);
+        return TipyInflector::tableize($className);
     }
 
     protected static function fieldNameToAttrName($fieldName) {
