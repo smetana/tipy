@@ -62,12 +62,11 @@ class TipyApp {
             $methodName     = $this->in->get('method');
 
             // Some basic checking
-            if (!$controllerName ||
-                !$methodName ||
-                 preg_match("/\W/", $controllerName) ||
-                 preg_match("/\W/", $methodName)
-            ) {
-                throw new TipyException("Wrong or insufficient params.");
+            if (!$controllerName || preg_match('/^\W*$/', $controllerName)) {
+                throw new TipyException('Controller name is missing');
+            }
+            if (!$methodName || preg_match('/^\W*$/', $methodName)) {
+                throw new TipyException('Method name is missing');
             }
 
             // Create controller and call method
@@ -76,12 +75,12 @@ class TipyApp {
                 require_once $controllerFile;
                 $controller = new $controllerName();
             } else {
-                throw new TipyException('Unknown controller. Sorry.');
+                throw new TipyException('Unable to find '.$controllerName.' class');
             }
             if (in_array($methodName, get_class_methods($controllerName))) {
                     $controller->execute($methodName);
             } else {
-                throw new TipyException('Unknown method. Sorry.');
+                throw new TipyException('Undefined method '.$controllerName.'::'.$methodName.'()');
             }
         } catch (Exception $exception) {
             // TODO: implement debug mode output
