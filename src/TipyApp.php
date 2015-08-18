@@ -57,14 +57,14 @@ class TipyApp {
 
     public function run() {
         try {
-            // Get controller and method name
+            // Get controller and action name
             $controllerName = $this->in->get('controller');
-            $methodName     = $this->in->get('method');
+            $actionName     = $this->in->get('action');
 
             // Some basic checking
             if (!$controllerName || preg_match('/^\W*$/', $controllerName)) {
-                // If we did not get controller and method from param try match some defaults
-                if (TipyRouter::match($this->request, $controllerName, $methodName, $id)) {
+                // If we did not get controller and action from param try match some defaults
+                if (TipyRouter::match($this->request, $controllerName, $actionName, $id)) {
                     if ($id && !$this->in->get('id')) {
                         $this->in->set('id', $id);
                     }
@@ -72,11 +72,11 @@ class TipyApp {
                     throw new TipyException('Controller name is missing');
                 }
             }
-            if (!$methodName || preg_match('/^\W*$/', $methodName)) {
-                throw new TipyException('Method name is missing');
+            if (!$actionName || preg_match('/^\W*$/', $actionName)) {
+                throw new TipyException('Action name is missing');
             }
 
-            // Create controller and call method
+            // Create controller and call action
             $controllerFile = $this->config->get('application_path') .'/controllers/'.$controllerName.'.php';
             if (file_exists($controllerFile)) {
                 require_once $controllerFile;
@@ -84,10 +84,10 @@ class TipyApp {
             } else {
                 throw new TipyException('Unable to find '.$controllerName.' class');
             }
-            if (in_array($methodName, get_class_methods($controllerName))) {
-                    $controller->execute($methodName);
+            if (in_array($actionName, get_class_methods($controllerName))) {
+                    $controller->execute($actionName);
             } else {
-                throw new TipyException('Undefined method '.$controllerName.'::'.$methodName.'()');
+                throw new TipyException('Undefined action '.$controllerName.'::'.$actionName.'()');
             }
         } catch (Exception $exception) {
             // TODO: implement debug mode output

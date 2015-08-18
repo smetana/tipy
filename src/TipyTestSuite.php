@@ -174,10 +174,10 @@ class TipyTestSuite {
         $this->run = true;
     }
 
-    public function execute($controllerName, $methodName, &$output) {
+    public function execute($controllerName, $actionName, &$output) {
         $app = TipyApp::getInstance();
         $app->in->set('controller', $controllerName);
-        $app->in->set('method', $methodName);
+        $app->in->set('action', $actionName);
         $app->out->clear();
         $output = "";
         ob_start();

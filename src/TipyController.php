@@ -64,12 +64,11 @@ class TipyController {
     }
 
     // --------------------------------------------------------------
-    // Execute default methods before method
-    // execute methoid itseld and then do some postactions
+    // Calls executeBefore() callback and execute action
     // --------------------------------------------------------------
-    public function execute($method) {
+    public function execute($action) {
         $this->executeBefore();
-        $this->$method();
+        $this->$action();
     }
 
     // --------------------------------------------------------------
@@ -105,16 +104,14 @@ class TipyController {
     }
 
     // --------------------------------------------------------------
-    // Default actions that are to be executed by default
-    // before controller method
+    // Default actions that are to be executed before ::execute()
     // --------------------------------------------------------------
     public function executeBefore() {
         // override this
     }
 
     // --------------------------------------------------------------
-    // Default actions that are to be executed by default
-    // after controller method
+    // Default actions that are to be executed before ::execute()
     // --------------------------------------------------------------
     public function executeAfter() {
         // override this
