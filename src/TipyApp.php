@@ -76,10 +76,7 @@ class TipyApp {
                 throw new TipyException('Action name is missing');
             }
 
-            // Create controller and call action
-            $controllerFile = $this->config->get('application_path') .'/controllers/'.$controllerName.'.php';
-            if (file_exists($controllerFile)) {
-                require_once $controllerFile;
+            if (class_exists($controllerName)) {
                 $controller = new $controllerName();
             } else {
                 throw new TipyException('Unable to find '.$controllerName.' class');
