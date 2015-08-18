@@ -76,11 +76,14 @@ class TipyApp {
                 throw new TipyException('Action name is missing');
             }
 
+            $controllerName = TipyInflector::controllerize($controllerName).'Controller';
             if (class_exists($controllerName)) {
                 $controller = new $controllerName();
             } else {
                 throw new TipyException('Unable to find '.$controllerName.' class');
             }
+
+            $actionName = TipyInflector::camelCase($actionName);
             if (in_array($actionName, get_class_methods($controllerName))) {
                     $controller->execute($actionName);
             } else {
