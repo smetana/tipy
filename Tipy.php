@@ -21,7 +21,6 @@ require_once('src/TipyModel.php');
 require_once('src/TipyView.php');
 require_once('src/TipyFlash.php');
 require_once('src/TipyController.php');
-require_once('src/TipyRouter.php');
 require_once('src/TipyApp.php');
 CLI_MODE && require_once('src/TipyCli.php');
 
