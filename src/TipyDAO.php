@@ -1,6 +1,7 @@
 <?php
 
 class TipyDaoException extends Exception {}
+class TipyDaoRollbackException extends Exception {}
 
 // ---------------------------------------------------------
 // ApplicationDAO
@@ -176,7 +177,7 @@ class TipyDAO {
     // ----------------------------------------------------
     // Start transaction with fallback mechanics
     // ----------------------------------------------------
-    protected static function startTransaction() {
+    private static function _startTransaction() {
         $app = TipyApp::getInstance();
         if (self::$openTransactionsCount == 0) {
             $result = $app->db->query('BEGIN');
@@ -195,14 +196,14 @@ class TipyDAO {
     // ----------------------------------------------------
     public function shutdownCheck() {
         if (self::isTransactionInProgress()) {
-            self::rollback('hard');
+            self::_rollback('hard');
         }
     }
 
     // ----------------------------------------------------
     // Commit transaction
     // ----------------------------------------------------
-    protected static function commit() {
+    private static function _commit() {
         $app = TipyApp::getInstance();
         if (self::$openTransactionsCount == 0) {
             throw new TipyDaoException('No transaction in progress');
@@ -227,9 +228,7 @@ class TipyDAO {
     // ----------------------------------------------------
     // Rollback transaction
     // ----------------------------------------------------
-
-
-    protected static function rollback($kind = 'soft') {
+    private static function _rollback($kind = 'soft') {
         $app = TipyApp::getInstance();
         if (self::$openTransactionsCount == 0) {
             throw new TipyDaoException('No transaction in progress');
@@ -244,13 +243,11 @@ class TipyDAO {
             if ($result) {
                 self::$openTransactionsCount = 0;
             }
-            return $result;
         } elseif (self::$openTransactionsCount > 1) {
             $result = $app->db->query('ROLLBACK TO SAVEPOINT '.self::currentSavepointName());
             if ($result) {
                 self::$openTransactionsCount--;
             }
-            return $result;
         } else {
             // Just to be sure
             throw new TipyDaoException('Negative open transactions counter. Please contact tipy maintainers');
@@ -258,15 +255,26 @@ class TipyDAO {
         return $result;
     }
 
+    // ----------------------------------------------------
+    // Public method to force transaction rollback
+    // ----------------------------------------------------
+    public static function rollback() {
+        // Not about exception message:
+        // By default this exception is to be caught inside TipyDAO::transaction()
+        // If it is not caught this means TipyDAO::rollback() was called outside transaction
+        // Then this exception message makes sense
+        throw new TipyDaoRollbackException("Uncaught rollback exception. Probably called outside transaction");
+    }
+
     //   TipyDAO::transaction(function() {
     //      $this->save();
     //   });
     //
-    //   To rollback transaction return false
+    //   To rollback transaction call TipyDAO::rollback()
     //
     //   TipyDAO::transaction(function() {
     //      $this->save();
-    //      return false; // rollback
+    //      TipyDAO::rollback();
     //   });
     //
     //   To use variable from upper scope
@@ -278,16 +286,14 @@ class TipyDAO {
     //   });
     public static function transaction($closure) {
         try {
-            self::startTransaction();
-            if ($closure() === false) {
-                self::rollback();
-            } else {
-                self::commit();
-            }
+            self::_startTransaction();
+            $result = $closure();
+            self::_commit();
+            return $result;
+        } catch (TipyDaoRollbackException $e) {
+            self::_rollback();
         } catch (Exception $e) {
-            if (self::isTransactionInProgress()) {
-                self::rollback();
-            }
+            self::_rollback();
             throw $e;
         }
     }

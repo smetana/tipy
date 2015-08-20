@@ -282,7 +282,7 @@ class TestModel extends TipyTestSuite {
             $user->lockForUpdate();
             $this->assertEqual(TipyTestUser::count(), 20);
             $this->assertEqual(TipyTestFriend::count(), 90);
-            return false;
+            TipyModel::rollback();
         });
         $this->assertEqual(TipyTestUser::count(), 10);
         $this->assertEqual(TipyTestFriend::count(), 45);

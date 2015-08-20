@@ -69,10 +69,48 @@ class TestDAO extends TipyTestSuite {
             $this->createRecord(2);
             $this->createRecord(3);
             $this->assertEqual(TipyTestRecord::count(), 3);
-            return false;
+            TipyModel::rollback();
         });
         $this->assertEqual(TipyTestRecord::count(), 0);
     }
+
+    public function testRollbackWithoutTransaction() {
+        $this->assertThrown('TipyDaoRollbackException', "Uncaught rollback exception. Probably called outside transaction", function () {
+            TipyModel::rollback();
+        });
+    }
+
+    public function testDoubleRollback() {
+        $this->assertEqual(TipyTestRecord::count(), 0);
+        TipyModel::transaction(function() {
+            $this->createRecord(1);
+            TipyModel::transaction(function() {
+                $this->createRecord(2);
+                $this->createRecord(3);
+                $this->createRecord(4);
+                TipyModel::rollback();
+                echo "This line and below should never be executed!";
+                TipyModel::rollback();
+                TipyModel::rollback();
+            });
+        });
+        $this->assertEqual(TipyTestRecord::count(), 1);
+    }
+
+    public function testReturnFromTransaction() {
+        $this->assertEqual(TipyTestRecord::count(), 0);
+        $result = TipyModel::transaction(function() {
+            $this->createRecord(1);
+            $this->createRecord(2);
+            $this->createRecord(3);
+            $this->assertEqual(TipyTestRecord::count(), 3);
+            return "Three records created";
+        });
+        $this->assertEqual(TipyTestRecord::count(), 3);
+        $this->assertSame($result, "Three records created");
+    }
+
+
 
     public function testLockForUpdate() {
         $this->createRecord(1);
@@ -98,7 +136,7 @@ class TestDAO extends TipyTestSuite {
                 $this->createRecord(5);
                 $this->assertEqual(TipyTestRecord::count(), 5);
                 $this->assertEqual($dao->currentSavepointName(), 'tipy_savepoint_1');
-                return false;
+                TipyModel::rollback();
             });
             $this->assertEqual($dao->currentSavepointName(), null);
             $this->assertEqual(TipyTestRecord::count(), 3);
@@ -114,7 +152,7 @@ class TestDAO extends TipyTestSuite {
                     $this->createRecord(7);
                     $this->createRecord(8);
                     $this->assertEqual(TipyTestRecord::count(), 8);
-                    return false;
+                    TipyModel::rollback();
                 });
                 $this->assertEqual($dao->currentSavepointName(), 'tipy_savepoint_1');
             });
@@ -137,7 +175,7 @@ class TestDAO extends TipyTestSuite {
             $profile->sign = null;
             $profile->save();
             $this->assertNull($profile->sign);
-            return false;
+            TipyModel::rollback();
         });
     }
 

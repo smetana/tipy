@@ -58,7 +58,7 @@ class TipyTestSuite {
                     $this->exceptions[] = $e;
                     echo TipyCli::red('E');
                 }
-                return false;
+                TipyDAO::rollback();
             });
             $this->afterTest();
         }
