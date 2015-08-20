@@ -177,7 +177,7 @@ class TipyDAO {
     // ----------------------------------------------------
     // Start transaction with fallback mechanics
     // ----------------------------------------------------
-    private static function _startTransaction() {
+    protected static function startTransaction() {
         $app = TipyApp::getInstance();
         if (self::$openTransactionsCount == 0) {
             $result = $app->db->query('BEGIN');
@@ -203,7 +203,7 @@ class TipyDAO {
     // ----------------------------------------------------
     // Commit transaction
     // ----------------------------------------------------
-    private static function _commit() {
+    protected static function commit() {
         $app = TipyApp::getInstance();
         if (self::$openTransactionsCount == 0) {
             throw new TipyDaoException('No transaction in progress');
@@ -228,7 +228,7 @@ class TipyDAO {
     // ----------------------------------------------------
     // Rollback transaction
     // ----------------------------------------------------
-    private static function _rollback($kind = 'soft') {
+    protected static function rollbackTransaction($kind = 'soft') {
         $app = TipyApp::getInstance();
         if (self::$openTransactionsCount == 0) {
             throw new TipyDaoException('No transaction in progress');
@@ -286,14 +286,14 @@ class TipyDAO {
     //   });
     public static function transaction($closure) {
         try {
-            self::_startTransaction();
+            self::startTransaction();
             $result = $closure();
-            self::_commit();
+            self::commit();
             return $result;
         } catch (TipyDaoRollbackException $e) {
-            self::_rollback();
+            self::rollbackTransaction();
         } catch (Exception $e) {
-            self::_rollback();
+            self::rollbackTransaction();
             throw $e;
         }
     }
