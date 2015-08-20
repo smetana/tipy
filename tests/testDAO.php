@@ -110,7 +110,17 @@ class TestDAO extends TipyTestSuite {
         $this->assertSame($result, "Three records created");
     }
 
-
+    public function testExceptionIsTrownThrough() {
+        $this->assertEqual(TipyTestRecord::count(), 0);
+        # escaped from TipyModel::transaction()
+        $this->assertThrown("Exception", "Kolobok!", function() {
+            TipyModel::transaction(function() {
+                $this->createRecord(1);
+                throw new Exception("Kolobok!");
+            });
+        });
+        $this->assertEqual(TipyTestRecord::count(), 0);
+    }
 
     public function testLockForUpdate() {
         $this->createRecord(1);
