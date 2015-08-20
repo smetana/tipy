@@ -45,7 +45,6 @@ class TestDAO extends TipyTestSuite {
             } catch (Exception $e) {
                 $this->run = false;
                 $this->exceptions[] = $e;
-                $colors = new Colors();
                 echo TipyCli::red("E");
             }
             $this->afterTest();
