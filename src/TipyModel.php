@@ -225,7 +225,7 @@ class TipyModel extends TipyDAO {
             $fields = $this->queryAllRows("show columns from ".$this->table);
             foreach ($fields as $field) {
                 $fieldName = $field["Field"];
-                $fieldType = preg_replace('/\(\d+\)/', '', $field["Type"]);
+                $fieldType = preg_replace('/\(.*\)/', '', $field["Type"]);
                 $fieldType = preg_replace('/ unsigned/', '', $fieldType);
                 $attrName = $this->fieldNameToAttrName($fieldName);
                 $this->fields[] = $fieldName;
