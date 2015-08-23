@@ -10,4 +10,5 @@
 defined('TEST_MODE') || define('TEST_MODE', true);
 require_once(__DIR__.'/../src/TipyTestSuite.php');
 $runner = new TestRunner();
-$runner->run();
+$exitCode = $runner->run();
+exit($exitCode);
