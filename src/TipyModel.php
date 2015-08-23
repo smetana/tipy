@@ -98,12 +98,40 @@ class TipyModel extends TipyDAO {
     const CREATED_AT = 'created_at';
     const UPDATED_AT = 'updated_at';
 
+    // Arrays are not allowed as constants
+    // so store this as static varible
+    public static $mysqlToPhpTypes = [
+        'char'      => 'string',
+        'varchar'   => 'string',
+        'binary'    => 'string',
+        'varbinary' => 'string',
+        'blob'      => 'string',
+        'text'      => 'string',
+        'enum'      => 'string',
+        'set'       => 'string',
+        'integer'   => 'integer',
+        'int'       => 'integer',
+        'smallint'  => 'integer',
+        'tinyint'   => 'integer',
+        'mediumint' => 'integer',
+        'bigint'    => 'integer',
+        'bit'       => 'integer',
+        'boolean'   => 'integer',
+        'decimal'   => 'float',
+        'numeric'   => 'float',
+        'double'    => 'float',
+        'date'      => 'datetime',
+        'datetime'  => 'datetime',
+        'timestamp' => 'datetime'
+    ];
+
     protected static $globalReflections = [];
 
     public $className;
     public $table;
     public $attributes;
     public $fields;
+    public $fieldTypes;
     public $reflections;
     public $data;
     public $isDeletedRecord;
@@ -187,6 +215,7 @@ class TipyModel extends TipyDAO {
         $this->data = [];
         if (array_key_exists($this->className, self::$globalReflections)) {
             $this->fields = self::$globalReflections[$this->className]["fields"];
+            $this->fieldTypes = self::$globalReflections[$this->className]["fieldTypes"];
             $this->attributes = self::$globalReflections[$this->className]["attributes"];
             $this->reflections = self::$globalReflections[$this->className]["reflections"];
         } else {
@@ -196,14 +225,17 @@ class TipyModel extends TipyDAO {
             $fields = $this->queryAllRows("show columns from ".$this->table);
             foreach ($fields as $field) {
                 $fieldName = $field["Field"];
+                $fieldType = preg_replace('/\(\d+\)/', '', $field["Type"]);
                 $attrName = $this->fieldNameToAttrName($fieldName);
                 $this->fields[] = $fieldName;
+                $this->fieldTypes[$fieldName] = $fieldType;
                 $this->attributes[] = $attrName;
                 $this->reflections[$fieldName] = $attrName;
             }
             // Store reflections for future use of this class
             self::$globalReflections[$this->className] = [];
             self::$globalReflections[$this->className]["fields"] = $this->fields;
+            self::$globalReflections[$this->className]["fieldTypes"] = $this->fieldTypes;
             self::$globalReflections[$this->className]["attributes"] = $this->attributes;
             self::$globalReflections[$this->className]["reflections"] = $this->reflections;
         }
@@ -487,10 +519,33 @@ class TipyModel extends TipyDAO {
     // ---------------------------------------------------------------
     protected static function instanceFromResult($instance, $result) {
         foreach ($instance->reflections as $field => $attr) {
-            $instance->data[$attr] = array_key_exists($field, $result) ? $result[$field] : null;
+            if (array_key_exists($field, $result) && $result[$field]) {
+                $instance->data[$attr] = $instance->typeCast($field, $result[$field]);
+            } else {
+                $instance->data[$attr] = null;
+            }
         }
         return $instance;
     }
+
+
+    protected function typeCast($field, $value) {
+        $type = $this->fieldTypes[$field];
+        switch (self::$mysqlToPhpTypes[$type]) {
+            // $value is already string so we don't typecast to string
+            case 'integer':
+                settype($value, 'integer');
+                break;
+            case 'float':
+                settype($value, 'float');
+                break;
+            case 'datettime':
+                $value = new DateTime($value);
+                break;
+        }
+        return $value;
+    }
+
 
     protected function findHasMany($name, $options = null) {
         $cacheAssoc = false;
