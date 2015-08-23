@@ -1,0 +1,21 @@
+{
+    "name": "tipy/tipy",
+    "type": "project",
+    "description": "Tiny PHP MVC Framework",
+    "keywords": ["tipy", "framework", "MVC"],
+    "homepage": "https://github.com/smetana/tipy",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Serge Smetana",
+            "email": "serge.smetana@gmail.com"
+        },
+        {
+            "name": "Roman Zhbadynskyi",
+            "email": "zhbadynskyi@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.5.9"
+    }
+}
