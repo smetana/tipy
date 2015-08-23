@@ -9,9 +9,13 @@ class TipyTestRecord extends TipyModel { }
 
 class TestDAO extends TipyTestSuite {
 
-    // Rewrite beforeTest and afterTest to disable transactional fixtures
-    // Also we need separate table to test transactions behaviour without
-    // affecting other tests
+    // Do not use transactional fixtures
+    // to test native transactions
+    public $transactionalFixtures = false;
+
+    // transactional fixtures are disable so we need separate 
+    // table to test transactions behaviour without affecting 
+    // other tests
     public function beforeTest() {
         $this->run = true;
         $app = TipyApp::getInstance();
@@ -27,28 +31,6 @@ class TestDAO extends TipyTestSuite {
     public function afterTest() {
         $app = TipyApp::getInstance();
         $app->db->query('DROP TABLE tipy_test_records');
-    }
-
-    public function run() {
-        $this->clear();
-        $className = get_class($this);
-        $methods = get_class_methods($className);
-        $dao = new TipyDAO();
-        foreach ($methods as $testName) {
-            if (!preg_match("/^test/", $testName)) {
-                continue;
-            }
-            $this->tests++;
-            $this->beforeTest();
-            try {
-                $this->$testName();
-            } catch (Exception $e) {
-                $this->run = false;
-                $this->exceptions[] = $e;
-                echo TipyCli::red("E");
-            }
-            $this->afterTest();
-        }
     }
 
     public function testTransactionCommit() {

@@ -27,6 +27,7 @@ class TipyTestSuite {
     protected $tests;
     protected $assertions;
     protected $failures;
+    public $transactionalFixtures = true;
 
     public function __construct() {
         $this->clear();
@@ -50,7 +51,7 @@ class TipyTestSuite {
             }
             $this->tests++;
             $this->beforeTest();
-            TipyDAO::transaction(function() use ($testName) {
+            $testClosure = function() use ($testName) {
                 try {
                     $this->$testName();
                 } catch (Exception $e) {
@@ -58,8 +59,15 @@ class TipyTestSuite {
                     $this->exceptions[] = $e;
                     echo TipyCli::red('E');
                 }
-                TipyDAO::rollback();
-            });
+            };
+            if ($this->transactionalFixtures) {
+                TipyDAO::transaction(function() use ($testName, $testClosure) {
+                    $testClosure();
+                    TipyDAO::rollback();
+                });
+            } else {
+                $testClosure();
+            }
             $this->afterTest();
         }
     }
