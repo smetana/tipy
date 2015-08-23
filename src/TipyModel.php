@@ -99,7 +99,7 @@ class TipyModel extends TipyDAO {
     const UPDATED_AT = 'updated_at';
 
     // Arrays are not allowed as constants
-    // so store this as static varible
+    // so store this as static variable
     public static $mysqlToPhpTypes = [
         'char'      => 'string',
         'varchar'   => 'string',
