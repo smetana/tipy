@@ -226,6 +226,7 @@ class TipyModel extends TipyDAO {
             foreach ($fields as $field) {
                 $fieldName = $field["Field"];
                 $fieldType = preg_replace('/\(\d+\)/', '', $field["Type"]);
+                $fieldType = preg_replace('/ unsigned/', '', $fieldType);
                 $attrName = $this->fieldNameToAttrName($fieldName);
                 $this->fields[] = $fieldName;
                 $this->fieldTypes[$fieldName] = $fieldType;
