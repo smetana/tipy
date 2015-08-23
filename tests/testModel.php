@@ -114,6 +114,21 @@ class TestModel extends TipyTestSuite {
         $this->assertTrue(is_string($post->message));
     }
 
+    public function testTypeCastNulls() {
+        $comment = TipyTestBlogComment::create([
+            'userId' => 0,
+            'title' => '',
+            'message' => null
+        ]);
+        $comment->reload();
+        $this->assertTrue(is_int($comment->id));
+        $this->assertTrue(is_int($comment->userId));
+        $this->assertSame($comment->userId, 0);
+        $this->assertTrue(is_string($comment->title));
+        $this->assertSame($comment->title, '');
+        $this->assertNull($comment->message);
+    }
+
     public function testReloadNewRecord() {
         $post = new TipyTestBlogPost;
         try {

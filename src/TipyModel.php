@@ -520,7 +520,7 @@ class TipyModel extends TipyDAO {
     // ---------------------------------------------------------------
     protected static function instanceFromResult($instance, $result) {
         foreach ($instance->reflections as $field => $attr) {
-            if (array_key_exists($field, $result) && $result[$field]) {
+            if (array_key_exists($field, $result) && $result[$field] !== null) {
                 $instance->data[$attr] = $instance->typeCast($field, $result[$field]);
             } else {
                 $instance->data[$attr] = null;
