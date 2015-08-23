@@ -196,7 +196,7 @@ class TipyDAO {
     // ----------------------------------------------------
     public function shutdownCheck() {
         if (self::isTransactionInProgress()) {
-            self::_rollback('hard');
+            self::rollbackTransaction('hard');
         }
     }
 
