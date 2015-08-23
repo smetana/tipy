@@ -10,14 +10,6 @@ class TipySession extends TipyBinder {
     }
 }
 
-$request_headers = [];
-if (!function_exists('apache_request_headers')) {
-    function apache_request_headers() {
-        global $request_headers;
-        return $request_headers;
-    }
-}
-
 // -----------------------------------------------------
 // Test suite with assertions kit
 // -----------------------------------------------------
