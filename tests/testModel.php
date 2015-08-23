@@ -91,6 +91,29 @@ class TestModel extends TipyTestSuite {
         $this->assertEqual($e->getMessage(), "Unable to reload deleted model");
     }
 
+    public function testDataTypes() {
+        $post = TipyTestBlogPost::create([
+            'userId' => 2,
+            'title' => 'This is a title',
+            'message' => 'This is a message!'
+        ]);
+        $this->assertTrue(is_int($post->id));
+        $this->assertTrue(is_int($post->userId));
+        $this->assertTrue(is_int($post->createdAt));
+        $this->assertNull($post->updatedAt);
+        $this->assertTrue(is_string($post->title));
+        $this->assertTrue(is_string($post->message));
+
+        $post->reload();
+
+        $this->assertTrue(is_int($post->id));
+        $this->assertTrue(is_int($post->userId));
+        $this->assertTrue(is_int($post->createdAt));
+        $this->assertNull($post->updatedAt);
+        $this->assertTrue(is_string($post->title));
+        $this->assertTrue(is_string($post->message));
+    }
+
     public function testReloadNewRecord() {
         $post = new TipyTestBlogPost;
         try {
