@@ -153,7 +153,7 @@ class TipyTestSuite {
         $this->assertion($a === false, "expected to be false");
     }
 
-    public function assertThrown($exceptionClass, $exceptionMessage, $closure, $messageSubstrLength = 0) {
+    public function assertThrown($exceptionClass, $exceptionMessage, $closure) {
         $this->assertions++;
         $expected = $exceptionClass.": ".$exceptionMessage;
         try {
@@ -165,8 +165,7 @@ class TipyTestSuite {
         } catch (AssertionFailedException $e) {
             throw $e;
         } catch (Exception $e) {
-            $message = $messageSubstrLength ? substr($e->getMessage(), 0, $messageSubstrLength) : $e->getMessage();
-            $actual = get_class($e).": ".$message;
+            $actual = get_class($e).": ".$e->getMessage();
             if ($expected != $actual) {
                 throw new AssertionFailedException(
                     $expected.PHP_EOL.
