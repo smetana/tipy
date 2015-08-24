@@ -96,22 +96,25 @@ class TipyTestSuite {
         }
     }
 
+    public function varDump($var) {
+        ob_start();
+        var_dump($var);
+        $var = ob_get_clean();
+        $var = preg_replace('/\n$/', '', $var);
+        return $var;
+    }
+
     public function assertion($result, $message) {
         $this->assertions++;
         if (!$result) {
             $trace = debug_backtrace();
             $args = $trace[1]['args'];
-            ob_start();
-            var_dump($args[0]);
-            $a = ob_get_clean();
-            $a = preg_replace('/\n$/', ' ', $a);
+            $a = $this->varDump($args[0]);
             if (sizeof($args) > 1) {
-                ob_start();
-                var_dump($args[1]);
-                $b = ob_get_clean();
-                $message = $a.PHP_EOL."  ".$message.PHP_EOL.$b;
+                $b = $this->varDump($args[1]);
+                $message = $a." ".$message." ".$b;
             } else {
-                $message = $a.PHP_EOL."  ".$message.PHP_EOL;
+                $message = $a." ".$message;
             }
             $e = new AssertionFailedException($message);
             throw $e;
@@ -131,11 +134,11 @@ class TipyTestSuite {
     }
 
     public function assertNull($a) {
-        $this->assertion($a === null, "expected to be null");
+        $this->assertion($a === null, "expected to be NULL");
     }
 
     public function assertNotNull($a) {
-        $this->assertion($a !== null, "expected not to be null");
+        $this->assertion($a !== null, "expected not to be NULL");
     }
 
     public function assertTrue($a) {
@@ -151,21 +154,13 @@ class TipyTestSuite {
         $expected = $exceptionClass.": ".$exceptionMessage;
         try {
             $closure();
-            throw new AssertionFailedException(
-                $expected.PHP_EOL.
-                "  expected but nothing was thrown".PHP_EOL
-            );
+            throw new AssertionFailedException('"'.$expected.'" expected but nothing was thrown');
         } catch (AssertionFailedException $e) {
             throw $e;
         } catch (Exception $e) {
             $actual = get_class($e).": ".$e->getMessage();
             if ($expected != $actual) {
-                throw new AssertionFailedException(
-                    $expected.PHP_EOL.
-                    "  expected but".PHP_EOL.
-                    $actual.PHP_EOL.
-                    "  was thrown".PHP_EOL
-                );
+                throw new AssertionFailedException('"'.$expected.'" expected but "'.$actual.'" was thrown');
             }
         }
     }
@@ -176,12 +171,7 @@ class TipyTestSuite {
             $closure();
         } catch (Exception $e) {
             $actual = get_class($e).': '.$e->getMessage();
-            throw new AssertionFailedException(
-                "Nothing".PHP_EOL.
-                "  expected but".PHP_EOL.
-                $actual.PHP_EOL.
-                "  was thrown".PHP_EOL
-           );
+            throw new AssertionFailedException('Nothing expected but "'.$actual.'" was thrown');
         }
     }
 
@@ -391,9 +381,8 @@ class TestRunner {
                 echo TipyCli::yellow($test['function']).": ";
                 echo $testBody['file']." at line (".TipyCli::cyan($testBody['line']).")".PHP_EOL;
                 echo $e->getMessage();
-                echo PHP_EOL;
+                echo PHP_EOL.PHP_EOL;
             }
-            echo PHP_EOL;
         }
         if (sizeof($this->exceptions) > 0) {
             echo TipyCli::red('Exceptions:').PHP_EOL;
