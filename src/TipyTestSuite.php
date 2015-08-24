@@ -56,6 +56,10 @@ class TipyTestSuite {
                     $trace = $e->getTrace();
                     $test = $trace[2];
                     $testBody = $trace[1];
+                    if ($test['function'] == "{closure}") {
+                        $test = $trace[1];
+                        $testBody = $trace[0];
+                    }
                     $this->failures[] = [$e, $test['function'], $testBody['file'], $testBody['line']];
                 } catch (Exception $e) {
                     $this->exceptions[] = $e;
@@ -154,14 +158,22 @@ class TipyTestSuite {
         $expected = $exceptionClass.": ".$exceptionMessage;
         try {
             $closure();
-            throw new AssertionFailedException($expected.PHP_EOL."  expected but nothing was thrown");
+            throw new AssertionFailedException(
+                $expected.PHP_EOL.
+                "  expected but nothing was thrown".PHP_EOL
+            );
         } catch (AssertionFailedException $e) {
             throw $e;
         } catch (Exception $e) {
             $message = $messageSubstrLength ? substr($e->getMessage(), 0, $messageSubstrLength) : $e->getMessage();
             $actual = get_class($e).": ".$message;
             if ($expected != $actual) {
-                throw new AssertionFailedException($expected.PHP_EOL."  expected but".PHP_EOL.$actual.PHP_EOL."  was thrown");
+                throw new AssertionFailedException(
+                    $expected.PHP_EOL.
+                    "  expected but".PHP_EOL.
+                    $actual.PHP_EOL.
+                    "  was thrown".PHP_EOL
+                );
             }
         }
     }
@@ -172,7 +184,12 @@ class TipyTestSuite {
             $closure();
         } catch (Exception $e) {
             $actual = get_class($e).': '.$e->getMessage();
-            throw new AssertionFailedException("Nothing".PHP_EOL."  expected but".PHP_EOL.$actual.PHP_EOL."  was thrown");
+            throw new AssertionFailedException(
+                "Nothing".PHP_EOL.
+                "  expected but".PHP_EOL.
+                $actual.PHP_EOL.
+                "  was thrown".PHP_EOL
+           );
         }
     }
 
@@ -377,7 +394,7 @@ class TestRunner {
                 echo $e->getMessage();
                 echo PHP_EOL;
             }
-            echo PHP_EOL.PHP_EOL;
+            echo PHP_EOL;
         }
         if (sizeof($this->exceptions) > 0) {
             echo TipyCli::red('Exceptions:').PHP_EOL;
