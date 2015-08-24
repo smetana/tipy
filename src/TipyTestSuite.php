@@ -10,6 +10,13 @@ class TipySession extends TipyBinder {
     }
 }
 
+// When assertion fails we need to stop current test execution
+// throw this exception to stop the test
+class AssertionFailedException extends Exception {
+    public $expected;
+    public $actual;
+}
+
 // -----------------------------------------------------
 // Test suite with assertions kit
 // -----------------------------------------------------
@@ -46,8 +53,14 @@ class TipyTestSuite {
             $testClosure = function() use ($testName) {
                 try {
                     $this->$testName();
+                    echo TipyCli::green('.');
+                } catch (AssertionFailedException $e) {
+                    echo TipyCli::purple('F');
+                    $trace = $e->getTrace();
+                    $test = $trace[2];
+                    $testBody = $trace[1];
+                    $this->failures[] = [$e->actual, $e->expected,  $test['function'], $testBody['file'], $testBody['line']];
                 } catch (Exception $e) {
-                    $this->run = false;
                     $this->exceptions[] = $e;
                     echo TipyCli::red('E');
                 }
@@ -70,7 +83,6 @@ class TipyTestSuite {
         // clear session and input
         $app->in->clear();
         $app->session->clear();
-        $this->run = true;
     }
 
     // do end oprations
@@ -92,64 +104,39 @@ class TipyTestSuite {
 
     public function assertion($a, $b) {
         $this->assertions++;
-        if ($a == $b) {
-            echo TipyCli::green('.');
-        } else {
-            echo TipyCli::purple('F');
-            $e = new Exception();
-            $trace = $e->getTrace();
-            $test = $trace[2];
-            $testBody = $trace[1];
-            $this->failures[] = [$a, $b, $test['function'], $testBody['file'], $testBody['line']];
+        if ($a != $b) {
+            $e = new AssertionFailedException();
+            $e->expected = $b;
+            $e->actual = $a;
+            throw $e;
         }
     }
 
     public function assertEqual($a, $b) {
-        if (!$this->run) {
-            return;
-        }
         $this->assertion($a, $b);
     }
 
     public function assertNotEqual($a, $b) {
-        if (!$this->run) {
-            return;
-        }
         $this->assertion($a <> $b, true);
     }
 
     public function assertSame($a, $b) {
-        if (!$this->run) {
-            return;
-        }
         $this->assertion($a === $b, true);
     }
 
     public function assertNull($a) {
-        if (!$this->run) {
-            return;
-        }
         $this->assertion($a === null, true);
     }
 
     public function assertNotNull($a) {
-        if (!$this->run) {
-            return;
-        }
         $this->assertion($a !== null, true);
     }
 
     public function assertTrue($a) {
-        if (!$this->run) {
-            return;
-        }
         $this->assertion($a === true, true);
     }
 
     public function assertFalse($a) {
-        if (!$this->run) {
-            return;
-        }
         $this->assertion($a === false, true);
     }
 
@@ -161,7 +148,6 @@ class TipyTestSuite {
             $message = $messageSubstrLength ? substr($e->getMessage(), 0, $messageSubstrLength) : $e->getMessage();
             $this->assertion(get_class($e).': '.$message, $exceptionClass.': '.$exceptionMessage);
         }
-        $this->run = true;
     }
 
     public function assertNotThrown($closure) {
@@ -171,7 +157,6 @@ class TipyTestSuite {
         } catch (Exception $e) {
             $this->assertion(get_class($e).': '.$e->getMessage(), null);
         }
-        $this->run = true;
     }
 
     public function execute($controllerName, $actionName, &$output) {
@@ -384,7 +369,10 @@ class TestRunner {
             foreach ($this->exceptions as $e) {
                 $i++;
                 echo $i.") ";
-                echo TipyCli::yellow($e->getMessage()).PHP_EOL;
+                $trace = $e->getTrace();
+                echo TipyCli::yellow($trace[0]['function']).": ";
+                echo $e->getFile()." at line (".TipyCli::cyan($e->getLine()).")".PHP_EOL;
+                echo TipyCli::brown(get_class($e).": ".$e->getMessage()).PHP_EOL;
                 echo $this->printBacktrace($e->getTrace());
                 echo PHP_EOL.PHP_EOL;
             }
