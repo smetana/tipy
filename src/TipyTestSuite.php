@@ -354,7 +354,6 @@ class TestRunner {
             $test->run();
             $this->updateSummary($test->getSummary());
         }
-        $app->db->query('DROP DATABASE '.$app->config->get('db_test_name'));
         $this->printSummary();
         if (sizeof($this->failures) + sizeof($this->exceptions) == 0) {
             return 0;
