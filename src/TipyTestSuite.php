@@ -404,20 +404,11 @@ class TestRunner {
                 $trace = $e->getTrace();
                 echo TipyCli::yellow($trace[0]['function']).": ";
                 echo $e->getFile()." at line (".TipyCli::cyan($e->getLine()).")".PHP_EOL;
-                echo TipyCli::brown(get_class($e).": ".$e->getMessage()).PHP_EOL;
-                echo $this->printBacktrace($e->getTrace());
+                echo get_class($e).": ".$e->getMessage().PHP_EOL;
+                echo $e->getTraceAsString();
                 echo PHP_EOL.PHP_EOL;
             }
         }
     }
 
-    private function printBacktrace($trace) {
-        foreach ($trace as $call) {
-            echo basename($call['file']);
-            echo " (".TipyCli::cyan($call['line'])."): ";
-            echo $call['function']."(";
-            var_export($call['args']);
-            echo ")".PHP_EOL;
-        }
-    }
 }
