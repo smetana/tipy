@@ -52,15 +52,8 @@ class TipyTestSuite {
                     $this->$testName();
                     echo TipyCli::green('.');
                 } catch (AssertionFailedException $e) {
+                    $this->failures[] = $e;
                     echo TipyCli::purple('F');
-                    $trace = $e->getTrace();
-                    $test = $trace[2];
-                    $testBody = $trace[1];
-                    if ($test['function'] == "{closure}") {
-                        $test = $trace[1];
-                        $testBody = $trace[0];
-                    }
-                    $this->failures[] = [$e, $test['function'], $testBody['file'], $testBody['line']];
                 } catch (Exception $e) {
                     $this->exceptions[] = $e;
                     echo TipyCli::red('E');
@@ -384,11 +377,19 @@ class TestRunner {
         if (sizeof($this->failures) > 0) {
             echo TipyCli::red('Failures:').PHP_EOL;
             $i = 0;
-            foreach ($this->failures as $failure) {
+            foreach ($this->failures as $e) {
                 $i++;
-                echo "$i) ".TipyCli::yellow($failure[1]).": ";
-                echo $failure[2]." at line (".TipyCli::cyan($failure[3]).")".PHP_EOL;
-                $e = $failure[0];
+                echo $i.") ";
+                $trace = $e->getTrace();
+                if ($trace[2]['function'] == "{closure}") {
+                    $test = $trace[1];
+                    $testBody = $trace[0];
+                } else {
+                    $test = $trace[2];
+                    $testBody = $trace[1];
+                }
+                echo TipyCli::yellow($test['function']).": ";
+                echo $testBody['file']." at line (".TipyCli::cyan($testBody['line']).")".PHP_EOL;
                 echo $e->getMessage();
                 echo PHP_EOL;
             }
