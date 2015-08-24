@@ -12,10 +12,7 @@ class TipySession extends TipyBinder {
 
 // When assertion fails we need to stop current test execution
 // throw this exception to stop the test
-class AssertionFailedException extends Exception {
-    public $expected;
-    public $actual;
-}
+class AssertionFailedException extends Exception {}
 
 // -----------------------------------------------------
 // Test suite with assertions kit
@@ -59,7 +56,7 @@ class TipyTestSuite {
                     $trace = $e->getTrace();
                     $test = $trace[2];
                     $testBody = $trace[1];
-                    $this->failures[] = [$e->actual, $e->expected,  $test['function'], $testBody['file'], $testBody['line']];
+                    $this->failures[] = [$e, $test['function'], $testBody['file'], $testBody['line']];
                 } catch (Exception $e) {
                     $this->exceptions[] = $e;
                     echo TipyCli::red('E');
@@ -102,60 +99,80 @@ class TipyTestSuite {
         }
     }
 
-    public function assertion($a, $b) {
+    public function assertion($result, $message) {
         $this->assertions++;
-        if ($a != $b) {
-            $e = new AssertionFailedException();
-            $e->expected = $b;
-            $e->actual = $a;
+        if (!$result) {
+            $trace = debug_backtrace();
+            $args = $trace[1]['args'];
+            ob_start();
+            var_dump($args[0]);
+            $a = ob_get_clean();
+            $a = preg_replace('/\n$/', ' ', $a);
+            if (sizeof($args) > 1) {
+                ob_start();
+                var_dump($args[1]);
+                $b = ob_get_clean();
+                $message = $a.PHP_EOL."  ".$message.PHP_EOL.$b;
+            } else {
+                $message = $a.PHP_EOL."  ".$message.PHP_EOL;
+            }
+            $e = new AssertionFailedException($message);
             throw $e;
         }
     }
 
     public function assertEqual($a, $b) {
-        $this->assertion($a, $b);
+        $this->assertion($a == $b, "expected but was");
     }
 
     public function assertNotEqual($a, $b) {
-        $this->assertion($a <> $b, true);
+        $this->assertion($a <> $b, "expected not be equal");
     }
 
     public function assertSame($a, $b) {
-        $this->assertion($a === $b, true);
+        $this->assertion($a === $b, "expected to be the same (===) as");
     }
 
     public function assertNull($a) {
-        $this->assertion($a === null, true);
+        $this->assertion($a === null, "expected to be null");
     }
 
     public function assertNotNull($a) {
-        $this->assertion($a !== null, true);
+        $this->assertion($a !== null, "expected not to be null");
     }
 
     public function assertTrue($a) {
-        $this->assertion($a === true, true);
+        $this->assertion($a === true, "expected to be true");
     }
 
     public function assertFalse($a) {
-        $this->assertion($a === false, true);
+        $this->assertion($a === false, "expected to be false");
     }
 
     public function assertThrown($exceptionClass, $exceptionMessage, $closure, $messageSubstrLength = 0) {
+        $this->assertions++;
+        $expected = $exceptionClass.": ".$exceptionMessage;
         try {
             $closure();
-            $this->assertion(null, $exceptionClass.': '.$exceptionMessage);
+            throw new AssertionFailedException($expected.PHP_EOL."  expected but nothing was thrown");
+        } catch (AssertionFailedException $e) {
+            throw $e;
         } catch (Exception $e) {
             $message = $messageSubstrLength ? substr($e->getMessage(), 0, $messageSubstrLength) : $e->getMessage();
-            $this->assertion(get_class($e).': '.$message, $exceptionClass.': '.$exceptionMessage);
+            $actual = get_class($e).": ".$message;
+            if ($expected != $actual) {
+                throw new AssertionFailedException($expected.PHP_EOL."  expected but".PHP_EOL.$actual.PHP_EOL."  was thrown");
+            }
         }
     }
 
     public function assertNotThrown($closure) {
+        $this->assertions++;
         try {
             $closure();
-            $this->assertion(true, true);
         } catch (Exception $e) {
-            $this->assertion(get_class($e).': '.$e->getMessage(), null);
+            $actual = get_class($e).': '.$e->getMessage();
+            throw new AssertionFailedException("Nothing".PHP_EOL."  expected but".PHP_EOL.$actual.PHP_EOL."  was thrown");
         }
     }
 
@@ -354,11 +371,10 @@ class TestRunner {
             $i = 0;
             foreach ($this->failures as $failure) {
                 $i++;
-                echo "$i) ".TipyCli::yellow($failure[2]).": ";
-                echo $failure[3]." at line (".TipyCli::cyan($failure[4]).")".PHP_EOL;
-                var_dump($failure[1]);
-                echo " expected but was ".PHP_EOL;
-                var_dump($failure[0]);
+                echo "$i) ".TipyCli::yellow($failure[1]).": ";
+                echo $failure[2]." at line (".TipyCli::cyan($failure[3]).")".PHP_EOL;
+                $e = $failure[0];
+                echo $e->getMessage();
                 echo PHP_EOL;
             }
             echo PHP_EOL.PHP_EOL;
