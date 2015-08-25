@@ -21,22 +21,20 @@ class TestModel extends TipyTestSuite {
             $post->delete();
             $post->save();
         });
+        
+        // This should not raise exceptions
+        $post = new TipyTestBlogPost;
+        $post->userId = 2;
+        $post->title = "Hello World!";
+        $post->message = "This is a blog post!";
 
-        // Just example of assertNotThrown method
-        $this->assertNotThrown(function () {
-            $post = new TipyTestBlogPost;
-            $post->userId = 2;
-            $post->title = "Hello World!";
-            $post->message = "This is a blog post!";
+        $this->assertEqual($post->isNewRecord(), true);
+        $this->assertEqual($post->createdAt, null);
+        $this->assertEqual($post->save(), true);
+        $this->assertEqual($post->isNewRecord(), false);
+        $this->assertNotEqual($post->createdAt, null);
 
-            $this->assertEqual($post->isNewRecord(), true);
-            $this->assertEqual($post->createdAt, null);
-            $this->assertEqual($post->save(), true);
-            $this->assertEqual($post->isNewRecord(), false);
-            $this->assertNotEqual($post->createdAt, null);
-
-            $post->delete();
-        });
+        $post->delete();
     }
 
     public function testCRUD() {
