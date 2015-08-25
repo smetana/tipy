@@ -165,6 +165,24 @@ class TipyTestSuite {
         }
     }
 
+    public function assertThrownRegexp($expectedClassString, $expectedMessageRegexp, $closure) {
+        $this->assertions++;
+        $expected = $expectedClassString.": ".$expectedMessageRegexp;
+        try {
+            $closure();
+            throw new AssertionFailedException('"'.$expected.'" expected but nothing was thrown');
+        } catch (AssertionFailedException $e) {
+            throw $e;
+        } catch (Exception $e) {
+            $actualClass = get_class($e);
+            $actualMessage = $e->getMessage();
+            if (($expectedClassString != $actualClass) || !preg_match($expectedMessageRegexp, $actualMessage)) {
+                $actual = $actualClass.': '.$actualMessage;
+                throw new AssertionFailedException('"'.$expected.'" does not match "'.$actual.'"');
+            }
+        }
+    }
+
     public function execute($controllerName, $actionName, &$output) {
         $app = TipyApp::getInstance();
         $app->in->set('controller', $controllerName);
