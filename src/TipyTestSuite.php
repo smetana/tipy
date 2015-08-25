@@ -165,16 +165,6 @@ class TipyTestSuite {
         }
     }
 
-    public function assertNotThrown($closure) {
-        $this->assertions++;
-        try {
-            $closure();
-        } catch (Exception $e) {
-            $actual = get_class($e).': '.$e->getMessage();
-            throw new AssertionFailedException('Nothing expected but "'.$actual.'" was thrown');
-        }
-    }
-
     public function execute($controllerName, $actionName, &$output) {
         $app = TipyApp::getInstance();
         $app->in->set('controller', $controllerName);
