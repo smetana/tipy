@@ -33,7 +33,7 @@ app/models/BlogPost.php
 class BlogPost extends TipyModel {
 
     protected $belongsTo = [
-        'user' => ['class' => 'TipyTestUser', 'foreign_key' => 'user_id']
+        'user' => ['class' => 'User', 'foreign_key' => 'user_id']
     ];
 
 }
