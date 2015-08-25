@@ -2,9 +2,6 @@
 
 Tiny PHP MVC framework.
 
-This is a **tipy core**.
-See [tipy-example](https://github.com/smetana/tipy-example) for application example.
-
 # Requirements
 
 * PHP 5.5+
