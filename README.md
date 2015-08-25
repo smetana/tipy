@@ -82,4 +82,4 @@ app/views/myView.php
 # Routing
 
 For now tipy uses Apache's .htaccess for routing.
-[tipy-example](https://github.com/smetana/tipy-example) has set of predefined routes that makes easy to add new route to your application.
+[tipy-example](https://github.com/smetana/tipy-example) has set of predefined routes which make easy to add new route to your application.
