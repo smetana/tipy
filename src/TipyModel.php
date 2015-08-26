@@ -38,7 +38,7 @@
 //
 //    protected $hasMany = [
 //        'posts' => ['class' => 'BlogPost', 'dependent' => 'nullify'],
-//        'positive_posts' => ['class' => 'BlogPost', 'conditions' => 'rating > 0', 'dependent' => 'nullify'],
+//        'positivePosts' => ['class' => 'BlogPost', 'conditions' => 'rating > 0', 'dependent' => 'nullify'],
 //        'relations' => ['class' => 'UserGroup', 'dependent' => 'delete']
 //    );
 //
