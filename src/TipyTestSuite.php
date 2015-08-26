@@ -109,44 +109,44 @@ class TipyTestSuite {
         if (!$result) {
             $trace = debug_backtrace();
             $args = $trace[1]['args'];
-            $a = $this->varDump($args[0]);
+            $actual = $this->varDump($args[0]);
             if (sizeof($args) > 1) {
-                $b = $this->varDump($args[1]);
-                $message = $a." ".$message." ".$b;
+                $expected = $this->varDump($args[1]);
+                $message = $actual." ".$message." ".$expected;
             } else {
-                $message = $a." ".$message;
+                $message = $actual." ".$message;
             }
             $e = new AssertionFailedException($message);
             throw $e;
         }
     }
 
-    public function assertEqual($a, $b) {
-        $this->assertion($a == $b, "expected but was");
+    public function assertEqual($actual, $expected) {
+        $this->assertion($actual == $expected, "expected to be equal");
     }
 
-    public function assertNotEqual($a, $b) {
-        $this->assertion($a <> $b, "expected not be equal");
+    public function assertNotEqual($actual, $expected) {
+        $this->assertion($actual <> $expected, "expected not be equal");
     }
 
-    public function assertSame($a, $b) {
-        $this->assertion($a === $b, "expected to be the same (===) as");
+    public function assertSame($actual, $expected) {
+        $this->assertion($actual === $expected, "expected to be the same (===) as");
     }
 
-    public function assertNull($a) {
-        $this->assertion($a === null, "expected to be NULL");
+    public function assertNull($actual) {
+        $this->assertion($actual === null, "expected to be NULL");
     }
 
-    public function assertNotNull($a) {
-        $this->assertion($a !== null, "expected not to be NULL");
+    public function assertNotNull($actual) {
+        $this->assertion($actual !== null, "expected not to be NULL");
     }
 
-    public function assertTrue($a) {
-        $this->assertion($a === true, "expected to be true");
+    public function assertTrue($actual) {
+        $this->assertion($actual === true, "expected to be true");
     }
 
-    public function assertFalse($a) {
-        $this->assertion($a === false, "expected to be false");
+    public function assertFalse($actual) {
+        $this->assertion($actual === false, "expected to be false");
     }
 
     public function assertThrown($exceptionClass, $exceptionMessage, $closure) {
