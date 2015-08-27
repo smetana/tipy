@@ -344,6 +344,8 @@ class TestRunner {
             $test = new $test;
             $test->run();
             $this->updateSummary($test->getSummary());
+            // Force to call __destruct()
+            unset($test);
         }
         $this->printSummary();
         if (sizeof($this->failures) + sizeof($this->exceptions) == 0) {
