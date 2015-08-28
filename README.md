@@ -2,24 +2,54 @@
 
 Tiny PHP MVC framework.
 
-# Requirements
+## Prerequisites
 
 * PHP 5.5+
-* Apache 2.4
-* MySQL 5+ (for now tipy supports MySQL database only)
+* Apache 2
+* MySQL
+* Git
+* Composer
 
-# Installation
+## Installation
 
-See [tipy-example](https://github.com/smetana/tipy-example) for installation and usage details.
+Clone [tipy-project](https://github.com/smetana/tipy-project) to quickly bootstrap your tipy web app.
+This is an application skeleton for a typical tipy project.
 
-# Convention over Configuration
+```shell
+git clone https://github.com/smetana/tipy-project myproject
+cd myproject
+composer.phar install
+```
+You can also use [tipy-example](https://github.com/smetana/tipy-example) as a demo.
 
-tipy strictly follows "Convention over Configuration" paradigm therefore you will have
-to maintain only one small config file for database connection and mailer.
+## Convention over Configuration
 
-# Models
-app/models/User.php
+tipy follows "Convention over Configuration" paradigm therefore you have
+to maintain only one small config file for database connection but you have
+to follow tipy conventions in code.
+
+## Routes
+
+tipy uses Apache's .htaccess for routing.<br/>
+tipy-project comes with small set of predefined routes.
+```
+/:controller
+/:controller/:action
+/:controller/:action/:id
+```
+Examples (please note the case in urls and PHP code):
+
+```
+/welcome             =>  WelcomeController::index()
+/code/open_source    =>  CodeController::openSource()
+/my_blog/article/11  =>  MyBlogController::article() # $id = 11
+```
+##### Routes Conventions
+* *Everything in snake_case in urls becomes camelCase in php code*.
+
+## Models
 ```php
+// app/models/User.php
 class User extends TipyModel {
 
     protected $hasMany = [
@@ -27,9 +57,8 @@ class User extends TipyModel {
     );
 
 }
-```
-app/models/BlogPost.php
-```php
+
+// app/models/BlogPost.php
 class BlogPost extends TipyModel {
 
     protected $belongsTo = [
@@ -39,7 +68,7 @@ class BlogPost extends TipyModel {
 }
 ```
 
-# Controllers
+## Controllers
 app/controllers/WelcomeController.php
 ```php
 class WelcomeController extends TipyController {
@@ -50,7 +79,7 @@ class WelcomeController extends TipyController {
 }
 ```
 
-# Views
+## Views
 tipy views are plain php files. Simple and powerful. No heavy template systems. And all your application data is isolated from views.
 You pass to view only you what to want to show.
 
@@ -78,8 +107,3 @@ app/views/myView.php
 </body>
 </html>
 ```
-
-# Routing
-
-For now tipy uses Apache's .htaccess for routing.
-[tipy-example](https://github.com/smetana/tipy-example) has set of predefined routes which make easy to add new route to your application.
