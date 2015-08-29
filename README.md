@@ -31,21 +31,15 @@ to follow tipy conventions in code.
 ## Routes
 
 tipy uses Apache's .htaccess for routing.<br/>
-tipy-project comes with small set of predefined routes.
-```
-/:controller
-/:controller/:action
-/:controller/:action/:id
-```
-Examples (please note the case in urls and PHP code):
+Using combination of predefined rewrite rules and tipy conventions it is very
+easy to define new routes.
 
+```apache
+#/public/.htaccess
+
+RewriteRule ^$             /welcome [QSA,L]           # WelcomeController::index()
+RewriteRule ^open_source$  /code/open_source [QSA,L]  # CodeController::openSource()
 ```
-/welcome             =>  WelcomeController::index()
-/code/open_source    =>  CodeController::openSource()
-/my_blog/article/11  =>  MyBlogController::article() # $id = 11
-```
-##### Routes Conventions
-* *Everything in snake_case in urls becomes camelCase in php code*.
 
 ## Models
 ```php
