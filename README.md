@@ -34,42 +34,46 @@ tipy uses Apache's .htaccess for routing.<br/>
 Using combination of predefined rewrite rules and tipy conventions it is very
 easy to define new routes.
 
+/public/.htaccess
 ```apache
-#/public/.htaccess
+RewriteRule ^$        /blog [QSA,L]
+# => BlogController::index()
 
-RewriteRule ^$             /welcome [QSA,L]           # WelcomeController::index()
-RewriteRule ^open_source$  /code/open_source [QSA,L]  # CodeController::openSource()
+RewriteRule ^/code$   /code/open_source [QSA,L]
+# => CodeController::openSource()
 ```
 
 ## Models
+app/models/BlogPost.php
 ```php
-// app/models/User.php
-class User extends TipyModel {
-
-    protected $hasMany = [
-        'posts' => ['class' => 'BlogPost', 'dependent' => 'nullify']
-    );
-
-}
-
-// app/models/BlogPost.php
 class BlogPost extends TipyModel {
-
+    protected $hasMany = [
+        'comments' => ['class' => 'Comment', 'dependent' => 'destroy']
+    );
+}
+```
+app/models/Comment.php
+```php
+class Comment extends TipyModel {
     protected $belongsTo = [
-        'user' => ['class' => 'User', 'foreign_key' => 'user_id']
+        'post' => ['class' => 'BlogPost', 'foreign_key' => 'blog_post_id']
     ];
-
 }
 ```
 
 ## Controllers
-app/controllers/WelcomeController.php
-```php
-class WelcomeController extends TipyController {
+app/controllers/BlogController.php
 
-    public function index() {
-        $this->renderView('welcome');
+```php
+class BlogController extends TipyController {
+
+    public function article() {
+        $blogPost = BlogPost::load($this->in('id'));
+        $this->out('blogPost', $blogPost);
+        $this->out('comments', $blogPost->comments);
+        $this->renderView('blog/article');
     }
+
 }
 ```
 
@@ -77,27 +81,29 @@ class WelcomeController extends TipyController {
 tipy views are plain php files. Simple and powerful. No heavy template systems. And all your application data is isolated from views.
 You pass to view only you what to want to show.
 
-app/controllers/MyController.php
+app/controllers/BlogController.php
 ```php
-class MyController extends TipyController {
+class BlogController extends TipyController {
 
-    public function myAction() {
-        $this->out->set('myVar1', 'Hello World!');
-        $this->out->set('myVar2', 'Welcome to Tipy!');
-        $this->renderView('myView');
+    public function article() {
+        $post = BlogPost::load($this-in('id'));
+        $this->out->set('title', $post->title);
+        $this->out->set('message', $post->message);
+        $this->renderView('blog/article');
     }
 }
 ```
-app/views/myView.php
+app/views/blog/article.php
 
 ```html
 <!DOCTYPE html>
 <html>
 <head>
-    <title><?= $myVar1 ></title>
+    <title><?= $title ></title>
 </head>
 <body>
-    <p><?= $myvar2 ?></p>
+    <h1><?= $title ?></p>
+    <p><?= $message ?></p>
 </body>
 </html>
 ```
