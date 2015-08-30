@@ -18,6 +18,7 @@ class TipyApp {
     public $out;
     public $view;
     public $session;
+    public $documentRoot;
 
     private function __clone()     {}
     private function __wakeup()    {}
@@ -32,14 +33,9 @@ class TipyApp {
         $this->session    = new TipySession();   // Session
         $this->db         = null;                // DB resource
 
-        // dispatcher.php is called by Apache with current working dir
-        // set to DocumentRoot. Use it to get all paths needed
+        // dispatcher.php is called by Apache with current working dir set to DocumentRoot
         $cwd = getcwd();
-        // Set path to document_root
-        $this->config->set('document_root', $cwd);
-        // Set path to application
-        $this->config->set('application_path', realpath($cwd.'/../app'));
-        // Set path to templates
+        $this->documentRoot = $cwd;
         $this->view->setTemplatePath(realpath($cwd.'/../app/views'));
     }
 
