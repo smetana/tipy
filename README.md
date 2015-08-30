@@ -12,13 +12,26 @@ Tiny PHP MVC framework.
 
 ## Installation
 
-Clone [tipy-project](https://github.com/smetana/tipy-project) to quickly bootstrap your tipy web app.
-This is an application skeleton for a typical tipy project.
+Clone [tipy-project](https://github.com/smetana/tipy-project) to quickly bootstrap your tipy web app:
 
 ```shell
 git clone https://github.com/smetana/tipy-project myproject
 cd myproject
 composer.phar install
+```
+Add virtual host to apache2
+
+```apache
+# /etc/apache2/sites-available/tipy-conf
+
+<VirtualHost 127.0.0.1:80>
+    ServerName localhost
+    DocumentRoot /home/user/projects/tipy-project/public
+    <Directory "/home/user/projects/tipy-project">
+        AllowOverride All
+        Require all granted
+    </Directory>
+</VirtualHost>
 ```
 You can also use [tipy-example](https://github.com/smetana/tipy-example) as a demo.
 
@@ -32,10 +45,11 @@ to follow tipy conventions in code.
 
 tipy uses Apache's .htaccess for routing.<br/>
 Using combination of predefined rewrite rules and tipy conventions it is very
-easy to define new routes.
+easy to define new routes:
 
-/public/.htaccess
 ```apache
+# public/.htaccess
+
 RewriteRule ^$        /blog [QSA,L]
 # => BlogController::index()
 
@@ -44,16 +58,18 @@ RewriteRule ^/code$   /code/open_source [QSA,L]
 ```
 
 ## Models
-app/models/BlogPost.php
 ```php
+// app/models/BlogPost.php
+
 class BlogPost extends TipyModel {
     protected $hasMany = [
         'comments' => ['class' => 'Comment', 'dependent' => 'destroy']
     );
 }
 ```
-app/models/Comment.php
 ```php
+// app/models/Comment.php
+
 class Comment extends TipyModel {
     protected $belongsTo = [
         'post' => ['class' => 'BlogPost', 'foreign_key' => 'blog_post_id']
@@ -62,15 +78,14 @@ class Comment extends TipyModel {
 ```
 
 ## Controllers
-app/controllers/BlogController.php
-
 ```php
+// app/controllers/BlogController.php
+
 class BlogController extends TipyController {
 
     public function article() {
         $blogPost = BlogPost::load($this->in('id'));
         $this->out('blogPost', $blogPost);
-        $this->out('comments', $blogPost->comments);
         $this->renderView('blog/article');
     }
 
@@ -78,32 +93,20 @@ class BlogController extends TipyController {
 ```
 
 ## Views
-tipy views are plain php files. Simple and powerful. No heavy template systems. And all your application data is isolated from views.
-You pass to view only you what to want to show.
-
-app/controllers/BlogController.php
-```php
-class BlogController extends TipyController {
-
-    public function article() {
-        $post = BlogPost::load($this-in('id'));
-        $this->out->set('title', $post->title);
-        $this->out->set('message', $post->message);
-        $this->renderView('blog/article');
-    }
-}
-```
-app/views/blog/article.php
-
 ```html
+<!-- app/views/blog/article.php -->
+
 <!DOCTYPE html>
 <html>
 <head>
-    <title><?= $title ></title>
+    <title><?= $blogPost->title ></title>
 </head>
 <body>
-    <h1><?= $title ?></p>
-    <p><?= $message ?></p>
+    <h1><?= $blogPost->title ?></p>
+    <p><?= $blogPost->body ?></p>
+    <? foreach($blogPost->comments as $comment) ?>
+        <p><?= $comment->body ?></p>
+    <? } ?>
 </body>
 </html>
 ```
