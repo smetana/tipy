@@ -20,18 +20,18 @@ class TipyApp {
     public $session;
     public $documentRoot;
 
-    private function __clone()     {}
-    private function __wakeup()    {}
+    private function __clone() {}
+    private function __wakeup() {}
     private function __construct() {
-        $this->config     = new TipyConfig();    // Config
-        $this->request    = new TipyRequest();   // Request wrapper
-        $this->env        = new TipyEnv();       // Environment wrapper
-        $this->cookie     = new TipyCookie();    // Cookie wrapper
-        $this->in         = new TipyInput();     // Input wrapper
-        $this->out        = new TipyOutput();    // Output data holder
-        $this->view       = new TipyView();      // Template renderer
-        $this->session    = new TipySession();   // Session
-        $this->db         = null;                // DB resource
+        $this->config  = new TipyConfig();
+        $this->request = new TipyRequest();
+        $this->env     = new TipyEnv();
+        $this->cookie  = new TipyCookie();
+        $this->in      = new TipyInput();
+        $this->out     = new TipyOutput();
+        $this->view    = new TipyView();
+        $this->session = new TipySession();
+        $this->db      = null; // Lazy database connection
 
         // dispatcher.php is called by Apache with current working dir set to DocumentRoot
         $cwd = getcwd();
