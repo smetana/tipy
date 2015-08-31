@@ -74,7 +74,7 @@ class TipyController {
     // --------------------------------------------------------------
     // exit function wrapper for tests compability
     // --------------------------------------------------------------
-    public function safeExit($message) {
+    private function safeExit($message) {
         if (defined('TEST_MODE') and TEST_MODE) {
             throw new TipyException($msg);
         } else {
