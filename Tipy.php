@@ -1,9 +1,21 @@
 <?php
-// If tipy run in 'cli' SAPI then we don't need to
-// initialize outout buffer and run application.
-// Just require classes needed.
+/**
+ * tipy : Tiny PHP MVC framework
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * @copyright     Copyright (c) 2008-2015 Serge Smetana <serge.smetana@gmail.com>
+ * @copyright     Copyright (c) 2008-2015 Roman Zhbadynskyi <zhbadynskyi@gmail.com>
+ * @link          https://github.com/smetana/tipy
+ * @author        Serge Smetana <serge.smetana@gmail.com>
+ * @author        Roman Zhbadynskyi <zhbadynskyi@gmail.com>
+ * @license       http://www.opensource.org/licenses/mit-license.php MIT License
+ */
+
 define('CLI_MODE', php_sapi_name() == 'cli');
 
+// Require base classes
 require_once('src/TipyErrorHandler.php');
 require_once('src/TipyIOWrapper.php');
 require_once('src/TipyConfig.php');
@@ -22,9 +34,21 @@ require_once('src/TipyView.php');
 require_once('src/TipyFlash.php');
 require_once('src/TipyController.php');
 require_once('src/TipyApp.php');
+// Some useful goodies for command line
 CLI_MODE && require_once('src/TipyCli.php');
 
+set_error_handler('tipyErrorHandler');
+
+/**
+ * Main class to run application. Just add to dispatcher.php:
+ *
+ * <code>
+ * require('Tipy.php');
+ * Tipy::run();
+ * </code>
+ */
 class Tipy {
+
     public static function run() {
         CLI_MODE && die("TipyApp cannot be run in CLI mode\n");
         ob_start();
