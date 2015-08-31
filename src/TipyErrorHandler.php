@@ -1,21 +1,14 @@
 <?php
 
-// DEBUG_MODE constant. Unless this constant is set somewhere before
-// this condition you won't get any error message
-defined('DEBUG_MODE') || define('DEBUG_MODE', false);
-
 // +----------------------------------------------------------------+
 // Error handler
 // throw exceptions based on E_* error types
 // +----------------------------------------------------------------+
 
-$old_error_handler = set_error_handler(function ($err_severity, $err_msg, $err_file, $err_line, array $err_context) {
+set_error_handler(function ($err_severity, $err_msg, $err_file, $err_line, array $err_context) {
     // error was suppressed with the @-operator
     if (0 === error_reporting()) {
         return false;
-    }
-    if (!DEBUG_MODE) {
-        $err_file = basename($err_file);
     }
     switch ($err_severity) {
         case E_ERROR:             throw new ErrorException            ($err_msg, 0, $err_severity, $err_file, $err_line);
