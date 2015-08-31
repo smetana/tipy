@@ -1,7 +1,5 @@
 <?php
 
-class TipyException extends Exception {}
-
 // ==================================================================
 // Application
 // Class to store Application context

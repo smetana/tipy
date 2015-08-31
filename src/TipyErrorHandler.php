@@ -13,21 +13,85 @@
  * @license       http://www.opensource.org/licenses/mit-license.php MIT License
  */
 
+/**
+ * Replaces PHP error with E_WARNING severity
+ */
 class WarningException extends ErrorException {}
+
+/**
+ * Replaces PHP error with E_PARSE severity
+ */
 class ParseException extends ErrorException {}
+
+/**
+ * Replaces PHP error with E_NOTICE severity
+ */
 class NoticeException extends ErrorException {}
+
+/**
+ * Replaces PHP error with E_CODE_ERROR severity
+ */
 class CoreErrorException extends ErrorException {}
+
+/**
+ * Replaces PHP error with E_CORE_WARNING severity
+ */
 class CoreWarningException extends ErrorException {}
+
+/**
+ * Replaces PHP error with E_COMPILE_ERROR severity
+ */
 class CompileErrorException extends ErrorException {}
+
+/**
+ * Replaces PHP error with E_COMPILE_WARNING severity
+ */
 class CompileWarningException extends ErrorException {}
+
+/**
+ * Replaces PHP error with E_USER_ERROR severity
+ */
 class UserErrorException extends ErrorException {}
+
+/**
+ * Replaces PHP error with E_USER_WARNING severity
+ */
 class UserWarningException extends ErrorException {}
+
+/**
+ * Replaces PHP error with E_USER_NOTICE severity
+ */
 class UserNoticeException extends ErrorException {}
+
+/**
+ * Replaces PHP error with E_STRICT severity
+ */
 class StrictException extends ErrorException {}
+
+/**
+ * Replaces PHP error with E_RECOVERABLE_ERROR severity
+ */
 class RecoverableErrorException extends ErrorException {}
+
+/**
+ * Replaces PHP error with E_DEPRECATED severity
+ */
 class DeprecatedException extends ErrorException {}
+
+/**
+ * Replaces PHP error with E_USER_DEPRECATED severity
+ */
 class UserDeprecatedException extends ErrorException {}
-class NoMethodException extends ErrorException {}
+
+/**
+ * Base Tipy exception class
+ */
+class TipyException extends Exception {}
+
+/**
+ * Raised when a method is called on a class which doesn't have it defined
+ */
+class NoMethodException extends TipyException {}
 
 /**
  * Error handler function to convert PHP errors to exceptions.

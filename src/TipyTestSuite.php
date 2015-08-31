@@ -1,13 +1,20 @@
 <?php
 require_once(__DIR__.'/../Tipy.php');
 
-// When assertion fails we need to stop current test execution
-// throw this exception to stop the test
-class AssertionFailedException extends Exception {}
+/**
+ * Raised when asserton is failed
+ *
+ * When assertion fails we need to stop current test execution
+ * throw this exception to stop the test
+ * Typically used should not see this exception. All of them
+ * should be catched by TipyTestRunner
+ */
+class AssertionFailedException extends TipyException {}
 
-// -----------------------------------------------------
-// Test suite with assertions kit
-// -----------------------------------------------------
+
+/**
+ * Test suite with assertion kit
+ */
 class TipyTestSuite {
 
     protected $exeptions;
@@ -195,9 +202,7 @@ class TipyTestSuite {
     }
 }
 
-// -----------------------------------------------------
-// Class for running tests
-// -----------------------------------------------------
+
 class TestRunner {
 
     public $fixtures;
