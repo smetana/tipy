@@ -1,15 +1,6 @@
 <?php
 require_once(__DIR__.'/../Tipy.php');
 
-//
-// Override application session for tests
-//
-class TipySession extends TipyIOWrapper {
-    public function close() {
-        $this->ioArray = [];
-    }
-}
-
 // When assertion fails we need to stop current test execution
 // throw this exception to stop the test
 class AssertionFailedException extends Exception {}

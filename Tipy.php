@@ -24,8 +24,7 @@ require_once('src/TipyEnv.php');
 require_once('src/TipyCookie.php');
 require_once('src/TipyInput.php');
 require_once('src/TipyOutput.php');
-// No server sessions in CLI_MODE
-CLI_MODE || require_once('src/TipySession.php');
+require_once('src/TipySession.php');
 require_once('src/TipyMailer.php');
 require_once('src/TipyDAO.php');
 require_once('src/TipyInflector.php');
@@ -34,8 +33,10 @@ require_once('src/TipyView.php');
 require_once('src/TipyFlash.php');
 require_once('src/TipyController.php');
 require_once('src/TipyApp.php');
-// Some useful goodies for command line
-CLI_MODE && require_once('src/TipyCli.php');
+if (CLI_MODE) {
+    require_once('src/TipyCli.php');
+    require_once('src/TipyCliSession.php');
+}
 
 set_error_handler('tipyErrorHandler');
 

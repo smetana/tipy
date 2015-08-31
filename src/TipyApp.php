@@ -30,9 +30,12 @@ class TipyApp {
         $this->in      = new TipyInput();
         $this->out     = new TipyOutput();
         $this->view    = new TipyView();
-        $this->session = new TipySession();
         $this->db      = null; // Lazy database connection
-
+        if (CLI_MODE) {
+            $this->session = new TipyCliSession();
+        } else {
+            $this->session = new TipySession();
+        }
         // dispatcher.php is called by Apache with current working dir set to DocumentRoot
         $cwd = getcwd();
         $this->documentRoot = $cwd;
