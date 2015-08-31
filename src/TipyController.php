@@ -6,29 +6,29 @@
 
 class TipyController {
 
-    public $config;            // Config
-    public $in;                // Input wrapper
-    public $out;               // Output data holder
-    public $env;               // Environment wrapper
-    public $view;              // Template Renderer
-    public $db;                // DB Handler
-    public $session;           // Session
-    public $cookie;            // Cookies placeholder
+    public $config;
+    public $in;
+    public $out;
+    public $env;
+    public $view;
+    public $db;
+    public $session;
+    public $cookie;
     protected $flash;
 
     // Application Constructor
     public function __construct() {
         $app = TipyApp::getInstance();
-        $this->config     = $app->config;
-        $this->request    = $app->request;
-        $this->in         = $app->in;
-        $this->out        = $app->out;
-        $this->env        = $app->env;
-        $this->cookie     = $app->cookie;
-        $this->view       = $app->view;
-        $this->db         = $app->db;
-        $this->session    = $app->session;
-        $this->flash      = new TipyFlash($this->session);
+        $this->config   = $app->config;
+        $this->request  = $app->request;
+        $this->in       = $app->in;
+        $this->out      = $app->out;
+        $this->env      = $app->env;
+        $this->cookie   = $app->cookie;
+        $this->view     = $app->view;
+        $this->db       = $app->db;
+        $this->session  = $app->session;
+        $this->flash     = new TipyFlash($this->session);
     }
 
     public function in($name, $defaultValue = null) {
