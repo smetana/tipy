@@ -4,7 +4,7 @@
 // Environment wrapper
 // ==================================================================
 
-class TipyEnv extends TipyBinder {
+class TipyEnv extends TipyIOWrapper {
 
     public function __construct() {
         parent::__construct();

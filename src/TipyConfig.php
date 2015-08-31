@@ -4,7 +4,7 @@
 // Config class
 // ==================================================================
 
-class TipyConfig extends TipyBinder {
+class TipyConfig extends TipyIOWrapper {
 
     public function __construct() {
         parent::__construct();

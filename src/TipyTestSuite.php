@@ -4,9 +4,9 @@ require_once(__DIR__.'/../Tipy.php');
 //
 // Override application session for tests
 //
-class TipySession extends TipyBinder {
+class TipySession extends TipyIOWrapper {
     public function close() {
-        $this->binderData = [];
+        $this->ioArray = [];
     }
 }
 

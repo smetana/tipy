@@ -1,6 +1,6 @@
 <?php
 
-class TipyRequest extends TipyBinder {
+class TipyRequest extends TipyIOWrapper {
 
     public function __construct() {
         parent::__construct();

@@ -4,7 +4,7 @@
 // Input
 // ==================================================================
 
-class TipyInput extends TipyBinder {
+class TipyInput extends TipyIOWrapper {
 
     public function __construct() {
         parent::__construct();

@@ -7,8 +7,8 @@
 
 class TipyView {
 
-    private $binder;              // Internal param binder
-    private $templatePath;        // Path to templates
+    private $assigns; // Stores variable assigned to template
+    private $templatePath;
 
     // This two stacks are used when processed template (or the part)
     // is nested into other template.
@@ -20,41 +20,41 @@ class TipyView {
     // Contrustor
     // --------------------------------------------------------------
     public function __construct() {
-        $this->binder           = new TipyBinder();
+        $this->assigns          = new TipyIOWrapper();
         $this->contentStack     = [];
         $this->templateStack    = [];
     }
 
     // --------------------------------------------------------------
-    // Bind data to internal param binder
+    // Bind array to assigns
     // --------------------------------------------------------------
     public function bind($data) {
-        $this->binder->bind($data);
+        $this->assigns->bind($data);
     }
 
     // --------------------------------------------------------------
-    // Get variable from binder
+    // Get assigned variable
     // --------------------------------------------------------------
     public function get($varname) {
         if (func_num_args() > 1) {
-            return $this->binder->get($varname, $func_get_arg(1));
+            return $this->assigns->get($varname, $func_get_arg(1));
         } else {
-            return $this->binder->get($varname);
+            return $this->assigns->get($varname);
         }
     }
 
     // --------------------------------------------------------------
-    // Set binder variable
+    // Assign variable to template
     // --------------------------------------------------------------
     public function set($varname, $value) {
-        $this->binder->set($varname, $value);
+        $this->assigns->set($varname, $value);
     }
 
     // --------------------------------------------------------------
-    // Get all binder variables
+    // Get all assigned variables
     // --------------------------------------------------------------
     public function getAll() {
-        return $this->binder->getAll();
+        return $this->assigns->getAll();
     }
 
     // --------------------------------------------------------------
@@ -65,11 +65,11 @@ class TipyView {
     }
 
     // --------------------------------------------------------------
-    // Process template with internal binder vars
+    // Process template
     // --------------------------------------------------------------
     public function processTemplate($templateName) {
         $templateName = $this->templateName($templateName);
-        $vars = $this->binder->getAll();
+        $vars = $this->assigns->getAll();
         extract($vars);
         $output = "";
         ob_start();
@@ -130,7 +130,7 @@ class TipyView {
     // --------------------------------------------------------------
     private function includeTemplate($templateName) {
         $templateName = $this->templateName($templateName);
-        $vars = $this->binder->getAll();
+        $vars = $this->assigns->getAll();
         extract($vars);
         include($templateName);
     }
