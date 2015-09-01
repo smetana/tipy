@@ -2,6 +2,9 @@
 
 class TipyRequest extends TipyIOWrapper {
 
+    /**
+     * @internal
+     */
     public function __construct() {
         parent::__construct();
         $this->bind($_SERVER);

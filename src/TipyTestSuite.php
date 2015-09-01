@@ -4,8 +4,9 @@ require_once(__DIR__.'/../Tipy.php');
 /**
  * Raised when asserton is failed
  *
- * When assertion fails we need to stop current test execution
- * throw this exception to stop the test
+ * When assertion fails we need to stop current test execution.
+ * Throw this exception to stop the test.
+ *
  * Typically used should not see this exception. All of them
  * should be catched by TipyTestRunner
  */
