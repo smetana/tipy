@@ -1,0 +1,18 @@
+source: [./]
+destination: ../tipy-doc
+exclude: [tests, vendor]
+skipDocPath:
+extensions: [php]
+main:
+title: tipy
+groups: auto
+accessLevels: [public, protected]
+internal: No
+php: No
+tree: No
+deprecated: Yes
+todo: Yes
+sourceCode: Yes
+download: No
+quiet: No
+debug: Yes
