@@ -6,72 +6,72 @@
  */
 
 /**
- * Replaced PHP error with E_WARNING severity
+ * Thrown on E_WARNING error
  */
 class WarningException extends ErrorException {}
 
 /**
- * Replaced PHP error with E_PARSE severity
+ * Thrown on E_PARSE error
  */
 class ParseException extends ErrorException {}
 
 /**
- * Replaced PHP error with E_NOTICE severity
+ * Thrown on E_NOTICE error
  */
 class NoticeException extends ErrorException {}
 
 /**
- * Replaced PHP error with E_CODE_ERROR severity
+ * Thrown on E_CODE_ERROR error
  */
 class CoreErrorException extends ErrorException {}
 
 /**
- * Replaced PHP error with E_CORE_WARNING severity
+ * Thrown on E_CORE_WARNING error
  */
 class CoreWarningException extends ErrorException {}
 
 /**
- * Replaced PHP error with E_COMPILE_ERROR severity
+ * Thrown on E_COMPILE_ERROR error
  */
 class CompileErrorException extends ErrorException {}
 
 /**
- * Replaced PHP error with E_COMPILE_WARNING severity
+ * Thrown on E_COMPILE_WARNING error
  */
 class CompileWarningException extends ErrorException {}
 
 /**
- * Replaced PHP error with E_USER_ERROR severity
+ * Thrown on E_USER_ERROR error
  */
 class UserErrorException extends ErrorException {}
 
 /**
- * Replaced PHP error with E_USER_WARNING severity
+ * Thrown on E_USER_WARNING error
  */
 class UserWarningException extends ErrorException {}
 
 /**
- * Replaced PHP error with E_USER_NOTICE severity
+ * Thrown on E_USER_NOTICE error
  */
 class UserNoticeException extends ErrorException {}
 
 /**
- * Replaced PHP error with E_STRICT severity
+ * Thrown on E_STRICT error
  */
 class StrictException extends ErrorException {}
 
 /**
- * Replaced PHP error with E_RECOVERABLE_ERROR severity
+ * Thrown on E_RECOVERABLE_ERROR error
  */
 class RecoverableErrorException extends ErrorException {}
 
 /**
- * Replaced PHP error with E_DEPRECATED severity
+ * Thrown on E_DEPRECATED error
  */
 class DeprecatedException extends ErrorException {}
 
 /**
- * Replaced PHP error with E_USER_DEPRECATED severity
+ * Thrown on E_USER_DEPRECATED error
  */
 class UserDeprecatedException extends ErrorException {}
 
@@ -81,15 +81,13 @@ class UserDeprecatedException extends ErrorException {}
 class TipyException extends Exception {}
 
 /**
- * Raised when a method is called on a class which doesn't have it defined
+ * Thrown when a method is called on a class which doesn't have it defined
  */
 class NoMethodException extends TipyException {}
 
 /**
  * Error handler function to convert PHP errors to exceptions.
- *
- * User controllers and actions are wrapped in try-catch statements.
- * Also it is good for TipyModel transactions.
+ * @internal
  */
 function tipyErrorHandler($severity, $msg, $file, $line, array $context) {
     // error was suppressed with the @-operator

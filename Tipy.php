@@ -39,6 +39,7 @@ if (CLI_MODE) {
     require_once('src/TipyCliSession.php');
 }
 
+// Convert PHP errors to exceptions
 set_error_handler('tipyErrorHandler');
 
 /**
