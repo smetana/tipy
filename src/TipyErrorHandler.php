@@ -1,8 +1,8 @@
 <?php
 /**
- *
  * This file contains exceptions classes and tipyErrorHandler
  *
+ * @package tipy
  */
 
 /**

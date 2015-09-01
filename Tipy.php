@@ -5,6 +5,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
+ * @package       tipy
  * @copyright     Copyright (c) 2008-2015 Serge Smetana <serge.smetana@gmail.com>
  * @copyright     Copyright (c) 2008-2015 Roman Zhbadynskyi <zhbadynskyi@gmail.com>
  * @link          https://github.com/smetana/tipy
@@ -41,7 +42,9 @@ if (CLI_MODE) {
 set_error_handler('tipyErrorHandler');
 
 /**
- * Main class to run application. Just add to dispatcher.php:
+ * Main class to run application.
+ *
+ * Just add to dispatcher.php:
  *
  * <code>
  * require('Tipy.php');
