@@ -47,8 +47,7 @@ class TipyApp {
         return self::$instance;
     }
 
-    // We don't init DB connection by default
-    public function initDbConnection() {
+    public function connectToDb() {
         new TipyDAO();
     }
 

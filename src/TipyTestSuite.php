@@ -327,7 +327,7 @@ class TestRunner {
     public function run() {
         $this->findFixtures();
         $app = TipyApp::getInstance();
-        $app->initDbConnection();
+        $app->connectToDb();
         $app->db->query('DROP DATABASE IF EXISTS '.$app->config->get('db_test_name'));
         $app->db->query('CREATE DATABASE '.$app->config->get('db_test_name'));
         $app->db->select_db($app->config->get('db_test_name'));
