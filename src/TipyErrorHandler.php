@@ -1,16 +1,8 @@
 <?php
 /**
- * tipy : Tiny PHP MVC framework
  *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ * This file contains exceptions classes and tipyErrorHandler
  *
- * @copyright     Copyright (c) 2008-2015 Serge Smetana <serge.smetana@gmail.com>
- * @copyright     Copyright (c) 2008-2015 Roman Zhbadynskyi <zhbadynskyi@gmail.com>
- * @link          https://github.com/smetana/tipy
- * @author        Serge Smetana <serge.smetana@gmail.com>
- * @author        Roman Zhbadynskyi <zhbadynskyi@gmail.com>
- * @license       http://www.opensource.org/licenses/mit-license.php MIT License
  */
 
 /**
