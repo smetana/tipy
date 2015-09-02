@@ -33,9 +33,18 @@
  * </html>
  * </code>
  *
- * You can wrap one template in another one
  *
+ * <b>NOTE: $this</b> is available inside template and gives access to
+ * TipyView object which renders current template.
  *
+ * Example:
+ * <code>
+ * <ul>
+ *     <li>
+ *         <? $this->includeTemplate('item') ?>
+ *     </li>
+ * </ul>
+ * </code>
  */
 class TipyView {
 
@@ -147,33 +156,78 @@ class TipyView {
         return $this->templatePath . "/" . $templateName . ".php";
     }
 
-    // --------------------------------------------------------------
-    // include template
-    // --------------------------------------------------------------
-    private function includeTemplate($templateName) {
+    /**
+     * Include template (child) to currently rendering template (parent).
+     * All parent template variables will be available to its children as
+     * they exist in one context.
+     *
+     * Should be called from template via <b>$this</b>.
+     *
+     * Example:
+     * <code>
+     * <ul>
+     *     <li>
+     *         <? $this->includeTemplate('item') ?>
+     *     </li>
+     * </ul>
+     * </code>
+     * @param string $templateName
+     */
+    protected function includeTemplate($templateName) {
         $templateFile = $this->expandTemplatePath($templateName);
         $vars = $this->assigns->getAll();
         extract($vars);
         include($templateFile);
     }
 
-    // --------------------------------------------------------------
-    // Apply template over processed one
-    // Entry point
-    // NOTE: this method is to be called as callback from template
-    // --------------------------------------------------------------
-    private function applyTemplateStart($templateName) {
+    /**
+     * Wrap another template (layout) around currently rendering template or even its part (child).
+     *
+     * Layout template should have <i>$this->childContent()</i> call to specify where child
+     * template will be inserted.
+     *
+     * All defined variables will be available in both templates as they exist in one context.
+     *
+     * Should be called from template via <b>$this</b>
+     *
+     * Example:
+     * <code>
+     * // app/views/child.php
+     * <p>
+     * <? $this->applyTemplateStart('layout') ?>
+     *     TipyView is cool!
+     * <? $this->applyTemplateEnd('layout') ?>
+     * </p>
+     * </code>
+     * <code>
+     * // app/views/layout.php
+     * <strong>
+     *     <? $this->childContent() ?>
+     * </strong>
+     * </code>
+     * Will be rendered as
+     * <code>
+     * <p>
+     * <strong>
+     *     TipyView is cool!
+     * </strong>
+     * </p>
+     * </code>
+     *
+     * @param string $templateName
+     */
+    protected function applyTemplateStart($templateName) {
         // Put template name into stack. We will use it
         $this->templateStack[] = $templateName;
         // And start processing
         ob_start();
     }
 
-    // --------------------------------------------------------------
-    // Exit point for the applyTemplate
-    // NOTE: This method is to be called as callback
-    // --------------------------------------------------------------
-    private function applyTemplateEnd() {
+    /**
+     * Indicates the end of layout
+     * @see applyTemplateStart()
+     */
+    protected function applyTemplateEnd() {
         // Get what we have processed and put it into stack
         $this->contentStack[] = ob_get_contents();
         ob_end_clean();
@@ -183,11 +237,11 @@ class TipyView {
         array_pop($this->contentStack);
     }
 
-    // --------------------------------------------------------------
-    // This method is to be used inside template processed over
-    // another template
-    // --------------------------------------------------------------
-    private function childContent() {
+    /**
+     * Insert caller template's content into layout template
+     * @see applyTemplateStart()
+     */
+    protected function childContent() {
         $stacksize = sizeof($this->contentStack);
         // if we have something in stack then return last value
         if ($stacksize > 0) {

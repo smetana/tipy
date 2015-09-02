@@ -6,7 +6,7 @@
  */
 
 /**
- * Class to wrap input/output superglobals for sanitation/validation.
+ * Base class to wrap input/output superglobals for sanitation/validation.
  *
  * For example if you want extra XSS protection on input or output
  * you may use controller's executeBefore() or executeAfter() hooks:
