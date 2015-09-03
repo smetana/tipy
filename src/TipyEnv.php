@@ -1,17 +1,31 @@
 <?php
+/**
+ * TipyEnv
+ *
+ * @package tipy
+ */
 
-// ==================================================================
-// Environment wrapper
-// ==================================================================
+/**
+ * Access environment variables
+ *
+ * Usage:
+ * <code>
+ * class MyController extends TipyController {
+ *     public function index() {
+ *         $path = $this->env->get('PATH');
+ *         // ...
+ *     }
+ * }
+ * </code>
+ */
+class TipyEnv {
 
-class TipyEnv extends TipyIOWrapper {
-
-    public function __construct() {
-        parent::__construct();
-        // little hack to autocreate $_SERVER if
-        // auto_globals_jit is on
-        $doesntmatter = $_SERVER['PHP_SELF'];
-        // So be it! For now....
-        $this->bind($_SERVER);
+    /**
+     * @param String $key
+     * @return string
+     */
+    public function get($key) {
+        return getenv($key);
     }
+
 }
