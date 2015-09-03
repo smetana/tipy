@@ -24,14 +24,12 @@ class TipyDAO {
             // Get  connection string
             $config = $app->config;
             $dbHost = $config->get('db_host');
-            if ($config->get('db_port')) {
-                $dbHost .= $dbHost.':'.$config->get('db_port');
-            }
+            $dbPort = $config->get('db_port') ?: null;
             $dbName = $config->get('db_name');
             $dbUser = $config->get('db_user');
             $dbPassword = $config->get('db_password');
 
-            $dbLink = new mysqli('p:'.$dbHost, $dbUser, $dbPassword, $dbName);
+            $dbLink = new mysqli('p:'.$dbHost, $dbUser, $dbPassword, $dbName, $dbPort);
             if ($dbLink->connect_error) {
                 throw new TipyDaoException('DB connection error (' . $dbLink->connect_errno . ') '
                     . $dbLink->connect_error);
