@@ -6,7 +6,7 @@
  */
 
 /**
- * Action output data.
+ * Action output data
  *
  * These values will be assigned to {@link TipyView} template on page rendering
  *

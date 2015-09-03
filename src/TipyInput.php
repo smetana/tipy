@@ -6,7 +6,7 @@
  */
 
 /**
- * Represents input data.
+ * Represents input data
  *
  * By default it is a TipyIOWrapper around $_REQUEST superglobal
  *

@@ -43,7 +43,7 @@ if (CLI_MODE) {
 set_error_handler('tipyErrorHandler');
 
 /**
- * Main class to run application.
+ * Main class to run application
  *
  * Just add to dispatcher.php:
  *

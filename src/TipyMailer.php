@@ -1,6 +1,6 @@
 <?php
 /**
- * Tipy Mailer
+ * TipyMailer
  *
  * @package tipy
  */
@@ -8,7 +8,7 @@
 require_once(__DIR__.'/../vendor/PHPMailer/class.phpmailer.php');
 
 /**
- * Tipy Mailer uses PHPMailer to send messages
+ * Uses PHPMailer to send messages
  *
  * {@link https://github.com/PHPMailer/PHPMailer}
  *
