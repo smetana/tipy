@@ -42,7 +42,7 @@ UNIQUE KEY `user_group` (`user_id`,`group_id`)
 
 CREATE TABLE `tipy_test_profiles` (
 `id` BIGINT( 20 ) NOT NULL AUTO_INCREMENT,
-`user_id` BIGINT( 20 ) NOT NULL,
+`user_id` BIGINT( 20 ) NULL,
 `sign` VARCHAR( 20 ) NULL ,
 `created_at` BIGINT( 20 ) NULL,
 PRIMARY KEY ( `id` )

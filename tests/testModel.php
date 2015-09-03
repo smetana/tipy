@@ -113,10 +113,16 @@ class TestModel extends TipyTestSuite {
     }
 
     public function testTypeCastNulls() {
+        $post = TipyTestBlogPost::create([
+            'userId' => 2,
+            'title' => 'This is a title',
+            'message' => 'This is a message!'
+        ]);
         $comment = TipyTestBlogComment::create([
-            'userId' => 0,
-            'title' => '',
-            'message' => null
+            'userId'     => 0,
+            'blogPostId' => $post->id,
+            'title'      => '',
+            'message'    => null
         ]);
         $comment->reload();
         $this->assertTrue(is_int($comment->id));
