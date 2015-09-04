@@ -18,7 +18,7 @@
  * </code>
  *
  * <a name="routing"></a>
- * <h2>Routing</h2>
+ * <h3>Routing</h3>
  *
  * Tipy uses <b>.htaccess</b> for routing.
  * .htaccess RewriteRules rewrite all request urls to something like:
@@ -37,7 +37,7 @@
  *
  * - snake_case is transformed to camelCase (first letter in lower case)
  *
- * <h2>Predefined Routes</h2>
+ * <h3>Predefined Routes</h3>
  *
  * Tipy also comes with a set of predefined rules so you don't need to
  * rewrite urls to dispatcher.php. It is enough to rewrite urls to one of the
