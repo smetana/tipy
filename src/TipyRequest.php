@@ -9,6 +9,18 @@
  * Access request and its header
  *
  * By default it is a TipyIOWrapper around $_SERVER superglobal
+ *
+ * Usage:
+ * <code>
+ * class MyController extends TipyController {
+ *     public function index() {
+ *         $requestIsPost = $this->request->isPost();
+ *         $userAgent = $this->request->get('HTTP_USER_AGENT');
+ *         // ...
+ *     }
+ * }
+ * </code>
+ *
  * @see TipyIOWrapper
  */
 class TipyRequest extends TipyIOWrapper {

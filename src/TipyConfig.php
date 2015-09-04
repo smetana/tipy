@@ -9,6 +9,16 @@
  * Access config variables
  *
  * Config variables are defined in <b>config.ini</b> file in your application root directory
+ *
+ * Usage:
+ * <code>
+ * class MyController extends TipyController {
+ *     public function index() {
+ *         $path = $this->config->get('my_config_var');
+ *         // ...
+ *     }
+ * }
+ * </code>
  */
 class TipyConfig extends TipyIOWrapper {
 

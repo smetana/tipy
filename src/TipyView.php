@@ -35,7 +35,7 @@
  *
  *
  * <b>NOTE: $this</b> is available inside template and gives access to
- * TipyView object which renders current template.
+ * TipyView instance which renders current template.
  *
  * Example:
  * <code>
