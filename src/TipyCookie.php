@@ -1,26 +1,44 @@
 <?php
+/**
+ * TipyCookie
+ *
+ * @package tipy
+ */
 
-// ==================================================================
-// Cookie class
-// ==================================================================
-
+/**
+ * Access cookies the same way as any other tipy input/output objects
+ *
+ * Usage:
+ * <code>
+ * class MyController extends TipyController {
+ *     public function index() {
+ *         $value = $this->cookie->get('myVar1');
+ *         $this->cookie->set('myVar2', 'Hello World!');
+ *         // ...
+ *     }
+ * }
+ * </code>
+ */
 class TipyCookie {
 
     private $cookies;
 
-    // --------------------------------------------------------------
-    // Constructor
-    // --------------------------------------------------------------
+    /**
+     * Construct TipyCookie instance from $_COOKIE.
+     */
     public function __construct() {
         $this->cookies = $_COOKIE;
     }
 
-    // --------------------------------------------------------------
-    // Get session variable, default value or null
-    // --------------------------------------------------------------
-    public function get($varname) {
-        if (isset($this->cookies[$varname])) {
-            return $this->cookies[$varname];
+    /**
+     * Get cookie variable by its name
+     * @param string $key
+     * @param mixed $defaultValue
+     * @return mixed
+     */
+    public function get($key) {
+        if (isset($this->cookies[$key])) {
+            return $this->cookies[$key];
         } else {
             if (func_num_args() > 1) {
                 return func_get_arg(1);
@@ -30,17 +48,22 @@ class TipyCookie {
         }
     }
 
-    // --------------------------------------------------------------
-    // Set cookie variable
-    // --------------------------------------------------------------
-    public function set($varname, $value, $expire = 0) {
-        setcookie($varname, $value, $expire, '/');
-        $this->cookies[$varname] = $value;
+    /**
+     * Set cookie variable. You may pass unix timestamp as optional argument to set cookie expire time.
+     * @param string $key
+     * @param mixed $value
+     * @param integer $expireTime
+     * @return mixed
+     */
+    public function set($key, $value, $expireTime = 0) {
+        setcookie($key, $value, $expireTime, '/');
+        $this->cookies[$key] = $value;
     }
 
-    // --------------------------------------------------------------
-    // Get all cookies
-    // --------------------------------------------------------------
+    /**
+     * Get all cookies as array
+     * @return array
+     */
     public function getAll() {
         return $this->cookies;
     }
