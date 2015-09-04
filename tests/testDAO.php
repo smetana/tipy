@@ -21,6 +21,19 @@ class TestDAO extends TipyTestSuite {
         $app->db->query('TRUNCATE TABLE tipy_test_records');
     }
 
+    public function testQuery() {
+        $this->createRecord(1);
+        $this->createRecord(2);
+        $this->createRecord(3);
+        $dao = new TipyDAO();
+        $result = $dao->query("select * from tipy_test_records where value = ?", ['value_2']);
+        $this->assertTrue(is_a($result, 'mysqli_result'));
+        $this->assertEqual($dao->numRows($result), 1);
+        $result = $dao->query("select * from tipy_test_records");
+        $this->assertTrue(is_a($result, 'mysqli_result'));
+        $this->assertEqual($dao->numRows($result), 3);
+    }
+
     public function testTransactionCommit() {
         $this->assertEqual(TipyTestRecord::count(), 0);
         TipyModel::transaction(function() {
