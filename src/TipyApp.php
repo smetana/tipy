@@ -80,7 +80,7 @@ class TipyApp {
             }
         } catch (Exception $exception) {
             // TODO: implement debug mode output
-            throw $exception;
+            throw new TipyException($exception->getMessage(), $exception->getCode(), $exception);
         }
     }
 }
