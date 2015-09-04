@@ -183,11 +183,6 @@ class TipyDAO {
         return $this->dbLink->affected_rows;
     }
 
-    public function queryErrno($sql, $params = null) {
-        $this->query($sql, $params, true);
-        return $this->dbLink->errno;
-    }
-
     protected static function savepointName($number) {
         return 'tipy_savepoint_'.($number - 1);
     }
