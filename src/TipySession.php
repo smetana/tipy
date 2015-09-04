@@ -1,18 +1,38 @@
 <?php
+/**
+ * TipySession
+ *
+ * @package tipy
+ */
 
-// ==================================================================
-// Session class
-// ==================================================================
-
+/**
+ * Access session data the same way as any other tipy input/output objects
+ *
+ * Usage:
+ * <code>
+ * class MyController extends TipyController {
+ *     public function index() {
+ *         $userId = $this->session->get('userId');
+ *         $this->session->set('my_variable', 'Hello World!');
+ *         // ...
+ *     }
+ * }
+ * </code>
+ */
 class TipySession {
 
+    /**
+     * Construct TipySession instance from $_SESSION.
+     * If session is not yet started it will be started immediately.
+     * If session is already started if will be resumed.
+     */
     public function __construct() {
         $this->start();
     }
 
-    // --------------------------------------------------------------
-    // Start session
-    // --------------------------------------------------------------
+    /**
+     * Start new or resume existing session
+     */
     public function start() {
         if (!session_id()) {
             session_set_cookie_params($this->get('sessionExpires', 0), '/');
@@ -20,39 +40,47 @@ class TipySession {
         }
     }
 
+    /**
+     * Set session lifetime in seconds
+     * @param integer $time
+     */
     public function setLifetime($time = 0) {
         $this->set('sessionExpires', $time);
         session_set_cookie_params($this->get('sessionExpires', 0), '/');
         session_regenerate_id();
     }
 
-    // --------------------------------------------------------------
-    // Close session
-    // --------------------------------------------------------------
+    /**
+     * Destroy the session and delete all session data
+     */
     public function close() {
         $_SESSION = [];
-        // If it's desired to kill the session, also delete the session cookie.
-        // Note: This will destroy the session, and not just the session data!
+        // If it's desired to kill the session, also delete the session cookie
         if (isset($_COOKIE[session_name()])) {
             setcookie(session_name(), '', 1, '/');
         }
-        // Finally, destroy the session.
         session_destroy();
     }
 
-    // --------------------------------------------------------------
-    // Set session data
-    // --------------------------------------------------------------
-    public function bind($data) {
-        $_SESSION = $data;
+    /**
+     * The way to set many variables at once
+     *
+     * <b>NOTE:</b> This will overwrite existing session data
+     * @param array $map
+     */
+    public function bind($map) {
+        $_SESSION = $map;
     }
 
-    // --------------------------------------------------------------
-    // Get session variable, default value or null
-    // --------------------------------------------------------------
-    public function get($varname) {
-        if (isset($_SESSION[$varname])) {
-            return $_SESSION[$varname];
+    /**
+     * Get session variable by its name
+     * @param string $key
+     * @param mixed $defaultValue
+     * @return mixed
+     */
+    public function get($key) {
+        if (isset($_SESSION[$key])) {
+            return $_SESSION[$key];
         } else {
             if (func_num_args() > 1) {
                 return func_get_arg(1);
@@ -62,16 +90,19 @@ class TipySession {
         }
     }
 
-    // --------------------------------------------------------------
-    // Set session variable
-    // --------------------------------------------------------------
-    public function set($varname, $value) {
-        $_SESSION[$varname] = $value;
+    /**
+     * Set session variable
+     * @param string $key
+     * @param mixed $value
+     */
+    public function set($key, $value) {
+        $_SESSION[$key] = $value;
     }
 
-    // --------------------------------------------------------------
-    // Get all session vars
-    // --------------------------------------------------------------
+    /**
+     * Get all data stored in session
+     * @return array
+     */
     public function getAll() {
         return $_SESSION;
     }
