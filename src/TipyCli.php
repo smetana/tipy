@@ -1,5 +1,32 @@
 <?php
+/**
+ * TipyCli
+ *
+ * @package tipy
+ */
 
+/**
+ * Various helpers for CLI mode
+ *
+ * For now this class has methods to return colored strings for console output
+ *
+ * @method static black(string $string)
+ * @method static red(string $string)
+ * @method static green(string $string)
+ * @method static brown(string $string)
+ * @method static blue(string $string)
+ * @method static purple(string $string)
+ * @method static cyan(string $string)
+ * @method static lightGray(string $string)
+ * @method static darkGray(string $string)
+ * @method static lightRed(string $string)
+ * @method static lightGreen(string $string)
+ * @method static yellow(string $string)
+ * @method static lightBlue(string $string)
+ * @method static lightPurple(string $string)
+ * @method static lightCyan(string $string)
+ * @method static white(string $string)
+ */
 class TipyCli {
 
     private static $cliColors = [
@@ -21,6 +48,9 @@ class TipyCli {
         'white'       => '1;37',
     ];
 
+    /**
+     * @internal
+     */
     public static function __callStatic($name, $args) {
         if (in_array($name, array_keys(self::$cliColors))) {
             $str = $args[0];
