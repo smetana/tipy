@@ -10,7 +10,6 @@
  *
  * These values will be assigned to {@link TipyView} template on page rendering
  *
- * Usage:
  * <code>
  * class MyController extends TipyController {
  *     public function index() {

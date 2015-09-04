@@ -8,7 +8,6 @@
 /**
  * Access cookies the same way as any other tipy input/output objects
  *
- * Usage:
  * <code>
  * class MyController extends TipyController {
  *     public function index() {

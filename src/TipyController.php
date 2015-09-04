@@ -8,7 +8,6 @@
 /**
  * Base controller class
  *
- * Usage:
  * <code>
  * class MyController extends TipyController {
  *     public function myAction() {

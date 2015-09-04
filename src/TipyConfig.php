@@ -10,7 +10,6 @@
  *
  * Config variables are defined in <b>config.ini</b> file in your application root directory
  *
- * Usage:
  * <code>
  * class MyController extends TipyController {
  *     public function index() {

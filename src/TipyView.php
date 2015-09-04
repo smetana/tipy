@@ -13,7 +13,6 @@
  * - Templates have variables defined in controller's TipyOutput instance and don't<br/>
  *   have access to application context except TipyView instance represented by $this (see note below)
  *
- * Usage:
  * <code>
  * // app/controllers/HelloWorldController.php
  * class HelloWorldController extends TipyController {
@@ -42,7 +41,6 @@
  * $this is available inside template and gives access to
  * TipyView instance which renders current template.
  *
- * Example:
  * <code>
  * <ul>
  *     <li>
@@ -168,7 +166,6 @@ class TipyView {
      *
      * Should be called from template via <b>$this</b>.
      *
-     * Example:
      * <code>
      * <ul>
      *     <li>
@@ -195,7 +192,6 @@ class TipyView {
      *
      * Should be called from template via <b>$this</b>
      *
-     * Example:
      * <code>
      * // app/views/child.php
      * <p>

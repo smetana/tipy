@@ -10,7 +10,6 @@
  *
  * By default it is a TipyIOWrapper around $_SERVER superglobal
  *
- * Usage:
  * <code>
  * class MyController extends TipyController {
  *     public function index() {

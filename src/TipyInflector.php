@@ -38,7 +38,6 @@ class TipyInflector extends Inflect {
     /**
      * Create a model class name from a plural table name.
      *
-     * Example
      * <code>
      * TipyInflector::classify('blog_posts') // => BlogPost
      * </code>
@@ -54,7 +53,6 @@ class TipyInflector extends Inflect {
     /**
      * Create plural table name from a model name.
      *
-     * Example
      * <code>
      * TipyInflector::tableize('BlogPost') // => blog_posts
      * </code>
@@ -70,7 +68,6 @@ class TipyInflector extends Inflect {
      * Create name valid to be a part of controller name from snake_case string.
      * This method does not change plural/singular form of nouns.
      *
-     * Example
      * <code>
      * TipyInflector::controllerize('blog_post') // => BlogPost
      * TipyInflector::controllerize('blog_posts') // => BlogPosts

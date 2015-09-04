@@ -8,7 +8,6 @@
 /**
  * Access environment variables
  *
- * Usage:
  * <code>
  * class MyController extends TipyController {
  *     public function index() {

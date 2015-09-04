@@ -10,7 +10,6 @@
  *
  * Initializes application context and executes controller's action
  *
- * Usage:
  * <code>
  * $app = TipyApp::getInstance();
  * </code>
