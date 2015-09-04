@@ -1,25 +1,85 @@
 <?php
+/**
+ * TipyApp
+ *
+ * @package tipy
+ */
 
-// ==================================================================
-// Application
-// Class to store Application context
-// ==================================================================
+/**
+ * Application singleton
+ *
+ * Initializes application context and executes controller's action
+ *
+ * Usage:
+ * <code>
+ * $app = TipyApp::getInstance();
+ * </code>
+ */
 class TipyApp {
 
     private static $instance = null;
 
+    /**
+     * TipyConfig
+     * @see TipyConfig
+     */
     public $config;
+
+    /**
+     * TipyView
+     * @see TipyEnv
+     */
     public $env;
+
+    /**
+     * TipyCookie
+     * @see TipyCookie
+     */
     public $cookie;
+
+    /**
+     * MySQL connection
+     */
     public $db;
+
+    /**
+     * TipyInput
+     * @see TipyInput
+     */
     public $in;
+
+    /**
+     * TipyOutput
+     * @see TipyOutput
+     */
     public $out;
+
+    /**
+     * TipyView
+     * @see TipyView
+     */
     public $view;
+
+    /**
+     * TipySession
+     * @see TipySession
+     */
     public $session;
+
+    /**
+     * Path to your application's <b>public</b> directory
+     * @see TipyCookie
+     */
     public $documentRoot;
 
     private function __clone() {}
     private function __wakeup() {}
+
+    /**
+     * Hidden from user. Runs only once.
+     * Initializes application context.
+     * @internal
+     */
     private function __construct() {
         $this->config  = new TipyConfig();
         $this->request = new TipyRequest();
@@ -40,6 +100,16 @@ class TipyApp {
         $this->view->setTemplatePath(realpath($cwd.'/../app/views'));
     }
 
+    /**
+     * Get application instance
+     * 
+     * Contruct application if it has not been initialized yet.
+     *
+     * <b>NOTE:</b> Does not connect to database.
+     *
+     * @return TipyApp
+     * @see TipyApp::connectToDb()
+     */
     public static function getInstance() {
         if (null === self::$instance) {
             self::$instance = new self();
@@ -47,10 +117,24 @@ class TipyApp {
         return self::$instance;
     }
 
+    /**
+     * Connect to database
+     */
     public function connectToDb() {
         new TipyDAO();
     }
 
+    /**
+     * Initialize controller and run action
+     *
+     * Requires <b>$app->in('controller')</b> and <b>$app->in('action')</b>
+     * parameters to be defined.
+     *
+     * This method also catches all exceptions thrown in controllers and
+     * throws final exception.
+     *
+     * @todo Different exceptions handling in production and development modes
+     */
     public function run() {
         try {
             // Get controller and action name
@@ -79,7 +163,6 @@ class TipyApp {
                 throw new TipyException('Undefined action '.$controllerName.'::'.$actionName.'()');
             }
         } catch (Exception $exception) {
-            // TODO: implement debug mode output
             throw new TipyException($exception->getMessage(), $exception->getCode(), $exception);
         }
     }
