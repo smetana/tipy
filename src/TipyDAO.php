@@ -1,7 +1,7 @@
 <?php
 
 class TipyDaoException extends Exception {}
-class TipyDaoRollbackException extends Exception {}
+class TipyRollbackException extends Exception {}
 
 // ---------------------------------------------------------
 // ApplicationDAO
@@ -261,7 +261,7 @@ class TipyDAO {
         // By default this exception is to be caught inside TipyDAO::transaction()
         // If it is not caught this means TipyDAO::rollback() was called outside transaction
         // Then this exception message makes sense
-        throw new TipyDaoRollbackException("Uncaught rollback exception. Probably called outside transaction");
+        throw new TipyRollbackException("Uncaught rollback exception. Probably called outside transaction");
     }
 
     //   TipyDAO::transaction(function() {
@@ -288,7 +288,7 @@ class TipyDAO {
             $result = $closure();
             self::commit();
             return $result;
-        } catch (TipyDaoRollbackException $e) {
+        } catch (TipyRollbackException $e) {
             self::rollbackTransaction();
         } catch (Exception $e) {
             self::rollbackTransaction();

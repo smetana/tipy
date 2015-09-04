@@ -57,7 +57,7 @@ class TestDAO extends TipyTestSuite {
     }
 
     public function testRollbackWithoutTransaction() {
-        $this->assertThrown('TipyDaoRollbackException', "Uncaught rollback exception. Probably called outside transaction", function () {
+        $this->assertThrown('TipyRollbackException', "Uncaught rollback exception. Probably called outside transaction", function () {
             TipyModel::rollback();
         });
     }
