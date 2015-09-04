@@ -1,3 +1,9 @@
+CREATE TABLE `tipy_test_records` (
+    `id` BIGINT( 20 ) NOT NULL AUTO_INCREMENT ,
+    `value` VARCHAR( 20 ) NULL,
+    PRIMARY KEY ( `id` )
+) ENGINE = InnoDB DEFAULT CHARSET=utf8;
+
 CREATE TABLE `tipy_test_users` (
 `id` BIGINT( 20 ) NOT NULL AUTO_INCREMENT ,
 `login` VARCHAR( 20 ) NULL ,

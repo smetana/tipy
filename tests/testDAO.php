@@ -16,21 +16,9 @@ class TestDAO extends TipyTestSuite {
     // transactional fixtures are disable so we need separate 
     // table to test transactions behaviour without affecting 
     // other tests
-    public function beforeTest() {
-        $this->run = true;
-        $app = TipyApp::getInstance();
-        $app->db->query("
-             CREATE TABLE `tipy_test_records` (
-                `id` BIGINT( 20 ) NOT NULL AUTO_INCREMENT ,
-                `value` VARCHAR( 20 ) NULL,
-                PRIMARY KEY ( `id` )
-            ) ENGINE = InnoDB DEFAULT CHARSET=utf8
-        ");
-    }
-
     public function afterTest() {
         $app = TipyApp::getInstance();
-        $app->db->query('DROP TABLE tipy_test_records');
+        $app->db->query('TRUNCATE TABLE tipy_test_records');
     }
 
     public function testTransactionCommit() {
