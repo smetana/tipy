@@ -14,7 +14,7 @@
 class TipyRequest extends TipyIOWrapper {
 
     /**
-     * @internal
+     * Construct TipyRequest instance from $_SERVER
      */
     public function __construct() {
         parent::__construct();

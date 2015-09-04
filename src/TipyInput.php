@@ -24,10 +24,11 @@
 class TipyInput extends TipyIOWrapper {
 
     /**
-     * @internal
+     * Construct TipyInput instance from $_REQUEST
      */
     public function __construct() {
         parent::__construct();
         $this->bind($_REQUEST);
     }
+
 }

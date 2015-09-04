@@ -29,14 +29,14 @@ class TipyIOWrapper {
     private $map;
 
     /**
-     * Override this
+     * Construct empty TipyIOWrapper instance
      */
     public function __construct() {
         $this->map = [];
     }
 
     /**
-     * Specify array to wrap in TipyIOWrapper.
+     * Specify array to wrap in TipyIOWrapper
      *
      * This array should be a hash with string keys.
      * This may be superglobal array like $_GET, $_POST, etc...
@@ -48,8 +48,9 @@ class TipyIOWrapper {
     }
 
     /**
-     * Return value from internal hash by key name.
-     * If key does not exist return defaultValue.
+     * Return value from internal hash by key name
+     *
+     * If key does not exist return defaultValue
      *
      * @param string $key
      * @param mixed $defaultValue

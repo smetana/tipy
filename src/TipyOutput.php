@@ -20,6 +20,7 @@
  *     }
  * }
  * </code>
+ *
  * @see TipyView
  */
 class TipyOutput extends TipyIOWrapper {
