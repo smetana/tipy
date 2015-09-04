@@ -48,7 +48,7 @@
  * /:controller/:action      # /source_code/open_source   => SourceCodeController::openSource();
  * /:controller/:action/:id  # /source_code/line_number/3 => SourceCodeController::lineNumber($id = 3);
  * </code>
-  */
+ */
 class TipyController {
 
     /**
