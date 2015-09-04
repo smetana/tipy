@@ -14,61 +14,57 @@
  * <code>
  * $app = TipyApp::getInstance();
  * </code>
+ *
+ * @see TipyController
  */
 class TipyApp {
 
     private static $instance = null;
 
     /**
-     * TipyConfig instance
-     * @see TipyConfig
+     * @var TipyConfig
      */
     public $config;
 
     /**
-     * TipyView instance
-     * @see TipyEnv
+     * @var TipyView
      */
     public $env;
 
     /**
-     * TipyCookie instance
-     * @see TipyCookie
+     * @var TipyCookie
      */
     public $cookie;
 
     /**
      * MySQL connection
+     * @var mysqli|null
      */
     public $db;
 
     /**
-     * TipyInput instance
-     * @see TipyInput
+     * @var TipyInput
      */
     public $in;
 
     /**
-     * TipyOutput instance
-     * @see TipyOutput
+     * @var TipyOutput
      */
     public $out;
 
     /**
-     * TipyView instance
-     * @see TipyView
+     * @var TipyView
      */
     public $view;
 
     /**
-     * TipySession instance
-     * @see TipySession
+     * @var TipySession
      */
     public $session;
 
     /**
      * Path to your application's <b>public</b> directory
-     * @see TipyCookie
+     * @var string
      */
     public $documentRoot;
 
@@ -130,9 +126,7 @@ class TipyApp {
      * Requires <b>$app->in('controller')</b> and <b>$app->in('action')</b>
      * parameters to be defined.
      *
-     * This method also catches all exceptions thrown in controllers and
-     * throws final exception.
-     *
+     * @see TipyController
      * @todo Different exceptions handling in production and development modes
      */
     public function run() {

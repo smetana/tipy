@@ -8,6 +8,11 @@
 /**
  * HTML template engine based on PHP output buffer and PHP itself
  *
+ * - Templates are located in app/views directory
+ * - Templates are simple php files with .php extension.
+ * - Templates have variables defined in controller's TipyOutput instance and don't<br/>
+ *   have access to application context except TipyView instance represented by $this (see note below)
+ *
  * Usage:
  * <code>
  * // app/controllers/HelloWorldController.php
@@ -33,8 +38,8 @@
  * </html>
  * </code>
  *
- *
- * <b>NOTE: $this</b> is available inside template and gives access to
+ * <b>Note about $this</b><br/>
+ * $this is available inside template and gives access to
  * TipyView instance which renders current template.
  *
  * Example:
