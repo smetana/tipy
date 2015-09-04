@@ -20,19 +20,19 @@ class TipyApp {
     private static $instance = null;
 
     /**
-     * TipyConfig
+     * TipyConfig instance
      * @see TipyConfig
      */
     public $config;
 
     /**
-     * TipyView
+     * TipyView instance
      * @see TipyEnv
      */
     public $env;
 
     /**
-     * TipyCookie
+     * TipyCookie instance
      * @see TipyCookie
      */
     public $cookie;
@@ -43,25 +43,25 @@ class TipyApp {
     public $db;
 
     /**
-     * TipyInput
+     * TipyInput instance
      * @see TipyInput
      */
     public $in;
 
     /**
-     * TipyOutput
+     * TipyOutput instance
      * @see TipyOutput
      */
     public $out;
 
     /**
-     * TipyView
+     * TipyView instance
      * @see TipyView
      */
     public $view;
 
     /**
-     * TipySession
+     * TipySession instance
      * @see TipySession
      */
     public $session;
