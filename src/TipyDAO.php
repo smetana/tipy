@@ -1,22 +1,45 @@
 <?php
+/**
+ * TipyDAO
+ *
+ * @package tipy
+ */
 
+
+/**
+ * Thown on database-related errors
+ */
 class TipyDaoException extends Exception {}
+
+/**
+ * Throw this to rollback transaction
+ */
 class TipyRollbackException extends Exception {}
 
-// ---------------------------------------------------------
-// ApplicationDAO
-// DB wrapper and base DAO class. Provides interface to
-// database base functions
-// ---------------------------------------------------------
+
+/**
+ * Database connection wrapper with basic database functions
+ *
+ *
+ */
 class TipyDAO {
 
+    /**
+     * @var mysqli|null
+     */
     protected $dbLink;
+    /**
+     * @internal
+     */
     public static $openTransactionsCount = 0;
+    /**
+     * @internal
+     */
     public static $queryCount;
 
-    // -----------------------------------------------------
-    // Constructor
-    // -----------------------------------------------------
+    /**
+     * Connect to database
+     */
     public function __construct() {
         $app = TipyApp::getInstance();
         // If not yet connected then connect.
@@ -45,10 +68,19 @@ class TipyDAO {
         $this->dbLink = $app->db;
     }
 
-    // ----------------------------------------------------
-    // query
-    // Just db query wrapper with some error handler
-    // ----------------------------------------------------
+    /**
+     * Query database
+     *
+     * <code>
+     * $dao = new TipyDAO();
+     * $result = $dao->query('select * from users where first_name=? and last_name=?', ['john', 'doe']);
+     * </code>
+     *
+     * @param string $sql SQL template with ? placeholders
+     * @param array $params Array with values to fill placeholders
+     * @throws TipyDaoException
+     * @return mysqli_result
+     */
     public function query($sql, $params = null) {
         if ($params) {
             $sql = str_replace('%', '%%', $sql);
