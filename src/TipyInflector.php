@@ -9,9 +9,7 @@
 require_once(__DIR__.'/../vendor/Inflect/Inflect.php');
 
 /**
- *
  * Transforms words from singular to plural, class names to table names, camelCase to snake_case, etc...
- *
  */
 class TipyInflector extends Inflect {
 
