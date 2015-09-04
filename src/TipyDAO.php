@@ -110,7 +110,7 @@ class TipyDAO {
     // ----------------------------------------------------
     // limitQuery
     // ----------------------------------------------------
-    public function limitQuery($sql, $span, $step, $params = []) {
+    public function limitQuery($sql, $span, $step, $params = null) {
         $sql = $sql." limit ".$span.",".$step;
         return $this->query($sql, $params);
     }
@@ -143,7 +143,7 @@ class TipyDAO {
     // queryRow
     // query & fetch in one flakon
     // ----------------------------------------------------
-    public function queryRow($sql, $params = []) {
+    public function queryRow($sql, $params = null) {
         $result = $this->query($sql, $params);
         return $this->fetchRow($result);
     }
@@ -152,7 +152,7 @@ class TipyDAO {
     // queryRows
     // query and fetch all rows in one flakon
     // ----------------------------------------------------
-    public function queryAllRows($sql, $params = []) {
+    public function queryAllRows($sql, $params = null) {
         $result = $this->query($sql, $params);
         return $this->fetchAllRows($result);
     }
@@ -160,7 +160,7 @@ class TipyDAO {
     // ----------------------------------------------------
     // limit query and fetch
     // ----------------------------------------------------
-    public function limitQueryAllRows($sql, $span, $step, $params = []) {
+    public function limitQueryAllRows($sql, $span, $step, $params = null) {
         $result = $this->limitQuery($sql, $span, $step, $params);
         if ($result) {
             return $this->fetchAllRows($result);
@@ -183,7 +183,7 @@ class TipyDAO {
         return $this->dbLink->affected_rows;
     }
 
-    public function queryErrno($sql, $params = []) {
+    public function queryErrno($sql, $params = null) {
         $this->query($sql, $params, true);
         return $this->dbLink->errno;
     }
