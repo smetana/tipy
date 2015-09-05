@@ -71,6 +71,21 @@ class TestDAO extends TipyTestSuite {
         $this->assertNull($row);
     }
 
+    public function testFetchAll() {
+        for ($i=1; $i<=5; $i++) {
+            $this->createRecord($i);
+        }
+        $dao = new TipyDAO();
+        $result = $dao->query("select * from tipy_test_records order by id");
+        $arr = $dao->fetchAllRows($result);
+        $this->assertEqual(sizeof($arr), 5);
+        $this->assertEqual($arr[0]["value"], 'value_1');
+        $this->assertEqual($arr[1]["value"], 'value_2');
+        $this->assertEqual($arr[2]["value"], 'value_3');
+        $this->assertEqual($arr[3]["value"], 'value_4');
+        $this->assertEqual($arr[4]["value"], 'value_5');
+    }
+
     public function testTransactionCommit() {
         $this->assertEqual(TipyTestRecord::count(), 0);
         TipyModel::transaction(function() {
