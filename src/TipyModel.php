@@ -133,7 +133,7 @@ class TipyValidationException extends Exception {}
  *
  * ### hasMany
  *
- * A has_many association indicates a one-to-many connection with another model.
+ * A hasMany association indicates a one-to-many connection with another model.
  *
  * <code>
  * create table users (               create table blog_posts (
@@ -147,49 +147,109 @@ class TipyValidationException extends Exception {}
  *
  * <code>
  * class User extends TipyModel {
- *
  *    protected $hasMany = [
  *        'posts' => ['class' => 'BlogPost']
  *    );
- *
  * }
  * </code>
  *
- * This gived User model magic property User::posts
+ * This gives User model magic property User::posts
  *
  * <code>
- * $posts = $user->posts; // equivalent of "select * from blog_posts where user_id = ".$user->id
+ * $posts = $user->posts;
  * </code>
  *
- * ### Examples
+ * ### hasOne
+ *
+ * A hasOne association indicates a one-to-one connection with another model.
+ *
+ * <code>
+ * create table users (               create table accounts (
+ *     id int(11), <---------------+      id int(11),
+ *     first_name varchar(255),    |      cc_number varchar(20),
+ *     last_name varchar(255),     |      cc_expire_date varchar(5),
+ *     primary key (id)            +----- user_id int(11),
+ * );                                     primary key (id)
+ *                                    );
+ * </code>
  *
  * <code>
  * class User extends TipyModel {
- *
- *    protected $hasMany = [
- *        'posts' => ['class' => 'BlogPost', 'dependent' => 'delete'],
- *        'positivePosts' => ['class' => 'BlogPost', 'conditions' => 'rating > 0', 'dependent' => 'delete'],
- *        'relations' => ['class' => 'UserGroup', 'dependent' => 'delete']
- *    );
- *
- *    protected $hasManyThrough = [
- *        'groups' => ['class' => 'Group', 'through' => 'UserGroup'],
- *    ];
- *
  *    protected $hasOne = [
- *        'profile' => ['class' => 'Profile', 'dependent' => 'delete', 'foreign_key' => 'user_id']
- *    ];
- *
- * }
- *
- * class Profile extends TipyModel {
- *
- *    protected $belongsTo = [
- *        'user' => ['class' => 'User']
- *    ];
- *
+ *        'account' => ['class' => 'Account']
+ *    );
  * }
  * </code>
+ *
+ * This gives User model magic property User::account
+ *
+ * <code>
+ * $ccNumber = $user->account->ccNumber;
+ * </code>
+ *
+ * ### belongsTo
+ *
+ * A belongsTo association is an opposite to hasMany and hasOne
+ *
+ * <code>
+ * create table users (               create table blog_posts (
+ *     id int(11), <---------------+      id int(11),
+ *     first_name varchar(255),    |      title varchar(255),
+ *     last_name varchar(255),     |      body text,
+ *     primary key (id)            +----- user_id int(11),
+ * );                                     primary key (id)
+ *                                    );
+ * </code>
+ *
+ * <code>
+ * class BlogPost extends TipyModel {
+ *    protected $belongsTo = [
+ *        'user' => ['class' => 'User']
+ *    );
+ * }
+ * </code>
+ *
+ * This gives BlogPost model magic property BlogPost->user
+ *
+ * <code>
+ * $firstName = $post->user->firstName;
+ * </code>
+ *
+ * ### hasManyThrough
+ *
+ * A hasManyThrough association indicates a many-to-many connection with another model
+ * through a third model.
+ *
+ * <code>
+ * create table users (
+ *     id int(11), <-------------+
+ *     first_name varchar(255),  |   create table memberships (
+ *     last_name varchar(255)    +------ user_id int(11).
+ * );                                    id int(11),
+ *                               +------ group_id int(11)
+ * create table groups (         |   );
+ *     id int(11), <-------------+
+ *     name varchar(255)
+ * );
+ * </code>
+ *
+ * <code>
+ * class User extends TipyModel {
+ *    protected $hasManyThrough = [
+ *        'groups' => ['class' => 'Group', 'through' => 'Membership'],
+ *    );
+ * }
+ * </code>
+ *
+ * This gives User model magic property User::groups
+ *
+ * <code>
+ * $groups = $user->groups;
+ * </code>
+ *
+ * ### Association options
+ * 
+ * 
  *
  * ### Associations cache
  *
