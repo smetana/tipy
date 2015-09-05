@@ -23,63 +23,44 @@ class TipyValidationException extends Exception {}
  * - Validates models before they get persisted to the database
  * - Performs database operations in an object-oriented fashion
  *
- * Conventions
- * -----------
+ * ### Conventions
  *
  * TipyModel follows "Convention over Configuration" paradigm and tries to use as
  * little configuration as possible. Of course you can configure model-database mapping
  * in the way you wish but you will write your code much faster following TipyModel
  * conventions:
  *
- * - <b>Class Name</b> - singular, CamelCase (first letter in upper case), like BlogPost
- * - <b>Table Name</b> - plural, snake_case (all letters in lower case), like blog_posts
+ * - <b>Class Name</b> - singular, CamelCase, first letter in upper case. - **BlogPost**
+ * - <b>Table Name</b> - plural, snake_case, all letters in lower case    - **blog_posts**
+ * - <b>Model Properties</b> - camelCase, first letter in lower case      - **createdAt**
+ * - <b>Table Fields</b> - snake_case, all letters in lower case          - **created_at**
+ * - <b>Foreign Key</b> - foreign table name + "_id"                      - **author_id**
+ * - <b>Primary Key</b> - is always **id**
+ * - If your table has **created_at** and **updated_at** fields they will be handled
+ *   automatically
  *
- * Examples:
- * <tt>
- * Class    | Table      |
- * -----------------------
- * BlogPost | blog_posts |
- * </tt>
- * ==================================================================
- * Default Conventions:
- * ==================================================================
+ * These conventions can be changed by overriding TipyModel methods:
+ * {@link classNameToTableName()},
+ * {@link fieldNameToAttrName()},
+ * {@link tableForeignKeyFieldName()},
+ * {@link classForeignKeyAttr()},
+ * and constants:
+ * {@link CREATED_AT},
+ * {@link UPDATED_AT}
  *
- *  Class name:  BlogPost                     singular CamelCase
- *  Table name:  blog_posts                   plural lowercase underscored
- * Primary Key:  id                           allways id
- *  Field Name:  some_field                   lowercase underscored
- *  Model Attr:  someField                    camelCase based on field name
- * Foreign key:  blog_comment_id              foreign table + "_id"
- * ==================================================================
+ * ### Examples
  *
- * This conventions can be changed by extending this class and redefining following methods:
- *      classNameToTableName(),
- *      fieldNameToAttrName(),
- *      tableForeignKeyFieldName(),
- *      classForeignKeyAttr(),
- *      getCurrentTime()
- * and folowing consts:
- *      CREATED_AT,
- *      UPDATED_AT
- *
-
-
-
-
- * ==================================================================
- * Model Samples
- *
+ * <code>
  * class User extends TipyModel {
  *
  *    protected $hasMany = [
- *        'posts' => ['class' => 'BlogPost', 'dependent' => 'nullify'],
- *        'positivePosts' => ['class' => 'BlogPost', 'conditions' => 'rating > 0', 'dependent' => 'nullify'],
+ *        'posts' => ['class' => 'BlogPost', 'dependent' => 'delete'],
+ *        'positivePosts' => ['class' => 'BlogPost', 'conditions' => 'rating > 0', 'dependent' => 'delete'],
  *        'relations' => ['class' => 'UserGroup', 'dependent' => 'delete']
  *    );
  *
  *    protected $hasManyThrough = [
  *        'groups' => ['class' => 'Group', 'through' => 'UserGroup'],
- *        'friends' => ['class' => 'User', 'through' => 'Friend', 'foreign_key' => 'person_id', 'through_key' => 'friend_id')
  *    ];
  *
  *    protected $hasOne = [
@@ -100,30 +81,34 @@ class TipyValidationException extends Exception {}
  *    ];
  *
  * }
- * ==================================================================
-
- * ==================================================================
- * TODO: add 'extend' to hasManyThrough asoc
- * ==================================================================
-
- * ==================================================================
- * Notes about associations caching:
- * ==================================================================
- * Associations are cached. So if you ask $post->comments more than once
- * only one query will be executed (first time), then comments will always
- * be taken from cache.
+ * </code>
  *
- * Downside of this approach, is that if comments were modified or
- * changed in the database cache doesn't know about it.
- * To reset associations cache use $post->reload()
+ * ### Associations cache
  *
- * Associations with queries are not cached. This means that
+ * Associations are cached. So if you call
+ * <code>
+ * $post->comments
+ * </code>
+ * more than once only one query will be executed (first call) and then
+ * comments will always be taken from cache.
+ *
+ * Downside of this approach: Cache doesn't know if comments were deleted
+ * or modified in the database. To reset associations cache use {@link TipyModel::reload()}
+ *
+ * Associations with conditions are not cached. This means that
+ * <code>
  * $post->comments(['order' => 'created_at desc'])
+ * </code>
  * will allways execute query
  *
  * In short always look for parethesis:
- *    $post->comments; is cached
- *    $post->comments(...); is not
+ * <code>
+ * $post->comments; // is cached
+ * $post->comments(...); // is not cached
+ * </code>
+ *
+ * @todo Associations doc
+ * @todo Get assiciated class name by property name
  */
 class TipyModel extends TipyDAO {
 
