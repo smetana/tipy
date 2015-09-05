@@ -6,7 +6,7 @@
  */
 
 /**
- * Base controller class
+ * C in MVC. Receive the request, fetch or save data from a models, and use a TipyView to create HTML output
  *
  * <code>
  * class MyController extends TipyController {
@@ -17,9 +17,9 @@
  * }
  * </code>
  *
- * <h3>Routing</h3>
+ * ### Routing
  *
- * Tipy uses <b>.htaccess</b> for routing.
+ * Tipy uses **.htaccess** for routing.
  * .htaccess RewriteRules rewrite all request urls to something like:
  * <code>
  * dispatcher.php?controller=my&method=my_action&id=... # => MyController::myAction()
@@ -27,16 +27,16 @@
  *
  * All query string parameters are preserved on url rewite.
  *
- * <b>controller</b> parameter represents controller class with:
+ * **controller** parameter represents controller class with:
  *
  * - snake_case converted to CamelCase (first letter in uppper case)
  * - word "Controller" is added to the end
  *
- * <b>action</b> parameter represents controller's method with:
+ * **action** parameter represents controller's method with:
  *
  * - snake_case converted to camelCase (first letter in lower case)
  *
- * <h3>Predefined Routes</h3>
+ * ### Predefined Routes
  *
  * Tipy also comes with a set of predefined rules so you don't need to
  * rewrite urls to dispatcher.php. It is enough to rewrite urls to one of the

@@ -6,7 +6,7 @@
  */
 
 /**
- * HTML template engine based on PHP output buffer and PHP itself
+ * V in MVC. HTML template engine based on PHP output buffer and PHP itself
  *
  * - Templates are located in app/views directory
  * - Templates are simple php files with .php extension.
@@ -37,7 +37,8 @@
  * </html>
  * </code>
  *
- * <b>Note about $this</b><br/>
+ * ### Note about $this
+ *
  * $this is available inside template and gives access to
  * TipyView instance which renders current template.
  *
@@ -164,7 +165,7 @@ class TipyView {
      * All parent template variables will be available to its children as
      * they exist in one context.
      *
-     * Should be called from template via <b>$this</b>.
+     * Should be called from template via **$this**.
      *
      * <code>
      * <ul>
@@ -185,12 +186,12 @@ class TipyView {
     /**
      * Wrap another template (layout) around currently rendering template or even its part (child).
      *
-     * Layout template should have <i>$this->childContent()</i> call to specify where child
+     * Layout template should have **$this->childContent()** call to specify where child
      * template will be inserted.
      *
      * All defined variables will be available in both templates as they exist in one context.
      *
-     * Should be called from template via <b>$this</b>
+     * Should be called from template via **$this**
      *
      * <code>
      * // app/views/child.php

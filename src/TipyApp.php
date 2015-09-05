@@ -14,7 +14,8 @@
  * $app = TipyApp::getInstance();
  * </code>
  *
- * <h3>Lazy database connection</h3>
+ * ### Lazy database connection
+ *
  * Application instance does not immediately connects to database.
  * To connect to database you need to instantiate TipyModel or TipyDAO class.
  *
@@ -68,7 +69,7 @@ class TipyApp {
     public $session;
 
     /**
-     * Path to your application's <b>public</b> directory
+     * Path to your application's **public** directory
      * @var string
      */
     public $documentRoot;
@@ -106,7 +107,7 @@ class TipyApp {
      * 
      * Contruct application if it has not been initialized yet.
      *
-     * <b>NOTE:</b> Does not connect to database.
+     * **NOTE** Does not connect to database.
      *
      * @return TipyApp
      * @see TipyApp::connectToDb()
@@ -128,7 +129,7 @@ class TipyApp {
     /**
      * Initialize controller and run action
      *
-     * Requires <b>$app->in('controller')</b> and <b>$app->in('action')</b>
+     * Requires **$app->in('controller')** and **$app->in('action')**
      * parameters to be defined.
      *
      * @see TipyController

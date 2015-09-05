@@ -64,7 +64,7 @@ class TipySession {
     /**
      * The way to set many variables at once
      *
-     * <b>NOTE:</b> This will overwrite existing session data
+     * **NOTE:** This will overwrite existing session data
      * @param array $map
      */
     public function bind($map) {

@@ -1,98 +1,130 @@
 <?php
+/**
+ * TipyModel
+ *
+ * @package tipy
+ */
 
-// ==================================================================
-// Simple Model class
-//
-// ==================================================================
-
-// ==================================================================
-// Default Conventions:
-// ==================================================================
-//
-//  Class name:  BlogPost                     singular CamelCase
-//  Table name:  blog_posts                   plural lowercase underscored
-// Primary Key:  id                           allways id
-//  Field Name:  some_field                   lowercase underscored
-//  Model Attr:  someField                    camelCase based on field name
-// Foreign key:  blog_comment_id              foreign table + "_id"
-// ==================================================================
-//
-// This conventions can be changed by extending this class and redefining following methods:
-//      classNameToTableName(),
-//      fieldNameToAttrName(),
-//      tableForeignKeyFieldName(),
-//      classForeignKeyAttr(),
-//      getCurrentTime()
-// and folowing consts:
-//      CREATED_AT,
-//      UPDATED_AT
-//
-
-
-
-
-// ==================================================================
-// Model Samples
-//
-// class User extends TipyModel {
-//
-//    protected $hasMany = [
-//        'posts' => ['class' => 'BlogPost', 'dependent' => 'nullify'],
-//        'positivePosts' => ['class' => 'BlogPost', 'conditions' => 'rating > 0', 'dependent' => 'nullify'],
-//        'relations' => ['class' => 'UserGroup', 'dependent' => 'delete']
-//    );
-//
-//    protected $hasManyThrough = [
-//        'groups' => ['class' => 'Group', 'through' => 'UserGroup'],
-//        'friends' => ['class' => 'User', 'through' => 'Friend', 'foreign_key' => 'person_id', 'through_key' => 'friend_id')
-//    ];
-//
-//    protected $hasOne = [
-//        'profile' => ['class' => 'Profile', 'dependent' => 'delete', 'foreign_key' => 'user_id']
-//    ];
-//
-//    public function validate() {
-//        if (!$this->login) throw new TipyValidtionException('Login should not be blank!');
-//        if (!$this->password) throw new TipyValidtionException('Password should not be blank!');
-//        if (!$this->email) throw new TipyValidtionException('Email should not be blank!');
-//    }
-// }
-//
-// class Profile extends TipyModel {
-//
-//    protected $belongsTo = [
-//        'user' => ['class' => 'User']
-//    ];
-//
-// }
-// ==================================================================
-
-// ==================================================================
-// TODO: add 'extend' to hasManyThrough asoc
-// ==================================================================
-
-// ==================================================================
-// Notes about associations caching:
-// ==================================================================
-// Associations are cached. So if you ask $post->comments more than once
-// only one query will be executed (first time), then comments will always
-// be taken from cache.
-//
-// Downside of this approach, is that if comments were modified or
-// changed in the database cache doesn't know about it.
-// To reset associations cache use $post->reload()
-//
-// Associations with queries are not cached. This means that
-// $post->comments(['order' => 'created_at desc'])
-// will allways execute query
-//
-// In short always look for parethesis:
-//    $post->comments; is cached
-//    $post->comments(...); is not
-
+/**
+ * Thown on TipyModel errors like "Unknown property", "Unknown metod", etc...
+ */
 class TipyModelException extends Exception {}
+
+/**
+ * Thow this from TipyModel::validate() method on validation errors
+ */
 class TipyValidationException extends Exception {}
 
+/**
+ * M in MVC. ORM framework for connecting application objects to tables in a database
+ *
+ * - Represents row in a table
+ * - Defines associations and hierarchies between models
+ * - Validates models before they get persisted to the database
+ * - Performs database operations in an object-oriented fashion
+ *
+ * Conventions
+ * -----------
+ *
+ * TipyModel follows "Convention over Configuration" paradigm and tries to use as
+ * little configuration as possible. Of course you can configure model-database mapping
+ * in the way you wish but you will write your code much faster following TipyModel
+ * conventions:
+ *
+ * - <b>Class Name</b> - singular, CamelCase (first letter in upper case), like BlogPost
+ * - <b>Table Name</b> - plural, snake_case (all letters in lower case), like blog_posts
+ *
+ * Examples:
+ * <tt>
+ * Class    | Table      |
+ * -----------------------
+ * BlogPost | blog_posts |
+ * </tt>
+ * ==================================================================
+ * Default Conventions:
+ * ==================================================================
+ *
+ *  Class name:  BlogPost                     singular CamelCase
+ *  Table name:  blog_posts                   plural lowercase underscored
+ * Primary Key:  id                           allways id
+ *  Field Name:  some_field                   lowercase underscored
+ *  Model Attr:  someField                    camelCase based on field name
+ * Foreign key:  blog_comment_id              foreign table + "_id"
+ * ==================================================================
+ *
+ * This conventions can be changed by extending this class and redefining following methods:
+ *      classNameToTableName(),
+ *      fieldNameToAttrName(),
+ *      tableForeignKeyFieldName(),
+ *      classForeignKeyAttr(),
+ *      getCurrentTime()
+ * and folowing consts:
+ *      CREATED_AT,
+ *      UPDATED_AT
+ *
+
+
+
+
+ * ==================================================================
+ * Model Samples
+ *
+ * class User extends TipyModel {
+ *
+ *    protected $hasMany = [
+ *        'posts' => ['class' => 'BlogPost', 'dependent' => 'nullify'],
+ *        'positivePosts' => ['class' => 'BlogPost', 'conditions' => 'rating > 0', 'dependent' => 'nullify'],
+ *        'relations' => ['class' => 'UserGroup', 'dependent' => 'delete']
+ *    );
+ *
+ *    protected $hasManyThrough = [
+ *        'groups' => ['class' => 'Group', 'through' => 'UserGroup'],
+ *        'friends' => ['class' => 'User', 'through' => 'Friend', 'foreign_key' => 'person_id', 'through_key' => 'friend_id')
+ *    ];
+ *
+ *    protected $hasOne = [
+ *        'profile' => ['class' => 'Profile', 'dependent' => 'delete', 'foreign_key' => 'user_id']
+ *    ];
+ *
+ *    public function validate() {
+ *        if (!$this->login) throw new TipyValidtionException('Login should not be blank!');
+ *        if (!$this->password) throw new TipyValidtionException('Password should not be blank!');
+ *        if (!$this->email) throw new TipyValidtionException('Email should not be blank!');
+ *    }
+ * }
+ *
+ * class Profile extends TipyModel {
+ *
+ *    protected $belongsTo = [
+ *        'user' => ['class' => 'User']
+ *    ];
+ *
+ * }
+ * ==================================================================
+
+ * ==================================================================
+ * TODO: add 'extend' to hasManyThrough asoc
+ * ==================================================================
+
+ * ==================================================================
+ * Notes about associations caching:
+ * ==================================================================
+ * Associations are cached. So if you ask $post->comments more than once
+ * only one query will be executed (first time), then comments will always
+ * be taken from cache.
+ *
+ * Downside of this approach, is that if comments were modified or
+ * changed in the database cache doesn't know about it.
+ * To reset associations cache use $post->reload()
+ *
+ * Associations with queries are not cached. This means that
+ * $post->comments(['order' => 'created_at desc'])
+ * will allways execute query
+ *
+ * In short always look for parethesis:
+ *    $post->comments; is cached
+ *    $post->comments(...); is not
+ */
 class TipyModel extends TipyDAO {
 
     const CREATED_AT = 'created_at';

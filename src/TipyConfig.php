@@ -8,7 +8,7 @@
 /**
  * Access config variables
  *
- * Config variables are defined in <b>config.ini</b> file in your application root directory
+ * Config variables are defined in **config.ini** file in your application root directory
  *
  * <code>
  * class MyController extends TipyController {
