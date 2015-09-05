@@ -16,14 +16,16 @@ class TipyModelException extends Exception {}
 class TipyValidationException extends Exception {}
 
 /**
- * M in MVC. ORM framework for connecting application objects to tables in a database
+ * M in MVC. TipyModel is ORM connecting objects to database
+ *
+ * TipyModel:
  *
  * - Represents row in a table
  * - Defines associations and hierarchies between models
  * - Validates models before they get persisted to the database
  * - Performs database operations in an object-oriented fashion
  *
- * ### Conventions
+ * ## Conventions
  *
  * TipyModel follows "Convention over Configuration" paradigm and tries to use as
  * little configuration as possible. Of course you can configure model-database mapping
@@ -48,6 +50,117 @@ class TipyValidationException extends Exception {}
  * {@link CREATED_AT},
  * {@link UPDATED_AT}
  *
+ * ## Defining Models
+ *
+ * Let's say you have the following table
+ *
+ * <code>
+ * create table users (
+ *     id int(11),
+ *     first_name varchar(255),
+ *     last_name varchar(255),
+ *     primary key (id)
+ * );
+ * </code>
+ *
+ * To make TipyModel from this table you simply need to extend TipyModel class
+ *
+ * <code>
+ * class User extends TipyModel {
+ * }
+ * </code>
+ *
+ * This magically connect User class to users table (see Conventions section above)
+ * gives User class a lot of useful methods and magic properties to access table
+ * fields
+ *
+ * <code>
+ * // create new User object and save it to database
+ * $user = new User();
+ * $user->firstName = 'John';
+ * $user->lastName = 'Doe';
+ * $user->save();
+ *
+ * // or like this
+ * $user = User::create([
+ *     'firstName' => 'John',
+ *     'lastName'  => 'Doe'
+ * ]);
+ *
+ * $id = $user->id;
+ * $sameUser = User::load($id);
+ * echo $sameUser->firstName;
+ * </code>
+ *
+ * ## Validation
+ *
+ * Model-level validation is the best way to ensure that only valid data is saved
+ * into database. It cannot be bypassed by end users and is convenient to test and maintain.
+ *
+ * Validations are run autmatically before {@link save()} and {@link update()} send
+ * SQL INSERT or UPDATE queries to the database.
+ *
+ * To add validation to your model simply override {@link validate()} method.
+ *
+ * <code>
+ * class User extends TipyModel {
+ *    public function validate() {
+ *        if (!$this->firstName) throw new TipyValidtionException('First name should not be blank!');
+ *        if (!$this->lastName) throw new TipyValidtionException('Last name should not be blank!');
+ *    }
+ * }
+ * </code>
+ *
+ * The common way to fail validation is to throw {@link TipyValidtionException} and then to
+ * catch it in controller.
+ *
+ * ## Associations
+ *
+ * Association is a connection between two models. By declaring associations you
+ * define Primary Key-Foreign Key connection between instances of the two models,
+ * and you also get a number of utility methods added to your model. Tipy supports
+ * the following types of associations:
+ *
+ * - hasMany
+ * - hasOne
+ * - belongsTo
+ * - hasManyThrough
+ *
+ * ### Defining Associations
+ *
+ * To define associations you need to assign {@link $hasMany}, {@link $hasOne},
+ * {@link $belongsTo}, {@link $hasManyThrough} model class property
+ *
+ * ### hasMany
+ *
+ * A has_many association indicates a one-to-many connection with another model.
+ *
+ * <code>
+ * create table users (               create table blog_posts (
+ *     id int(11), <---------------+      id int(11),
+ *     first_name varchar(255),    |      title varchar(255),
+ *     last_name varchar(255),     |      body text,
+ *     primary key (id)            +----- user_id int(11),
+ * );                                     primary key (id)
+ *                                    );
+ * </code>
+ *
+ * <code>
+ * class User extends TipyModel {
+ *
+ *    protected $hasMany = [
+ *        'posts' => ['class' => 'BlogPost']
+ *    );
+ *
+ * }
+ * </code>
+ *
+ * This gived User model magic property User::posts
+ *
+ * <code>
+ * $posts = $user->posts; // equivalent of "select * from blog_posts where user_id = ".$user->id
+ * </code>
+ *
  * ### Examples
  *
  * <code>
@@ -67,11 +180,6 @@ class TipyValidationException extends Exception {}
  *        'profile' => ['class' => 'Profile', 'dependent' => 'delete', 'foreign_key' => 'user_id']
  *    ];
  *
- *    public function validate() {
- *        if (!$this->login) throw new TipyValidtionException('Login should not be blank!');
- *        if (!$this->password) throw new TipyValidtionException('Password should not be blank!');
- *        if (!$this->email) throw new TipyValidtionException('Email should not be blank!');
- *    }
  * }
  *
  * class Profile extends TipyModel {
@@ -108,7 +216,7 @@ class TipyValidationException extends Exception {}
  * </code>
  *
  * @todo Associations doc
- * @todo Get assiciated class name by property name
+ * @todo Get associated class name by property name
  */
 class TipyModel extends TipyDAO {
 
