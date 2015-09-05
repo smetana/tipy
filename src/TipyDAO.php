@@ -130,34 +130,43 @@ class TipyDAO {
         return $this->query($sql, $params);
     }
 
-    // -----------------------------------------------------
-    // numRows
-    // -----------------------------------------------------
+    /**
+     * Return the number of rows from $result
+     *
+     * @param mysqli $result
+     * @return integer
+     */
     public function numRows(&$result) {
         return $result->num_rows;
     }
 
-    // -----------------------------------------------------
-    // fetchRow
-    // Need this method to do some common operations before
-    // returning fetchRow from query result
-    // -----------------------------------------------------
+    /**
+     * Return row as associative array from $result
+     *
+     * @param mysqli $results
+     * @return array
+     */
     public function fetchRow(&$result) {
         $result->field_seek(0);
         return $result->fetch_array(MYSQLI_ASSOC);
     }
 
-    // -----------------------------------------------------
-    // fetchAllRows - return all rows of the DB_result object
-    // -----------------------------------------------------
+    /**
+     * Return all rows as array of associative arrays from $result
+     *
+     * @param mysqli $results
+     * @return array
+     */
     public function fetchAllRows(&$result) {
         return $result->fetch_all(MYSQLI_ASSOC);
     }
 
-    // ----------------------------------------------------
-    // queryRow
-    // query & fetch in one flakon
-    // ----------------------------------------------------
+    /**
+     * Query and fetch one row
+     *
+     * @param mysqli $results
+     * @return array
+     */
     public function queryRow($sql, $params = null) {
         $result = $this->query($sql, $params);
         return $this->fetchRow($result);
