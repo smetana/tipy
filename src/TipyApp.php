@@ -14,7 +14,6 @@
  * $app = TipyApp::getInstance();
  * </code>
  *
- * <a name="lazy-database-connection"></a>
  * <h3>Lazy database connection</h3>
  * Application instance does not immediately connects to database.
  * To connect to database you need to instantiate TipyModel or TipyDAO class.
@@ -43,7 +42,7 @@ class TipyApp {
     public $cookie;
 
     /**
-     * MySQL connection
+     * MySQL database connection
      * @var mysqli|null
      */
     public $db;

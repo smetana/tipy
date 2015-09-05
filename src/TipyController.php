@@ -17,7 +17,6 @@
  * }
  * </code>
  *
- * <a name="routing"></a>
  * <h3>Routing</h3>
  *
  * Tipy uses <b>.htaccess</b> for routing.
@@ -26,16 +25,16 @@
  * dispatcher.php?controller=my&method=my_action&id=... # => MyController::myAction()
  * </code>
  *
- * All query string parameters will be preserved on url rewite.
+ * All query string parameters are preserved on url rewite.
  *
  * <b>controller</b> parameter represents controller class with:
  *
- * - snake_case transformed to CamelCase (first letter in uppper case)
+ * - snake_case converted to CamelCase (first letter in uppper case)
  * - word "Controller" is added to the end
  *
  * <b>action</b> parameter represents controller's method with:
  *
- * - snake_case is transformed to camelCase (first letter in lower case)
+ * - snake_case converted to camelCase (first letter in lower case)
  *
  * <h3>Predefined Routes</h3>
  *
