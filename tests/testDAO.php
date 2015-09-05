@@ -34,6 +34,43 @@ class TestDAO extends TipyTestSuite {
         $this->assertEqual($dao->numRows($result), 3);
     }
 
+    public function testLimitQuery() {
+        for ($i=1; $i<=10; $i++) {
+            $this->createRecord($i);
+        }
+        $dao = new TipyDAO();
+        $result = $dao->limitQuery("select * from tipy_test_records order by id", 0, 3);
+        $this->assertTrue(is_a($result, 'mysqli_result'));
+        $this->assertEqual($dao->numRows($result), 3);
+        $row = $dao->fetchRow($result);
+        $this->assertTrue(is_array($row));
+        $this->assertEqual($row["value"], 'value_1');
+        $row = $dao->fetchRow($result);
+        $this->assertTrue(is_array($row));
+        $this->assertEqual($row["value"], 'value_2');
+        $result = $dao->limitQuery("select * from tipy_test_records order by id", 3, 5);
+        $this->assertTrue(is_a($result, 'mysqli_result'));
+        $this->assertEqual($dao->numRows($result), 5);
+        $row = $dao->fetchRow($result);
+        $this->assertTrue(is_array($row));
+        $this->assertEqual($row["value"], 'value_4');
+        $row = $dao->fetchRow($result);
+        $this->assertTrue(is_array($row));
+        $this->assertEqual($row["value"], 'value_5');
+        // try to limit 10 but with offset which does not allow this
+        $result = $dao->limitQuery("select * from tipy_test_records order by id", 8, 10);
+        $this->assertTrue(is_a($result, 'mysqli_result'));
+        $this->assertEqual($dao->numRows($result), 2);
+        $row = $dao->fetchRow($result);
+        $this->assertTrue(is_array($row));
+        $this->assertEqual($row["value"], 'value_9');
+        $row = $dao->fetchRow($result);
+        $this->assertTrue(is_array($row));
+        $this->assertEqual($row["value"], 'value_10');
+        $row = $dao->fetchRow($result);
+        $this->assertNull($row);
+    }
+
     public function testTransactionCommit() {
         $this->assertEqual(TipyTestRecord::count(), 0);
         TipyModel::transaction(function() {

@@ -25,6 +25,7 @@ class TipyRollbackException extends Exception {}
 class TipyDAO {
 
     /**
+     * MySQL database connection
      * @var mysqli|null
      */
     protected $dbLink;
@@ -107,11 +108,25 @@ class TipyDAO {
         }
     }
 
-    // ----------------------------------------------------
-    // limitQuery
-    // ----------------------------------------------------
-    public function limitQuery($sql, $span, $step, $params = null) {
-        $sql = $sql." limit ".$span.",".$step;
+
+    /**
+     * Return the number of rows limited by $limit starting from $offset
+     *
+     * <code>
+     * $dao = new TipyDAO();
+     * // Select rows 6-15
+     * $result = $dao->imitQuery('select * from users', 5, 10);
+     * </code>
+     *
+     * @param string $sql SQL template with ? placeholders
+     * @param integer $offset offset of the first row
+     * @param integer $limit number of rows to return
+     * @param array $params Array with values to fill placeholders
+     * @throws TipyDaoException
+     * @return mysqli_result
+     */
+    public function limitQuery($sql, $offset, $limit, $params = null) {
+        $sql = $sql." limit ".$limit." offset ".$offset;
         return $this->query($sql, $params);
     }
 
