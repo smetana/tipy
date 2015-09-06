@@ -114,6 +114,18 @@ class TipyValidationException extends Exception {}
  * The common way to fail validation is to throw {@link TipyValidtionException} and then to
  * catch it in controller.
  *
+ * ## Hooks
+ *
+ * TipyModel allows to define logic triggered before or after an alteration of the model state.
+ * To do this override the following methods in your model:
+ *
+ * - {@link $beforeCreate()}
+ * - {@link $afterCreate()}
+ * - {@link $beforeUpdate()}
+ * - {@link $afterUpdate()}
+ * - {@link $beforeDelete()}
+ * - {@link $afterDelete()}
+ *
  * ## Associations
  *
  * Association is a connection between two models. By declaring associations you
@@ -508,7 +520,8 @@ class TipyModel extends TipyDAO {
     /**
      * Magic method to get the model property value or to execute model method
      *
-     * Lookup order
+     * Lookup order:
+     *
      * - model methods
      * - model assosications
      * - model properties
@@ -832,11 +845,12 @@ class TipyModel extends TipyDAO {
     /**
      * Count model records by conditions
      *
-     * Usage:
-     *     $post = BlogPost::count([
-     *          'conditions' => "title =?",
-     *          'values' => ['Hello']
-     *     ]);
+     * <code>
+     * $post = BlogPost::count([
+     *      'conditions' => "user_id = ?",
+     *      'values' => [42]
+     * ]);
+     * </code>
      *
      * @return integer
      */
@@ -984,7 +998,15 @@ class TipyModel extends TipyDAO {
         return $value;
     }
 
-
+    /**
+     * Select from the database and instantiaate {@link $hasMany}
+     * associated models by name and conditions
+     *
+     * @internal
+     * @param string name
+     * @param array $options
+     * @return array
+     */
     protected function findHasMany($name, $options = null) {
         $cacheAssoc = false;
         if (!$options and isset($this->associationsCache[$name])) {
@@ -1018,6 +1040,14 @@ class TipyModel extends TipyDAO {
         return $result;
     }
 
+    /**
+     * Select from the database and instantiate {@link $hasOne}
+     * associated model by name
+     *
+     * @internal
+     * @param string name
+     * @return TipyModel
+     */
     protected function findHasOne($name) {
         if (isset($this->associationsCache[$name])) {
             return $this->associationsCache[$name];
@@ -1031,6 +1061,14 @@ class TipyModel extends TipyDAO {
         return $assoc;
     }
 
+    /**
+     * Select from the database and instantiate {@link $belongsTo}
+     * associated model by name
+     *
+     * @internal
+     * @param string name
+     * @return TipyModel
+     */
     protected function findBelongsTo($name) {
         if (isset($this->associationsCache[$name])) {
             return $this->associationsCache[$name];
@@ -1042,6 +1080,15 @@ class TipyModel extends TipyDAO {
         return $assoc;
     }
 
+    /**
+     * Select from the database and instantiate {@link $hasManyThrough}
+     * associated model by name and conditions
+     *
+     * @internal
+     * @param string name
+     * @param array $options
+     * @return array
+     */
     protected function findHasManyThrough($name, $options = null) {
         $cacheAssoc = false;
         if (!$options and array_key_exists($name, $this->associationsCache)) {
@@ -1086,10 +1133,13 @@ class TipyModel extends TipyDAO {
         return $result;
     }
 
-    // ----------------------------------------------------
-    // Lock record for update
-    // Works only within transaction!
-    // ----------------------------------------------------
+    /**
+     * Lock model's connected row for update
+     *
+     * Should be called inside {@link transaction()}
+     *
+     * @throws TipyDaoException if called outside transaction
+     */
     public function lockForUpdate() {
         if (!$this->isTransactionInProgress()) {
             throw new TipyDaoException('No any transaction in progress');
@@ -1097,77 +1147,122 @@ class TipyModel extends TipyDAO {
         return $this->query('select id from '.$this->table.' where id=? for update', [$this->id]);
     }
 
-    // Hooks for Create, Update and Save
+    // ----------------------------------------
+    // Hooks
+    // ----------------------------------------
 
-    // --------------------------------------------------------------
-    // Default actions that are to be executed by default
-    // before deletion
-    // --------------------------------------------------------------
+    /**
+     * TipyModel hook called before {@link create()} and {@link createNewRecord}
+     *
+     * Override this in your model to add logic
+     */
     public function beforeCreate() {
-        // override this
     }
 
-    // --------------------------------------------------------------
-    // Default actions that are to be executed by default
-    // after Create
-    // --------------------------------------------------------------
+    /**
+     * TipyModel hook called after {@link update()} and {@link updateRecord}
+     *
+     * Override this in your model to add logic
+     */
     public function afterCreate() {
-        // override this
     }
 
-    // --------------------------------------------------------------
-    // Default actions that are to be executed by default
-    // before deletion
-    // --------------------------------------------------------------
+    /**
+     * TipyModel hook called before {@link update()} and {@link createNewRecord}
+     *
+     * Override this in your model to add logic
+     */
     public function beforeUpdate() {
-        // override this
     }
 
-    // --------------------------------------------------------------
-    // Default actions that are to be executed by default
-    // after Update
-    // --------------------------------------------------------------
+    /**
+     * TipyModel hook called after {@link update()} and {@link createNewRecord}
+     *
+     * Override this in your model to add logic
+     */
     public function afterUpdate() {
-        // override this
     }
 
-    // --------------------------------------------------------------
-    // Default actions that are to be executed by default
-    // before delete
-    // --------------------------------------------------------------
+    /**
+     * TipyModel hook called before {@link delete()}
+     *
+     * Override this in your model to add logic
+     */
     public function beforeDelete() {
-        // override this
     }
 
-    // --------------------------------------------------------------
-    // Default actions that are to be executed by default
-    // after deletion
-    // --------------------------------------------------------------
+    /**
+     * TipyModel hook called after {@link delete()}
+     *
+     * Override this in your model to add logic
+     */
     public function afterDelete() {
-        // override this
     }
 
-// ------------------------------------------------------------------
-//  Methods for prefered naming conventions
-// ------------------------------------------------------------------
+    /**
+     * ------------------------------------------------------
+     * Conventions Definition
+     * Override methods below to change TipyModel conventions
+     * ------------------------------------------------------
+     */
 
+    /**
+     * Converts table name to model class name
+     *
+     * You may override this method to change the rules
+     *
+     * @param string $className
+     * @return string
+     */
     protected static function classNameToTableName($className) {
         return TipyInflector::tableize($className);
     }
 
+    /**
+     * Converts table column name to model property name
+     *
+     * You may override this method to change the rules
+     *
+     * @param string $fieldName
+     * @return string
+     */
     protected static function fieldNameToAttrName($fieldName) {
         return TipyInflector::camelCase($fieldName);
     }
 
+    /**
+     * Return foreign key name for foreign table
+     *
+     * You may override this method to change the rules
+     *
+     * @param string $tableName
+     * @return string
+     */
     protected static function tableForeignKeyFieldName($tableName) {
         return TipyInflector::singularize($tableName)."_id";
     }
 
+    /**
+     * Associated model property representing foreign key
+     *
+     * You may override this method to change the rules
+     *
+     * @param string $className
+     * @return string
+     */
     protected static function classForeignKeyAttr($className) {
         return lcfirst($className)."Id";
     }
 
-    // time format for DB
+    /**
+     * Return current time for *created_at* and *updated_at* columns
+     *
+     * Default TipyModel convention is to use **unix timestamp** for
+     * timestamps. You can change this by overriding this method
+     * in your model
+     *
+     * @return integer
+     */
     protected static function getCurrentTime() {
         return time();
     }
