@@ -136,6 +136,124 @@ class TipyValidationException extends Exception {}
  * }
  * </code>
  *
+ * ### hasMany
+ *
+ * A hasMany association indicates a one-to-many connection with another model.
+ *
+ * <code>
+ * create table users (               create table blog_posts (
+ *     id int(11), <---------------+      id int(11),
+ *     first_name varchar(255),    |      title varchar(255),
+ *     last_name varchar(255),     |      body text,
+ *     primary key (id)            +----- user_id int(11),
+ * );                                     primary key (id)
+ *                                    );
+ * </code>
+ *
+ * <code>
+ * class User extends TipyModel {
+ *    protected $hasMany = [
+ *        'posts' => ['class' => 'BlogPost']
+ *    );
+ * }
+ * </code>
+ *
+ * This gives User model magic property User::posts
+ *
+ * <code>
+ * $posts = $user->posts;
+ * </code>
+ *
+ * ### hasOne
+ *
+ * A hasOne association indicates a one-to-one connection with another model.
+ *
+ * <code>
+ * create table users (               create table accounts (
+ *     id int(11), <---------------+      id int(11),
+ *     first_name varchar(255),    |      cc_number varchar(20),
+ *     last_name varchar(255),     |      cc_expire_date varchar(5),
+ *     primary key (id)            +----- user_id int(11),
+ * );                                     primary key (id)
+ *                                    );
+ * </code>
+ *
+ * <code>
+ * class User extends TipyModel {
+ *    protected $hasOne = [
+ *        'account' => ['class' => 'Account']
+ *    );
+ * }
+ * </code>
+ *
+ * This gives User model magic property User::account
+ *
+ * <code>
+ * $ccNumber = $user->account->ccNumber;
+ * </code>
+ *
+ * ### belongsTo
+ *
+ * A belongsTo association is an opposite to hasMany and hasOne
+ *
+ * <code>
+ * create table users (               create table blog_posts (
+ *     id int(11), <---------------+      id int(11),
+ *     first_name varchar(255),    |      title varchar(255),
+ *     last_name varchar(255),     |      body text,
+ *     primary key (id)            +----- user_id int(11),
+ * );                                     primary key (id)
+ *                                    );
+ * </code>
+ *
+ * <code>
+ * class BlogPost extends TipyModel {
+ *    protected $belongsTo = [
+ *        'user' => ['class' => 'User']
+ *    );
+ * }
+ * </code>
+ *
+ * This gives BlogPost model magic property BlogPost->user
+ *
+ * <code>
+ * $firstName = $post->user->firstName;
+ * </code>
+ *
+ * ### hasManyThrough
+ *
+ * A hasManyThrough association indicates a many-to-many connection with another model
+ * through a third model.
+ *
+ * <code>
+ * create table users (
+ *     id int(11), <-------------+
+ *     first_name varchar(255),  |   create table memberships (
+ *     last_name varchar(255)    +------ user_id int(11).
+ * );                                    id int(11),
+ *                               +------ group_id int(11)
+ * create table groups (         |   );
+ *     id int(11), <-------------+
+ *     name varchar(255)
+ * );
+ * </code>
+ *
+ * <code>
+ * class User extends TipyModel {
+ *    protected $hasManyThrough = [
+ *        'groups' => ['class' => 'Group', 'through' => 'Membership'],
+ *    );
+ * }
+ * </code>
+ *
+ * This gives User model magic property User::groups
+ *
+ * <code>
+ * $groups = $user->groups;
+ * </code>
+ *
+
+ *
  * ### Association Options
  *
  * Association options are arrays with the following keys
@@ -251,12 +369,16 @@ class TipyModel extends TipyDAO {
 
     /**
      * Magic properties representing table fields
+     *
+     * filled automatically
      * @var array
      */
     public $attributes;
 
     /**
      * Table field names list
+     *
+     * fields autmatically
      * @var array
      */
     public $fields;
@@ -264,7 +386,7 @@ class TipyModel extends TipyDAO {
     /**
      * Table field types list
      *
-     * Associative array $fieldName => $fieldType
+     * filled autmatically
      * @var array
      */
     public $fieldTypes;
@@ -301,125 +423,24 @@ class TipyModel extends TipyDAO {
 
     /**
      * One-to-many associations
-     *
-     * <code>
-     * create table users (               create table blog_posts (
-     *     id int(11), <---------------+      id int(11),
-     *     first_name varchar(255),    |      title varchar(255),
-     *     last_name varchar(255),     |      body text,
-     *     primary key (id)            +----- user_id int(11),
-     * );                                     primary key (id)
-     *                                    );
-     * </code>
-     *
-     * <code>
-     * class User extends TipyModel {
-     *    protected $hasMany = [
-     *        'posts' => ['class' => 'BlogPost']
-     *    );
-     * }
-     * </code>
-     *
-     * This gives User model magic property User::posts
-     *
-     * <code>
-     * $posts = $user->posts;
-     * </code>
      * @var array
      */
     protected $hasMany;
 
     /**
      * One-to-one associations
-     *
-     * <code>
-     * create table users (               create table accounts (
-     *     id int(11), <---------------+      id int(11),
-     *     first_name varchar(255),    |      cc_number varchar(20),
-     *     last_name varchar(255),     |      cc_expire_date varchar(5),
-     *     primary key (id)            +----- user_id int(11),
-     * );                                     primary key (id)
-     *                                    );
-     * </code>
-     *
-     * <code>
-     * class User extends TipyModel {
-     *    protected $hasOne = [
-     *        'account' => ['class' => 'Account']
-     *    );
-     * }
-     * </code>
-     *
-     * This gives User model magic property User::account
-     *
-     * <code>
-     * $ccNumber = $user->account->ccNumber;
-     * </code>
      * @var array
      */
     protected $hasOne;
 
     /**
      * Many-to-one associations
-     *
-     * This type of association is an opposite to hasMany
-     *
-     * <code>
-     * create table users (               create table blog_posts (
-     *     id int(11), <---------------+      id int(11),
-     *     first_name varchar(255),    |      title varchar(255),
-     *     last_name varchar(255),     |      body text,
-     *     primary key (id)            +----- user_id int(11),
-     * );                                     primary key (id)
-     *                                    );
-     * </code>
-     *
-     * <code>
-     * class BlogPost extends TipyModel {
-     *    protected $belongsTo = [
-     *        'user' => ['class' => 'User']
-     *    );
-     * }
-     * </code>
-     *
-     * This gives BlogPost model magic property BlogPost->user
-     *
-     * <code>
-     * $firstName = $post->user->firstName;
-     * </code>
      * @var array
      */
     protected $belongsTo;
 
     /**
      * Many-to-many associations through a third models
-     *
-     * <code>
-     * create table users (
-     *     id int(11), <-------------+
-     *     first_name varchar(255),  |   create table memberships (
-     *     last_name varchar(255)    +------ user_id int(11).
-     * );                                    id int(11),
-     *                               +------ group_id int(11)
-     * create table groups (         |   );
-     *     id int(11), <-------------+
-     *     name varchar(255)
-     * );
-     * </code>
-     *
-     * <code>
-     * class User extends TipyModel {
-     *    protected $hasManyThrough = [
-     *        'groups' => ['class' => 'Group', 'through' => 'Membership'],
-     *    );
-     * }
-     * </code>
-     *
-     * This gives User model magic property User::groups
-     *
-     * <code>
-     * $groups = $user->groups;
-     * </code>
      * @var array
      */
     protected $hasManyThrough;
