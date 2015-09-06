@@ -138,7 +138,7 @@ class TipyValidationException extends Exception {}
  *
  * ### Association Options
  *
- * Association properties are arrays with the following keys
+ * Association options are arrays with the following keys
  *
  * - **'class'** - associated model class
  * - **'dependent'** - 'delete', 'nullify', or null -
