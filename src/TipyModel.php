@@ -310,6 +310,7 @@ class TipyValidationException extends Exception {}
  *
  * @todo Accept conditions and values in one array 'conditions' => ['id = ?', $id]
  * @todo Get associated class name by property name
+ * @todo Improve find() to accept arguments like Post::find('first', 'conditions' => ['created_at > ?', time()]);
  */
 class TipyModel extends TipyDAO {
 
@@ -317,9 +318,8 @@ class TipyModel extends TipyDAO {
     const UPDATED_AT = 'updated_at';
 
     /**
-     * Arrays are not allowed as constants
-     * so store this as static variable
-     * @internal
+     * Rules to cast MySQL types to PHP types
+     * @var array
      */
     protected static $mysqlToPhpTypes = [
         'char'      => 'string',
@@ -348,6 +348,7 @@ class TipyModel extends TipyDAO {
 
     /**
      * Global models<->tables reflections cache
+     *
      * One for all models
      * @var array
      */
@@ -368,7 +369,7 @@ class TipyModel extends TipyDAO {
     public $table;
 
     /**
-     * Magic properties representing table fields
+     * Magic properties to access row columns
      *
      * filled automatically
      * @var array
@@ -376,7 +377,7 @@ class TipyModel extends TipyDAO {
     public $attributes;
 
     /**
-     * Table field names list
+     * Table column names list
      *
      * fields autmatically
      * @var array
@@ -384,7 +385,7 @@ class TipyModel extends TipyDAO {
     public $fields;
 
     /**
-     * Table field types list
+     * Table column types list
      *
      * filled autmatically
      * @var array
@@ -392,7 +393,7 @@ class TipyModel extends TipyDAO {
     public $fieldTypes;
 
     /**
-     * field => property reflections
+     * column => property reflections
      *
      * Associative array with connections betweed table fields and
      * model's magic propertiesa
@@ -409,8 +410,7 @@ class TipyModel extends TipyDAO {
     public $data;
 
     /**
-     * True if table row represented by model instance is
-     * already deleted from the database
+     * True if table row represented by model is deleted
      * @var boolean
      */
     public $isDeletedRecord;
@@ -445,6 +445,26 @@ class TipyModel extends TipyDAO {
      */
     protected $hasManyThrough;
 
+    /**
+     * Create new model
+     *
+     * <code>
+     * $post = new BloPost;
+     *
+     * $post = new BloPost([
+     *     'title' => 'Hello',
+     *     'body' => 'World!'
+     * ]);
+     * </code>
+     *
+     * **NOTE:** This method does not save anything to database
+     *
+     * - New model is not saved to the database and has $this->isNewRecord() == true
+     * - If $attrs has **'id'** key then model with the same id will be loaded from
+     *   the database and its attributes will be overwritten (but not saved)
+     *
+     * @param array $attrs Associative array representing new model properies
+     */
     public function __construct($attrs = null) {
         parent::__construct();
         $this->className = get_class($this);
@@ -466,35 +486,69 @@ class TipyModel extends TipyDAO {
         }
     }
 
+    /**
+     * Output something on *echo $obj;*
+     */
     public function __toString() {
         return '<'.$this->className.'>#'.$this->id;
     }
 
-    public function __set($attr, $value) {
-        $this->checkAttribute($attr);
-        $this->data[$attr] = $value;
+    /**
+     * Magic method to assign model property
+     *
+     * @param string $name
+     * @param mixed $value
+     * @throws TipyModelException if model property is not defined
+     */
+    public function __set($name, $value) {
+        $this->checkAttribute($name);
+        $this->data[$name] = $value;
     }
 
-    public function __get($attr) {
-        if (method_exists($this, $attr) and is_callable([$this, $attr])) {
-            return call_user_func([$this, $attr]);
+    /**
+     * Magic method to get the model property value or to execute model method
+     *
+     * Lookup order
+     * - model methods
+     * - model assosications
+     * - model properties
+     *
+     * @param string $name
+     * @throws TipyModelException on lookup failure
+     */
+    public function __get($name) {
+        if (method_exists($this, $name) and is_callable([$this, $name])) {
+            return call_user_func([$this, $name]);
         }
-        if ($this->belongsTo && array_key_exists($attr, $this->belongsTo)) {
-            return $this->findBelongsTo($attr);
+        if ($this->belongsTo && array_key_exists($name, $this->belongsTo)) {
+            return $this->findBelongsTo($name);
         }
-        if ($this->hasMany && array_key_exists($attr, $this->hasMany)) {
-            return $this->findHasMany($attr);
+        if ($this->hasMany && array_key_exists($name, $this->hasMany)) {
+            return $this->findHasMany($name);
         }
-        if ($this->hasOne && array_key_exists($attr, $this->hasOne)) {
-            return $this->findHasOne($attr);
+        if ($this->hasOne && array_key_exists($name, $this->hasOne)) {
+            return $this->findHasOne($name);
         }
-        if ($this->hasManyThrough && array_key_exists($attr, $this->hasManyThrough)) {
-            return $this->findHasManyThrough($attr);
+        if ($this->hasManyThrough && array_key_exists($name, $this->hasManyThrough)) {
+            return $this->findHasManyThrough($name);
         }
-        $this->checkAttribute($attr);
-        return array_key_exists($attr, $this->data) ? $this->data[$attr] : null;
+        $this->checkAttribute($name);
+        return array_key_exists($name, $this->data) ? $this->data[$name] : null;
     }
 
+    /**
+     * Magic method to call model property as a function
+     *
+     * Use it to pass conditions to assiciation properties
+     *
+     * <code>
+     * $post->comments(['conditions' => 'created_at > ?', 'values' => time() - 60*60*24])
+     * </code>
+     *
+     * @param string $name
+     * @param array $args
+     * @throws TipyModelException on lookup failure
+     */
     public function __call($name, $args) {
         if (isset($this->hasMany[$name])) {
             return $this->findHasMany($name, $args[0]);
@@ -505,15 +559,22 @@ class TipyModel extends TipyDAO {
         throw new TipyModelException("Unknown method '".$name."' for ".$this->className);
     }
 
+    /**
+     * Check for model property existance
+     *
+     * @throws TipyModelException if property does not exist
+     */
     public function checkAttribute($name) {
         if (!in_array($name, $this->attributes)) {
             throw new TipyModelException("Unknown property '".$name."' for ".$this->className);
         }
     }
 
-    // --------------------------------------------------------------
-    // Asks table about model attributes
-    // --------------------------------------------------------------
+    /**
+     * Reflect database table to model
+     *
+     * Loads table columns and creates model properties from them
+     */
     protected function makeReflection() {
         $this->data = [];
         if (array_key_exists($this->className, self::$globalReflections)) {
@@ -545,13 +606,16 @@ class TipyModel extends TipyDAO {
         }
     }
 
-    // --------------------------------------------------------------
-    // Creale model instance and load correspondent row from db
-    // Note that this method is static.
-    //
-    // Usage:
-    //     $post = BlogPost::load(123);
-    // --------------------------------------------------------------
+    /**
+     * Creale model instance from the table row
+     *
+     * <code>
+     * $post = BlogPost::load(123);
+     * </code>
+     *
+     * @param integer $id
+     * @return TipyModel|null
+     */
     public static function load($id) {
         $className = get_called_class();
         $instance = new $className;
@@ -566,13 +630,21 @@ class TipyModel extends TipyDAO {
         return $instance;
     }
 
+    /**
+     * True if new model instance has not been saved yet
+     *
+     * @return boolean
+     */
     public function isNewRecord() {
         return !$this->id;
     }
 
-    // --------------------------------------------------------------
-    // Save model's row
-    // --------------------------------------------------------------
+    /**
+     * Save model data as a table row
+     *
+     * @throws TipyModelException if model is marked as deleted
+     * @return mysqli_result
+     */
     public function save() {
         if ($this->isDeletedRecord) {
             throw new TipyModelException('Unable to save deleted model');
@@ -594,18 +666,25 @@ class TipyModel extends TipyDAO {
         return $result;
     }
 
-    // --------------------------------------------------------------
-    // Update model's row attribute
-    // --------------------------------------------------------------
+    /**
+     * Set model property and update model row immediately
+     *
+     * @param string $name
+     * @param mixed $value
+     * @throws TipyModelException if property does not exist
+     */
     public function update($name, $value) {
         $this->checkAttribute($name);
         $this->$name = $value;
         return $this->save();
     }
 
-    // --------------------------------------------------------------
-    // Support for model reload
-    // --------------------------------------------------------------
+    /**
+     * Reload model from the database
+     *
+     * @throws TipyModelException if trying to reload new (not-saved) model
+     * @throws TipyModelException if trying to reload model marked as deleted
+     */
     public function reload() {
         if (!$this->id) {
             throw new TipyModelException("Unable to reload unsaved model");
@@ -618,9 +697,24 @@ class TipyModel extends TipyDAO {
         $this->associationsCache = [];
     }
 
-    // --------------------------------------------------------------
-    // Creates new record from atributes immedialtely
-    // --------------------------------------------------------------
+    /**
+     * Create new model, save it to the database, and return model instance
+     *
+     * <code>
+     * $post = BlogPost::create([
+     *     'title' => 'Hello World'
+     * ])
+     *
+     * // is equivalent of
+     *
+     * $post = new BlogPost;
+     * $post->title = 'Hello World';
+     * $post->save();
+     * </code>
+     *
+     * @param array $attrs
+     * @return TipyModel
+     */
     public static function create($attr = null) {
         $className = get_called_class();
         $instance = new $className($attr);
@@ -628,9 +722,11 @@ class TipyModel extends TipyDAO {
         return $instance;
     }
 
-    // --------------------------------------------------------------
-    // Create new row from model
-    // --------------------------------------------------------------
+    /**
+     * Save new model as a table row
+     *
+     * @return mysqli_result
+     */
     protected function createNewRecord() {
         $this->beforeCreate();
         $fields = [];
@@ -654,9 +750,11 @@ class TipyModel extends TipyDAO {
         return $result;
     }
 
-    // --------------------------------------------------------------
-    // Updates model's correspondent row
-    // --------------------------------------------------------------
+    /**
+     * Updates table row connected to model
+     *
+     * @return mysqli_result
+     */
     protected function updateRecord() {
         if (!$this->id) {
             throw new TipyModelException("Cannot update record without an id");
@@ -680,18 +778,16 @@ class TipyModel extends TipyDAO {
         return $result;
     }
 
-    // --------------------------------------------------------------
-    // Delete model's correspondent method with assotiated records.
-    // Usage:
-    //     $post = BlogPost::load(123);
-    //     $post->delete();
-
-    // If method is called for new record exception is raised.
-    //
-    // After sucessfull delete oblect data is reset and object
-    // become a new record
-    // --------------------------------------------------------------
-
+    /**
+     * Delete table row connected to model
+     *
+     * - deletes table row
+     * - deletes all rows for associations with **'dependent' => 'delete'**
+     * - set to null all foreign keys for associations with **'dependent' => 'nullify'**
+     * - marks model as deleted
+     *
+     * @return mysqli_result
+     */
     public function delete() {
         if ($this->isNewRecord()) {
             throw new TipyModelException("Cannot delete unsaved model");
@@ -733,13 +829,17 @@ class TipyModel extends TipyDAO {
         return $result;
     }
 
-    // --------------------------------------------------------------
-    // Usage:
-    //     $post = BlogPost::count([
-    //          'conditions' => "title =?",
-    //          'values' => ['Hello']
-    //     ]);
-    // --------------------------------------------------------------
+    /**
+     * Count model records by conditions
+     *
+     * Usage:
+     *     $post = BlogPost::count([
+     *          'conditions' => "title =?",
+     *          'values' => ['Hello']
+     *     ]);
+     *
+     * @return integer
+     */
     public static function count($options = []) {
         $className = get_called_class();
         $instance = new $className;
@@ -756,16 +856,22 @@ class TipyModel extends TipyDAO {
         return $result['quantity'];
     }
 
-    // --------------------------------------------------------------
-    // Usage:
-    //     $post = BlogPost::find([
-    //          'conditions' => "title =?",
-    //          'values' => ['Hello'],
-    //          'limit' => 2.
-    //          'offset' => 3,
-    //          'order' => 'user_id asc'
-    //     ]);
-    // --------------------------------------------------------------
+    /**
+     * Return array of models by conditions
+     *
+     * <code>
+     * $post = BlogPost::find([
+     *      'conditions' => "title =?",
+     *      'values' => ['Hello'],
+     *      'limit' => 2.
+     *      'offset' => 3,
+     *      'order' => 'user_id asc'
+     * ]);
+     * </code>
+     *
+     * @param array $options
+     * @return array
+     */
     public static function find($options = ['values' => []]) {
         $className = get_called_class();
         $instance = new $className;
@@ -797,9 +903,21 @@ class TipyModel extends TipyDAO {
         return $instances;
     }
 
-    // --------------------------------------------------------------
-    // Usage: the same as find but returns only one record
-    // --------------------------------------------------------------
+    /**
+     * Same as find but return only first instance
+     *
+     * <code>
+     * $post = BlogPost::findFirst([
+     *      'conditions' => "title =?",
+     *      'values' => ['Hello'],
+     *      'limit' => 2.
+     *      'offset' => 3,
+     *      'order' => 'user_id asc'
+     * ]);
+     * </code>
+     *
+     * @return TipyModel
+     */
     public static function findFirst($options = []) {
         $options["limit"] = 1;
         $result = self::find($options);
@@ -810,17 +928,23 @@ class TipyModel extends TipyDAO {
         }
     }
 
-    // --------------------------------------------------------------
-    // Model validation. See example below
-    // --------------------------------------------------------------
+    /**
+     * Validates model data
+     *
+     * Executed before SQL INSERT or UPDATE statements are sent to database.
+     * Override this in your model classes
+     */
     public function validate() {
-        // This is an example of how to check for title existence
-        // if (!this->title) throw new TipyValidtionException('Title is mandatory');
     }
 
-    // ---------------------------------------------------------------
-    //  Protected
-    // ---------------------------------------------------------------
+
+    /**
+     * Fill model instance with data from mysqli_result
+     *
+     * @param TipyModel $instance
+     * @param mysqli_result
+     * @return TipyModel
+     */
     protected static function instanceFromResult($instance, $result) {
         foreach ($instance->reflections as $field => $attr) {
             if (array_key_exists($field, $result) && $result[$field] !== null) {
@@ -832,7 +956,17 @@ class TipyModel extends TipyDAO {
         return $instance;
     }
 
-
+    /**
+     * Cast column value to PHP type
+     *
+     * MySQL returns all field values as strings.
+     * This method return value casted to PHP type
+     * using rules from {@link $mysqlToPhpTypes}
+     *
+     * @param string field
+     * @param mixed $value
+     * @return mixed
+     */
     protected function typeCast($field, $value) {
         $type = $this->fieldTypes[$field];
         switch (self::$mysqlToPhpTypes[$type]) {
