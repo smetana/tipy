@@ -166,7 +166,7 @@ class TipyValidationException extends Exception {}
  * }
  * </code>
  *
- * ### Associations cache
+ * ### Associations Cache
  *
  * Associations are cached. So if you call
  * <code>
@@ -228,16 +228,75 @@ class TipyModel extends TipyDAO {
         'timestamp' => 'datetime'
     ];
 
+    /**
+     * Global models<->tables reflections cache
+     * One for all models
+     * @var array
+     */
     protected static $globalReflections = [];
 
+    /**
+     * Model class name
+     *
+     * Just to call get_class only once
+     * @var string
+     */
     public $className;
+
+    /**
+     * Table name
+     * @var string
+     */
     public $table;
+
+    /**
+     * Magic properties representing table fields
+     * @var array
+     */
     public $attributes;
+
+    /**
+     * Table field names list
+     * @var array
+     */
     public $fields;
+
+    /**
+     * Table field types list
+     *
+     * Associative array $fieldName => $fieldType
+     * @var array
+     */
     public $fieldTypes;
+
+    /**
+     * field => property reflections
+     *
+     * Associative array with connections betweed table fields and
+     * model's magic propertiesa
+     * @var array
+     */
     public $reflections;
+
+
+    /**
+     * Magic properties values
+     *
+     * @var array
+     */
     public $data;
+
+    /**
+     * True if table row represented by model instance is
+     * already deleted from the database
+     * @var boolean
+     */
     public $isDeletedRecord;
+
+    /**
+     * Associations cache
+     * @var array
+     */
     public $associationsCache;
 
     /**
