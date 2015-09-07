@@ -13,9 +13,9 @@ class TestAssertions extends TipyTestSuite {
     }
 
     public function testSame() {
-        $this->assertSame(1, 1);
-        $this->assertSame("1", "1");
-        $this->assertSame(false, false);
+        $this->assertIdentical(1, 1);
+        $this->assertIdentical("1", "1");
+        $this->assertIdentical(false, false);
     }
 
     public function testNotEqual() {

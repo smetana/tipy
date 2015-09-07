@@ -142,7 +142,7 @@ class TestDAO extends TipyTestSuite {
             return "Three records created";
         });
         $this->assertEqual(TipyTestRecord::count(), 3);
-        $this->assertSame($result, "Three records created");
+        $this->assertIdentical($result, "Three records created");
     }
 
     public function testExceptionIsTrownThrough() {

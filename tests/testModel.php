@@ -127,9 +127,9 @@ class TestModel extends TipyTestSuite {
         $comment->reload();
         $this->assertTrue(is_int($comment->id));
         $this->assertTrue(is_int($comment->userId));
-        $this->assertSame($comment->userId, 0);
+        $this->assertIdentical($comment->userId, 0);
         $this->assertTrue(is_string($comment->title));
-        $this->assertSame($comment->title, '');
+        $this->assertIdentical($comment->title, '');
         $this->assertNull($comment->message);
     }
 
