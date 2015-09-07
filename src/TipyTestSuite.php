@@ -20,7 +20,7 @@ class AssertionFailedException extends TipyException {}
 
 
 /**
- * Test suite with assertion kit
+ * Tipy Test Framework
  */
 class TipyTestSuite {
 
