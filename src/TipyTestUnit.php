@@ -377,6 +377,12 @@ class TipyTestRunner {
     private $args;
 
     /**
+     * Directory names to skip when looking for tests
+     * @var array
+     */
+    public $skipDirs = ['.git', '.svn', 'vendor'];
+
+    /**
      * @internal
      */
     public function __construct() {
@@ -467,6 +473,9 @@ class TipyTestRunner {
     }
 
     private function findTests($filename) {
+        if (in_array(basename($filename), $this->skipDirs)) {
+            return;
+        }
         if (is_dir($filename)) {
             if ($handle = opendir($filename)) {
                 while (false !== ($f = readdir($handle))) {
@@ -482,6 +491,20 @@ class TipyTestRunner {
             $testName = $matches[1];
             $this->testNames[] = $testName;
             $this->testFiles[$testName] = $filename;
+        }
+    }
+
+    /**
+     * Require autoloads if exist
+     */
+    private function requireAutoloads() {
+        // Look for autoload in working dir
+        if (file_exists($this->workingDir.'/autoload.php')) {
+            require_once($this->workingDir.'/autoload.php');
+        }
+        // Then look in app directory
+        if (file_exists($this->workingDir.'/../app/autoload.php')) {
+            require_once($this->workingDir.'/../app/autoload.php');
         }
     }
 
@@ -505,6 +528,7 @@ class TipyTestRunner {
         foreach ($this->fixtureFiles as $fixture) {
             TipyTestCase::applyFixture($app->db, $fixture);
         }
+        $this->requireAutoloads();
         echo PHP_EOL;
         foreach ($this->testNames as $test) {
             require_once($this->testFiles[$test]);

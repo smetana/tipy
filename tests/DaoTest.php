@@ -1,9 +1,6 @@
 <?php
 
-require_once 'autoload.php';
-
 class TipyTestRecord extends TipyModel { }
-
 
 // WARNING: This testcase does not use transactional fixtures automatically
 

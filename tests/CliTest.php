@@ -1,7 +1,5 @@
 <?php
 
-require_once 'autoload.php';
-
 class CliTest extends TipyTestCase {
 
     public function test() {
