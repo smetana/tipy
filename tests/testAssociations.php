@@ -2,7 +2,7 @@
 
 require_once 'autoload.php';
 
-class TestAssociations extends TipyTestSuite {
+class TestAssociations extends TipyTestCase {
 
     public function testHasMany() {
         $this->createPostsWithComments(5, 10);

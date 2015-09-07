@@ -2,7 +2,7 @@
 
 require_once 'autoload.php';
 
-class TestCli extends TipyTestSuite {
+class TestCli extends TipyTestCase {
 
     public function test() {
         $this->assertThrown('NoMethodException', "Call to undefined method TipyCli::lemon()", function () {

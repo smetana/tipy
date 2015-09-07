@@ -1,7 +1,13 @@
 <?php
 /**
- * TipyTestSuite
+ * TipyTest is an implementation of the xUnit test framework
+ * https://en.wikipedia.org/wiki/XUnit
+ *
+ * This file contains the following classes:
+ *
+ * TipyTestCase
  * TipyTestRunner
+ * AssertionFailedException
  *
  * @package tipy
  */
@@ -21,8 +27,12 @@ class AssertionFailedException extends TipyException {}
 
 /**
  * Tipy Test Framework
+ *
+ * TipyTest is an implementation of the xUnit test framework
+ *
+ * @see TipyTestRunner
  */
-class TipyTestSuite {
+class TipyTestCase {
 
     /**
      * Counters
@@ -72,7 +82,7 @@ class TipyTestSuite {
             }
             $this->tests++;
             $this->clearAppContext();
-            $this->beforeTest();
+            $this->setUp();
             $testClosure = function() use ($testName) {
                 try {
                     $this->$testName();
@@ -93,7 +103,7 @@ class TipyTestSuite {
             } else {
                 $testClosure();
             }
-            $this->afterTest();
+            $this->tearDown();
         }
     }
 
@@ -108,7 +118,7 @@ class TipyTestSuite {
      *
      * Override this in your test suite
      */
-    public function beforeTest() {
+    public function setUp() {
     }
 
     /**
@@ -116,7 +126,7 @@ class TipyTestSuite {
      *
      * Override this in your test suite
      */
-    public function afterTest() {
+    public function tearDown() {
     }
 
     /**
@@ -335,7 +345,7 @@ class TipyTestSuite {
  * exit($exitCode);
  * </code>
  *
- * @todo Combine {@link TipyTestSuite} and {@link TipyTestRunner} in one class
+ * @see TipyTestCase
  */
 class TipyTestRunner {
 
@@ -491,7 +501,7 @@ class TipyTestRunner {
         $app->db->query('CREATE DATABASE '.$app->config->get('db_test_name'));
         $app->db->select_db($app->config->get('db_test_name'));
         foreach ($this->fixtureFiles as $fixture) {
-            TipyTestSuite::applyFixture($app->db, $fixture);
+            TipyTestCase::applyFixture($app->db, $fixture);
         }
         echo PHP_EOL;
         foreach ($this->testNames as $test) {

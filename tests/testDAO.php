@@ -7,7 +7,7 @@ class TipyTestRecord extends TipyModel { }
 
 // WARNING: This testcase does not use transactional fixtures automatically
 
-class TestDAO extends TipyTestSuite {
+class TestDAO extends TipyTestCase {
 
     // Do not use transactional fixtures
     // to test native transactions
@@ -16,7 +16,7 @@ class TestDAO extends TipyTestSuite {
     // transactional fixtures are disable so we need separate 
     // table to test transactions behaviour without affecting 
     // other tests
-    public function afterTest() {
+    public function tearDown() {
         $app = TipyApp::getInstance();
         $app->db->query('TRUNCATE TABLE tipy_test_records');
     }
