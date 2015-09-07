@@ -1,4 +1,10 @@
 <?php
+/**
+ * TipyTestSuite
+ * TipyTestRunner
+ *
+ * @package tipy
+ */
 require_once(__DIR__.'/../Tipy.php');
 
 /**
@@ -204,19 +210,43 @@ class TipyTestSuite {
 }
 
 
+/**
+ * Run tests and print summary
+ *
+ * <code>
+ * $runner = new TestRunner();
+ * $exitCode = $runner->run();
+ * exit($exitCode);
+ * </code>
+ */
 class TestRunner {
 
+    /**
+     * Paths to fixtures
+     * @var array
+     */
     public $fixtures;
-    protected $tests;
-    protected $assertions;
-    protected $failures;
-    protected $exeptions;
-    protected $testNames;
-    protected $testFiles;
-    protected $fixtureFiles;
-    protected $workingDir;
-    protected $args;
 
+    /**
+     * Counters
+     */
+    private $tests;
+    private $assertions;
+    private $failures;
+    private $exeptions;
+
+    /**
+     * Config
+     */
+    private $testNames;
+    private $testFiles;
+    private $fixtureFiles;
+    private $workingDir;
+    private $args;
+
+    /**
+     * @internal
+     */
     public function __construct() {
         $this->tests          = 0;
         $this->assertions     = 0;
@@ -304,7 +334,6 @@ class TestRunner {
         }
     }
 
-    // Find tests and fixtures recursively
     private function findTests($filename) {
         if (is_dir($filename)) {
             if ($handle = opendir($filename)) {
@@ -322,9 +351,16 @@ class TestRunner {
         }
     }
 
-    // This function also return exit status to use in scripts
-    // 0 - if all tests passed
-    // 1 - if one of the tests failed
+    /**
+     * Run tests
+     *
+     * Returns exit status:
+     *
+     * - 0 - all tests passed
+     * - 1 - there were errors or failures
+     *
+     * @return integer
+     */
     public function run() {
         $this->findFixtures();
         $app = TipyApp::getInstance();
@@ -352,7 +388,7 @@ class TestRunner {
         }
     }
 
-    public function updateSummary($summary) {
+    private function updateSummary($summary) {
         $this->tests += $summary['tests'];
         $this->assertions += $summary['assertions'];
         foreach ($summary['failures'] as $failure) {
@@ -364,7 +400,7 @@ class TestRunner {
         return $summary;
     }
 
-    public function printSummary() {
+    private function printSummary() {
         echo PHP_EOL.PHP_EOL;
         echo "Tests: ".$this->tests;
         echo ", Assertions: ".$this->assertions;
