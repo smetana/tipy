@@ -218,8 +218,10 @@ class TipyTestSuite {
  * $exitCode = $runner->run();
  * exit($exitCode);
  * </code>
+ *
+ * @todo Combine {@link TipyTestSuite} and {@link TipyTestRunner} in one class
  */
-class TestRunner {
+class TipyTestRunner {
 
     /**
      * Paths to fixtures

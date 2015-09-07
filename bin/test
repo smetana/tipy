@@ -9,6 +9,6 @@
 //
 defined('TEST_MODE') || define('TEST_MODE', true);
 require_once(__DIR__.'/../src/TipyTestSuite.php');
-$runner = new TestRunner();
+$runner = new TipyTestRunner();
 $exitCode = $runner->run();
 exit($exitCode);
