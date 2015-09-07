@@ -40,7 +40,6 @@ class TipyTestSuite {
     public function run() {
         $className = get_class($this);
         $methods = get_class_methods($className);
-        $dao = new TipyDAO();
         foreach ($methods as $testName) {
             if (!preg_match("/^test/", $testName)) {
                 continue;
