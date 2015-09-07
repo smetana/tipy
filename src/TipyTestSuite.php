@@ -60,7 +60,7 @@ class TipyTestSuite {
     /**
      * Run test suite
      *
-     * Execute all <b>test_*</b> methods from test suite
+     * Execute all <b>test*</b> methods from test suite
      * and collect results
      */
     public function run() {
@@ -210,22 +210,49 @@ class TipyTestSuite {
         $this->assertion($actual === $expected, "expected to be the identical");
     }
 
+    /**
+     * Report an error if $actual is not *null*
+     * @param mixed $actual
+     * @throws AssertionFailedException
+     */
     public function assertNull($actual) {
         $this->assertion($actual === null, "expected to be NULL");
     }
 
+    /**
+     * Report an error if $actual is *null*
+     * @param mixed $actual
+     * @throws AssertionFailedException
+     */
     public function assertNotNull($actual) {
         $this->assertion($actual !== null, "expected not to be NULL");
     }
 
+    /**
+     * Report an error if $actual is *false*
+     * @param mixed $actual
+     * @throws AssertionFailedException
+     */
     public function assertTrue($actual) {
         $this->assertion($actual === true, "expected to be true");
     }
 
+    /**
+     * Report an error if $actual is *true*
+     * @param mixed $actual
+     * @throws AssertionFailedException
+     */
     public function assertFalse($actual) {
         $this->assertion($actual === false, "expected to be false");
     }
 
+    /**
+     * Report an error if $closure does not throw $exceptionClass with $exceptionMessage
+     * @param string $exceptionClass
+     * @param string $exceptionMessage
+     * @param closure $closure
+     * @throws AssertionFailedException
+     */
     public function assertThrown($exceptionClass, $exceptionMessage, $closure) {
         $this->assertions++;
         $expected = $exceptionClass.": ".$exceptionMessage;
@@ -242,6 +269,14 @@ class TipyTestSuite {
         }
     }
 
+    /**
+     * Report an error if $closure does not throw $exceptionClass
+     * or $exceptionMessage does not match $expectedMessageRegexp
+     * @param string $expectedClassString
+     * @param regexp $expectedMessageRegexp
+     * @param closure $closure
+     * @throws AssertionFailedException
+     */
     public function assertThrownRegexp($expectedClassString, $expectedMessageRegexp, $closure) {
         $this->assertions++;
         $expected = $expectedClassString.": ".$expectedMessageRegexp;
