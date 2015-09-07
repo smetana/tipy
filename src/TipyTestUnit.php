@@ -1,6 +1,6 @@
 <?php
 /**
- * TipyTest is an implementation of the xUnit test framework
+ * TipyTestUnit is an implementation of the xUnit test framework
  * https://en.wikipedia.org/wiki/XUnit
  *
  * This file contains the following classes:
@@ -28,7 +28,7 @@ class AssertionFailedException extends TipyException {}
 /**
  * Tipy Test Framework
  *
- * TipyTest is an implementation of the xUnit test framework
+ * TipyTestUnit is an implementation of the xUnit test framework
  *
  * @see TipyTestRunner
  */
@@ -476,7 +476,9 @@ class TipyTestRunner {
                 }
                 closedir($handle);
             }
-        } else if (preg_match('/(test\w+)\.php$/', $filename, $matches)) {
+        // support old test names like testAssertions.php
+        // and xUnit-style test names like AssetionsTest.php
+        } else if (preg_match('/(test\w+|\w+Test)\.php$/', $filename, $matches)) {
             $testName = $matches[1];
             $this->testNames[] = $testName;
             $this->testFiles[$testName] = $filename;

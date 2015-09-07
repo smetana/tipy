@@ -8,7 +8,7 @@
 //      ./bin/test tests/testModel.php tests/fixtures/tipy.sql
 //
 defined('TEST_MODE') || define('TEST_MODE', true);
-require_once(__DIR__.'/../src/TipyTest.php');
+require_once(__DIR__.'/../src/TipyTestUnit.php');
 $runner = new TipyTestRunner();
 $exitCode = $runner->run();
 exit($exitCode);
