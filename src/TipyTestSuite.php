@@ -72,7 +72,7 @@ class TipyTestSuite {
         }
     }
 
-    public function clearAppContext() {
+    private function clearAppContext() {
         $app = TipyApp::getInstance();
         $app->in->clear();
         $app->session->clear();
