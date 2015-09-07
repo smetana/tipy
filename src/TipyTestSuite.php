@@ -24,12 +24,35 @@ class AssertionFailedException extends TipyException {}
  */
 class TipyTestSuite {
 
-    protected $exeptions;
-    protected $tests;
-    protected $assertions;
-    protected $failures;
+    /**
+     * Counters
+     */
+    private $tests;
+    private $assertions;
+
+    /**
+     * Arrays
+     */
+    private $exeptions;
+    private $failures;
+
+    /**
+     * Set this to **false** to turn off transactional fixtures
+     *
+     * Every test is wrapped in transaction to restore
+     * database state after test is finished.
+     *
+     * There are some cases when you might want to turn this
+     * behaviour off:
+     *
+     * - To test real transactions
+     * - Your database does not support transactions
+     */
     public $transactionalFixtures = true;
 
+    /**
+     * Initialize test suite
+     */
     public function __construct() {
         $this->tests = 0;
         $this->assertions = 0;
@@ -37,6 +60,9 @@ class TipyTestSuite {
         $this->exceptions = [];
     }
 
+    /**
+     * Run test suite
+     */
     public function run() {
         $className = get_class($this);
         $methods = get_class_methods($className);
@@ -230,6 +256,10 @@ class TipyTestRunner {
      */
     private $tests;
     private $assertions;
+
+    /**
+     * Arrays
+     */
     private $failures;
     private $exeptions;
 
