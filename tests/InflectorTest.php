@@ -2,7 +2,7 @@
 
 require_once 'autoload.php';
 
-class TestInflector extends TipyTestCase {
+class InflectorTest extends TipyTestCase {
 
     public function testClassify() {
         $this->assertEqual(TipyInflector::classify('welcome'), 'Welcome');

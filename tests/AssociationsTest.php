@@ -2,7 +2,7 @@
 
 require_once 'autoload.php';
 
-class TestAssociations extends TipyTestCase {
+class AssociationsTest extends TipyTestCase {
 
     public function testHasMany() {
         $this->createPostsWithComments(5, 10);
@@ -80,8 +80,7 @@ class TestAssociations extends TipyTestCase {
         $this->assertEqual(TipyTestUser::count(), 10);
         $this->assertEqual(TipyTestGroup::count(), 5);
         $this->assertEqual(TipyTestUserAndGroupRelation::count(), 14);
-        $user = TipyTestUser::load(1);
-        $this->assertEqual($user->login, 'login_1');
+        $user = TipyTestUser::findFirst(['conditions' => "login = 'login_1'"]);
 
         // Test has_many_through collection
         $queryCount =  TipyDAO::$queryCount;
@@ -130,7 +129,7 @@ class TestAssociations extends TipyTestCase {
         $profile = $user->profile;
         // We got a new query
         $this->assertEqual(TipyDAO::$queryCount, $queryCount+1);
-        $this->assertEqual($profile->sign, 'signature of user 20'); // Auto_INCREMENT doesn't rollback
+        $this->assertEqual($profile->sign, 'signature of user login_10');
         $this->assertEqual($profile->userId, $user->id);
         // Test cached association
         $this->assertNotEqual($user->associationsCache["profile"], null);
@@ -169,8 +168,15 @@ class TestAssociations extends TipyTestCase {
 
     // methods that have names not starting whith 'test' are for seeding DB
     public function createUsersWithGroups($usersCount, $groupsCount) {
-        // user with id =1 in all groups
-        // group with id = 1 contains all users
+        // user login_1 is a member of all the groups
+        // group name_1 contains all users
+
+        for ($i=1; $i<=$groupsCount; $i++) {
+            $group = TipyTestGroup::create([
+                'name' => 'name_'.$i
+            ]);
+        }
+        $group1 = TipyTestGroup::findFirst(['conditions' => "name = 'name_1'"]);
 
         for ($i=1; $i<=$usersCount; $i++) {
             $user = TipyTestUser::create([
@@ -178,24 +184,20 @@ class TestAssociations extends TipyTestCase {
                 'password' => 'password_'.$i,
                 'email' => 'email_'.$i.'@example.com'
             ]);
-
-            $relation = TipyTestUserAndGroupRelation::create([
-                'userId' => $user->id,
-                'groupId' => 1
-            ]);
-
-        }
-        for ($i=1; $i<=$groupsCount; $i++) {
-            $group = TipyTestGroup::create([
-                'name' => 'name_'.$i
-            ]);
-            if ($i > 1) { // group with id = 1 alredy contains user with id = 1
+            if ($i == 1) {
+                for ($j = 1; $j <= $groupsCount; $j++) {
+                    $group = TipyTestGroup::findFirst(['conditions' => "name = 'name_".$j."'"]);
+                    $relation = TipyTestUserAndGroupRelation::create([
+                        'userId' => $user->id,
+                        'groupId' => $group->id
+                    ]);
+                }
+            } else {
                 $relation = TipyTestUserAndGroupRelation::create([
-                    'userId' => 1,
-                    'groupId' => $group->id
+                    'userId' => $user->id,
+                    'groupId' => $group1->id
                 ]);
             }
-
         }
     }
 
@@ -209,7 +211,7 @@ class TestAssociations extends TipyTestCase {
             ]);
             $profile = TipyTestProfile::create([
                 'userId' => $user->id,
-                'sign' => 'signature of user '.$user->id
+                'sign' => 'signature of user '.$user->login
             ]);
 
         }

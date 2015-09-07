@@ -2,7 +2,7 @@
 
 require_once 'autoload.php';
 
-class TestModel extends TipyTestCase {
+class ModelTest extends TipyTestCase {
 
     public function testJustForExample() {
         // Just example of assertThrown method

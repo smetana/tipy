@@ -7,7 +7,7 @@ class TipyTestRecord extends TipyModel { }
 
 // WARNING: This testcase does not use transactional fixtures automatically
 
-class TestDAO extends TipyTestCase {
+class DaoTest extends TipyTestCase {
 
     // Do not use transactional fixtures
     // to test native transactions

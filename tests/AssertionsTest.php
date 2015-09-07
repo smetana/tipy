@@ -2,8 +2,7 @@
 
 require_once 'autoload.php';
 
-
-class TestAssertions extends TipyTestCase {
+class AssertionsTest extends TipyTestCase {
     
     public function testEqual() {
         $this->assertEqual(1, 1);
