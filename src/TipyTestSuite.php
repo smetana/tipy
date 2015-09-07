@@ -214,7 +214,7 @@ class TipyTestSuite {
  * Run tests and print summary
  *
  * <code>
- * $runner = new TestRunner();
+ * $runner = new TipyTestRunner();
  * $exitCode = $runner->run();
  * exit($exitCode);
  * </code>
