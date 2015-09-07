@@ -50,9 +50,6 @@ class TipyTestSuite {
      */
     public $transactionalFixtures = true;
 
-    /**
-     * Initialize test suite
-     */
     public function __construct() {
         $this->tests = 0;
         $this->assertions = 0;
@@ -62,6 +59,9 @@ class TipyTestSuite {
 
     /**
      * Run test suite
+     *
+     * Execute all <b>test_*</b> methods from test suite
+     * and collect results
      */
     public function run() {
         $className = get_class($this);
@@ -103,14 +103,26 @@ class TipyTestSuite {
         $app->session->clear();
     }
 
-    // do start test operations
+    /**
+     * Hook called before each test execution
+     *
+     * Override this in your test suite
+     */
     public function beforeTest() {
     }
 
-    // do end oprations
+    /**
+     * Hook called after each test execution
+     *
+     * Override this in your test suite
+     */
     public function afterTest() {
     }
 
+    /**
+     * Execute fixture .sql file
+     * @internal
+     */
     public static function applyFixture($db, $filename) {
         $content = file_get_contents($filename, 1);
         if ($content) {
@@ -123,7 +135,10 @@ class TipyTestSuite {
         }
     }
 
-    public function varDump($var) {
+    /**
+     * Dump variable to string omiting STDOUT
+     */
+    private function varDump($var) {
         ob_start();
         var_dump($var);
         $var = ob_get_clean();
@@ -131,7 +146,13 @@ class TipyTestSuite {
         return $var;
     }
 
-    public function assertion($result, $message) {
+    /**
+     * Base assertion
+     * @param boolean $result
+     * @param string $message
+     * @throws AssertionFailedException if $result is not true
+     */
+    private function assertion($result, $message) {
         $this->assertions++;
         if (!$result) {
             $trace = debug_backtrace();
@@ -148,14 +169,33 @@ class TipyTestSuite {
         }
     }
 
+    /**
+     * Report an error if $actual and $expected are not equal
+     * @param mixed $actual
+     * @param mixed $expected
+     * @throws AssertionFailedException
+     */
     public function assertEqual($actual, $expected) {
         $this->assertion($actual == $expected, "expected to be equal");
     }
 
+    /**
+     * Report an error if $actual and $expected are equal
+     * @param mixed $actual
+     * @param mixed $expected
+     * @throws AssertionFailedException
+     */
     public function assertNotEqual($actual, $expected) {
         $this->assertion($actual <> $expected, "expected not be equal");
     }
 
+    /**
+     * Report an error if $actual and $expected are not equal 
+     * or not the same type
+     * @param mixed $actual
+     * @param mixed $expected
+     * @throws AssertionFailedException
+     */
     public function assertSame($actual, $expected) {
         $this->assertion($actual === $expected, "expected to be the same (===) as");
     }
@@ -210,6 +250,11 @@ class TipyTestSuite {
         }
     }
 
+    /**
+     * Execute controller
+     * @internal
+     * @todo This is prototype function. It is not production ready
+     */
     public function execute($controllerName, $actionName, &$output) {
         $app = TipyApp::getInstance();
         $app->in->set('controller', $controllerName);
@@ -221,6 +266,10 @@ class TipyTestSuite {
         $output = ob_get_clean();
     }
 
+    /**
+     * Return test suite execution results
+     * @return array
+     */
     public function getSummary() {
         return [
             "tests"      => $this->tests,
