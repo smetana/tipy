@@ -31,10 +31,6 @@ class TipyTestSuite {
     public $transactionalFixtures = true;
 
     public function __construct() {
-        $this->clear();
-    }
-
-    public function clear() {
         $this->tests = 0;
         $this->assertions = 0;
         $this->failures = [];
@@ -42,7 +38,6 @@ class TipyTestSuite {
     }
 
     public function run() {
-        $this->clear();
         $className = get_class($this);
         $methods = get_class_methods($className);
         $dao = new TipyDAO();
@@ -51,6 +46,7 @@ class TipyTestSuite {
                 continue;
             }
             $this->tests++;
+            $this->clearAppContext();
             $this->beforeTest();
             $testClosure = function() use ($testName) {
                 try {
@@ -76,17 +72,18 @@ class TipyTestSuite {
         }
     }
 
-    // do start test operations
-    public function beforeTest() {
+    public function clearAppContext() {
         $app = TipyApp::getInstance();
-        // clear session and input
         $app->in->clear();
         $app->session->clear();
     }
 
+    // do start test operations
+    public function beforeTest() {
+    }
+
     // do end oprations
     public function afterTest() {
-        // nothing here
     }
 
     public static function applyFixture($db, $filename) {
