@@ -38,7 +38,7 @@ You can also use [tipy-example](https://github.com/smetana/tipy-example) as a de
 ## Convention over Configuration
 
 Tipy follows "Convention over Configuration" paradigm therefore you have
-to maintain only one small config file for database connection
+to maintain only one small config file for database connection.
 
 ## API and Documentation
 
