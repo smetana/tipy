@@ -2,15 +2,15 @@
 
 Tiny PHP MVC framework.
 
-## Prerequisites
+## Installation
+
+Prerequisites:
 
 * PHP 5.5+
-* Apache 2
+* Apache 2 + mod_php5
 * MySQL
 * Git
 * Composer
-
-## Installation
 
 Clone [tipy-project](https://github.com/smetana/tipy-project) to quickly bootstrap your tipy web app:
 
@@ -37,47 +37,28 @@ You can also use [tipy-example](https://github.com/smetana/tipy-example) as a de
 
 ## Convention over Configuration
 
-tipy follows "Convention over Configuration" paradigm therefore you have
-to maintain only one small config file for database connection but you have
-to follow tipy conventions in code.
+Tipy follows "Convention over Configuration" paradigm therefore you have
+to maintain only one small config file for database connection
 
-## Routes
+## API and Documentation
 
-tipy uses Apache's .htaccess for routing.<br/>
-Using combination of predefined rewrite rules and tipy conventions it is very
-easy to define new routes:
+http://smetana.me/tipy-api - a reference to tipy classes with annotations.
 
-```apache
-# public/.htaccess
+## tipy is MVC
 
-RewriteRule ^$        /blog [QSA,L]
-# => BlogController::index()
-
-RewriteRule ^/code$   /code/open_source [QSA,L]
-# => CodeController::openSource()
-```
-
-## Models
+### Models
 ```php
 // app/models/BlogPost.php
 
 class BlogPost extends TipyModel {
+
     protected $hasMany = [
-        'comments' => ['class' => 'Comment', 'dependent' => 'destroy']
+        'comments' => ['class' => 'Comment', 'dependent' => 'delete']
     );
+
 }
 ```
-```php
-// app/models/Comment.php
-
-class Comment extends TipyModel {
-    protected $belongsTo = [
-        'post' => ['class' => 'BlogPost', 'foreign_key' => 'blog_post_id']
-    ];
-}
-```
-
-## Controllers
+### Controllers
 ```php
 // app/controllers/BlogController.php
 
@@ -86,15 +67,15 @@ class BlogController extends TipyController {
     public function article() {
         $blogPost = BlogPost::load($this->in('id'));
         $this->out('blogPost', $blogPost);
-        $this->renderView('blog/article');
+        $this->renderView('blog/post');
     }
 
 }
 ```
 
-## Views
+### Views
 ```html
-<!-- app/views/blog/article.php -->
+<!-- app/views/blog/post.php -->
 
 <!DOCTYPE html>
 <html>
@@ -104,9 +85,21 @@ class BlogController extends TipyController {
 <body>
     <h1><?= $blogPost->title ?></p>
     <p><?= $blogPost->body ?></p>
-    <? foreach($blogPost->comments as $comment) ?>
-        <p><?= $comment->body ?></p>
-    <? } ?>
 </body>
 </html>
 ```
+## With Testing Framework
+
+```php
+class BlogPostTest extends TipyTestCase {
+
+    public function testBlogPost() {
+        $post = BlogPost::load(1);
+        assertNotNull($post->title);
+        assertEqual($post->id, 1);
+    }
+
+}
+```
+
+See http://smetana.me/tipy-api for more details..
