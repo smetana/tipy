@@ -67,4 +67,35 @@ class TipyRequest extends TipyIOWrapper {
         return $this->get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest';
     }
 
+    /**
+     * Return true if request is a PUT request
+     * @return boolean
+     */
+    public function isPut() {
+        return $this->method == 'PUT';
+    }
+
+    /**
+     * Return true if request is a DELETE request
+     * @return boolean
+     */
+    public function isDelete() {
+        return $this->method == 'DELETE';
+    }
+
+    /**
+     * Return true if request is a OPTIONS request
+     * @return boolean
+     */
+    public function isOptions() {
+        return $this->method == 'OPTIONS';
+    }
+
+    /**
+     * Return true if request is a HEAD request
+     * @return boolean
+     */
+    public function isHead() {
+        return $this->method == 'HEAD';
+    }
 }
