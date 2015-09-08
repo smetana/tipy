@@ -195,6 +195,7 @@ class ModelTest extends TipyTestCase {
             ]);
         }
         $count = TipyTestBlogPost::count();
+        $this->assertTrue(is_int($count));
         $this->assertEqual($count, 12);
 
         // Test find by condition
