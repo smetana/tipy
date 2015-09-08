@@ -867,7 +867,7 @@ class TipyModel extends TipyDAO {
             $options['values'] = [];
         }
         $result = $instance->queryRow($sql, $options["values"]);
-        return $result['quantity'];
+        return (int) $result['quantity'];
     }
 
     /**
