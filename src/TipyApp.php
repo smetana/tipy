@@ -16,8 +16,8 @@
  *
  * ### Lazy database connection
  *
- * Application instance does not immediately connects to database.
- * To connect to database you need to instantiate TipyModel or TipyDAO class.
+ * Application instance does not immediately connect to the database.
+ * Database connection is established on first TipyModel or TipyDAO object creation.
  *
  * @see TipyController
  * @see TipyModel

@@ -45,9 +45,8 @@ set_error_handler('tipyErrorHandler');
 /**
  * Main class to run application
  *
- * Just add to dispatcher.php:
- *
  * <code>
+ * // public/dispatcher.php
  * require('Tipy.php');
  * Tipy::run();
  * </code>
