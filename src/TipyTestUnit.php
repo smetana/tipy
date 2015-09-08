@@ -1,6 +1,6 @@
 <?php
 /**
- * TipyTestUnit is an implementation of the xUnit test framework
+ * TipyTestUnit is the implementation of the xUnit test framework
  * https://en.wikipedia.org/wiki/XUnit
  *
  * This file contains the following classes:
@@ -28,7 +28,28 @@ class AssertionFailedException extends TipyException {}
 /**
  * Tipy Test Framework
  *
- * TipyTestUnit is an implementation of the xUnit test framework
+ * TipyTestUnit is the implementation of the xUnit test framework
+ *
+ * <code>
+ * class SimpleTest extends TipyTestCase {
+ *
+ *     public function testExample() {
+ *         $this->assertEqual(1, true);
+ *     }
+ *
+ * }
+ * </code>
+ *
+ * ## Conventions
+ *
+ * - Tests and fixtures live in *tests* directory
+ * - Fixtures are plain *.sql* files
+ * - Test files should have names ending with *Test* (like  *MyTest.php*)
+ * - Test case is a class that extends {@link TipyTestCase}
+ *   and have the same name as file containig this class.
+ * - There should be one class per file
+ * - Tests are test case class public methods with names
+ *   starning with *test* (like *testExample*)
  *
  * @see TipyTestRunner
  */
@@ -344,6 +365,41 @@ class TipyTestCase {
  * $exitCode = $runner->run();
  * exit($exitCode);
  * </code>
+ *
+ * ### ./bin/test
+ *
+ * tipy comes with a script to execute tests in your application's *tests* directory
+ *
+ * Let's say tipy is installed with Composer in vendor directory.
+ * Then you can run from your application root directory:
+ * <code>
+ * ./vendor/tipy/tipy/bin/test tests/
+ * </code>
+ *
+ * TipyTestRunner will find all tests and fixtures in *tests/* directory **recursively**
+ * and execute them.
+ *
+ * If you want to run specific test case or use specific fixture file you can specify
+ * them as arguments. Tipy recognize test by filename ( *Test.php) and fixture by
+ * .sql extension. More than one tests and fixtures are allowed.
+ *
+ * <code>
+ * ./vendor/tipy/tipy/bin/test tests/SpecificTest.php tests/fixtures/specific.sql
+ * </code>
+ *
+ * ### config.ini
+ *
+ * You can specify different config files for production mode and for tests
+ * Tipy will look for config.ini
+ *
+ * - first in *tests* directory
+ * - then in application root directory
+ *
+ * ### autoload.php
+ *
+ * By default tipy uses your application's autoload.php located in *app* directory.
+ * But if you want to add some mocks for tests you can place one more autoload.php
+ * into *tests* directory and TipyTestRunner will use it also
  *
  * @see TipyTestCase
  */
