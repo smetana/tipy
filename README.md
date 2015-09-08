@@ -102,4 +102,4 @@ class BlogPostTest extends TipyTestCase {
 }
 ```
 
-See http://smetana.me/tipy-api for more details..
+See http://smetana.me/tipy-api for more details.
