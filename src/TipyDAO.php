@@ -334,10 +334,9 @@ class TipyDAO {
 
     /**
      * Start transaction
-     * @deprecated Use TipyDAO::transaction() instead
      * @return mysqli_result
      */
-    protected static function startTransaction() {
+    private static function startTransaction() {
         $app = TipyApp::getInstance();
         if (self::$openTransactionsCount == 0) {
             $result = $app->db->query('BEGIN');
@@ -352,11 +351,10 @@ class TipyDAO {
 
     /**
      * Commit transaction
-     * @deprecated Use TipyDAO::transaction() instead
      * @throws TipyDaoException if there is no transaction in progress
      * @return mysqli_result
      */
-    protected static function commit() {
+    private static function commit() {
         $app = TipyApp::getInstance();
         if (self::$openTransactionsCount == 0) {
             throw new TipyDaoException('No transaction in progress');
@@ -380,11 +378,10 @@ class TipyDAO {
 
     /**
      * Rollback transaction
-     * @deprecated Use TipyDAO::rollback() instead
      * @throws TipyDaoException if there is no transaction in progress
      * @return mysqli_result
      */
-    protected static function rollbackTransaction($kind = 'soft') {
+    private static function rollbackTransaction($kind = 'soft') {
         $app = TipyApp::getInstance();
         if (self::$openTransactionsCount == 0) {
             throw new TipyDaoException('No transaction in progress');
