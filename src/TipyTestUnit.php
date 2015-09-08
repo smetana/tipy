@@ -224,17 +224,6 @@ class TipyTestCase {
      * @param mixed $actual
      * @param mixed $expected
      * @throws AssertionFailedException
-     * @deprecated Use assertIdentical() instead
-     */
-    public function assertSame($actual, $expected) {
-        $this->assertion($actual === $expected, "expected to be the same (===) as");
-    }
-
-    /**
-     * Report an error if $actual and $expected are not identical
-     * @param mixed $actual
-     * @param mixed $expected
-     * @throws AssertionFailedException
      */
     public function assertIdentical($actual, $expected) {
         $this->assertion($actual === $expected, "expected to be the identical");
