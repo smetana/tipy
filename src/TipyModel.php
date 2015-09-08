@@ -290,7 +290,7 @@ class TipyValidationException extends Exception {}
  *        'oldMessages' => [
  *            'class' => 'Message',
  *            'conditions' => 'created_at < ?',
- *            'values' => [time() - 60*60*24*7]
+ *            'values' => [strtotime('-1 week')]
  *        ]
  *    ];
  * }
@@ -555,7 +555,7 @@ class TipyModel extends TipyDAO {
      * Use it to pass conditions to assiciation properties
      *
      * <code>
-     * $post->comments(['conditions' => 'created_at > ?', 'values' => time() - 60*60*24])
+     * $post->comments(['conditions' => 'created_at > ?', 'values' => strtotime('-1 day')])
      * </code>
      *
      * @param string $name
