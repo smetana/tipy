@@ -44,12 +44,11 @@ class AssertionFailedException extends TipyException {}
  *
  * - Tests and fixtures live in *tests* directory
  * - Fixtures are plain *.sql* files
- * - Test files should have names ending with *Test* (like  *MyTest.php*)
- * - Test case is a class that extends {@link TipyTestCase}
- *   and have the same name as file containig this class.
- * - There should be one class per file
- * - Tests are test case class public methods with names
- *   starning with *test* (like *testExample*)
+ * - Test case file names end with *Test* (like  *MyTest.php*)
+ * - Test case file contains one class
+ * - Test case is a class extending {@link TipyTestCase}
+ * - Test case class have the same name as the file containing it
+ * - Tests are public methods starting with *test* (like *testExample*)
  *
  * @see TipyTestRunner
  */
