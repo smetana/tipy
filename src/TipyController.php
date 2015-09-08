@@ -16,36 +16,6 @@
  *     }
  * }
  * </code>
- *
- * ### Routing
- *
- * Tipy uses **.htaccess** for routing.
- * .htaccess RewriteRules rewrite all request urls to something like:
- * <code>
- * dispatcher.php?controller=my&method=my_action&id=... # => MyController::myAction()
- * </code>
- *
- * All query string parameters are preserved on url rewite.
- *
- * **controller** parameter represents controller class with:
- *
- * - snake_case converted to CamelCase (first letter in uppper case)
- * - word "Controller" is added to the end
- *
- * **action** parameter represents controller's method with:
- *
- * - snake_case converted to camelCase (first letter in lower case)
- *
- * ### Predefined Routes
- *
- * Tipy also comes with a set of predefined rules so you don't need to
- * rewrite urls to dispatcher.php. It is enough to rewrite urls to one of the
- * following form:
- * <code>
- * /:controller              # /source_code               => SourceCodeController::index();
- * /:controller/:action      # /source_code/open_source   => SourceCodeController::openSource();
- * /:controller/:action/:id  # /source_code/line_number/3 => SourceCodeController::lineNumber($id = 3);
- * </code>
  */
 class TipyController {
 

@@ -50,6 +50,53 @@ set_error_handler('tipyErrorHandler');
  * require('Tipy.php');
  * Tipy::run();
  * </code>
+ *
+ * ## Setup
+ *
+ * The most easiest way to setup new *tipy* project is to clone
+ * {@link https://github.com/smetana/tipy-project} repository.
+ * It is an empty *tipy* aplication skeleton
+ *
+ * ## Routing
+ *
+ * Tipy uses *.htaccess* .htaccess for routing.
+ * .htaccess' RewriteRules rewrite all request urls to something like:
+ * <code>
+ * dispatcher.php?controller=my&method=my_action&... # => MyController::myAction()
+ * </code>
+ *
+ * *All query string parameters are preserved on url rewite*.
+ *
+ * *controller* parameter represents controller class with:
+ *
+ * - snake_case converted to CamelCase (first letter in upper case)
+ * - plural/singular form is preserved
+ * - word "Controller" is added to the end
+ * <code>
+ * source_code => SourceCodeController
+ * blog_posts  => BlogPostsController
+ * </code>
+ *
+ * *action* parameter represents controller's method with:
+ *
+ * - snake_case converted to camelCase (first letter in lower case)
+ * - plural/singular form is preserved
+ *
+ * <code>
+ * open_source => openSource()
+ * show_posts  => showPosts()
+ * </code>
+ *
+ * ## Predefined Routes
+ *
+ * {@link https://github.com/smetana/tipy-project tipy-project} has a set of predefined rules so you don't need to
+ * rewrite urls to dispatcher.php. It is enough to rewrite urls to one of the
+ * following form:
+ * <code>
+ * /:controller              # /source_code               => SourceCodeController::index();
+ * /:controller/:action      # /source_code/open_source   => SourceCodeController::openSource();
+ * /:controller/:action/:id  # /source_code/line_number/3 => SourceCodeController::lineNumber($id = 3);
+ * </code>
  */
 class Tipy {
 
