@@ -12,7 +12,7 @@ Prerequisites:
 * Git
 * Composer
 
-Clone [tipy-project](https://github.com/smetana/tipy-project) to quickly bootstrap your tipy web app:
+Clone [tipy-project](https://github.com/smetana/tipy-project)
 
 ```shell
 git clone https://github.com/smetana/tipy-project myproject
@@ -67,7 +67,7 @@ class BlogController extends TipyController {
     public function article() {
         $blogPost = BlogPost::load($this->in('id'));
         $this->out('blogPost', $blogPost);
-        $this->renderView('blog/post');
+        $this->renderView('blog/article');
     }
 
 }
