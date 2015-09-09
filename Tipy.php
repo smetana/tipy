@@ -18,6 +18,7 @@ define('CLI_MODE', php_sapi_name() == 'cli');
 
 // Require base classes
 require_once('src/TipyErrorHandler.php');
+require_once('src/TipyLogger.php');
 require_once('src/TipyIOWrapper.php');
 require_once('src/TipyConfig.php');
 require_once('src/TipyRequest.php');
