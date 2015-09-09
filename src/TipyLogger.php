@@ -112,7 +112,7 @@ class TipyLogger {
      * @param integer $level default {@link $threshold}
      */
     public function log($message, $level = null) {
-        if (!$level) {
+        if ($level === NULL) {
             $level = $this->threshold;
         }
         if ($level <= $this->threshold) {
