@@ -1,135 +1,88 @@
 <?php
 
 class LoggerTest extends TipyTestCase {
-    
+
     public function testDefaultLogger() {
         $logger = new TipyLogger();
         $this->assertEqual($logger->threshold, TipyLogger::DEBUG);
-        $this->assertEqual($logger->filePath, 'php://stderr');
+        $this->assertEqual($this->getFilePath($logger), 'php://stderr');
     }
 
     public function testLogOutput() {
-        $logger = new TipyLogger(TipyLogger::DEBUG, 'php://memory');
+        $logger = new TipyLogger('php://memory');
         $logger->format = '[%level]';
-        $handler = $this->getFileHandler($logger);
-        $this->assertNotNull($handler);
+        $handle = $this->getHandle($logger);
+        $this->assertNotNull($handle);
         $logger->log('Debug message', TipyLogger::DEBUG);
         $logger->log('Info  message', TipyLogger::INFO);
-        $logger->log('Notic message', TipyLogger::NOTICE);
-        $logger->log('Warni message', TipyLogger::WARNING);
+        $logger->log('Warn  message', TipyLogger::WARN);
         $logger->log('Error message', TipyLogger::ERROR);
-        $logger->log('Criti message', TipyLogger::CRITICAL);
-        $logger->log('Alert message', TipyLogger::ALERT);
-        $logger->log('Emerg message', TipyLogger::EMERGENCY);
+        $logger->log('Fatal message', TipyLogger::FATAL);
         $log = $this->getLogContents($logger);
-        $this->assertEqual($log, 
-"[debug] Debug message
-[info] Info  message
-[notice] Notic message
-[warning] Warni message
-[error] Error message
-[critical] Criti message
-[alert] Alert message
-[emergency] Emerg message".PHP_EOL
+        $this->assertEqual($log,
+"[DEBUG] Debug message
+[INFO] Info  message
+[WARN] Warn  message
+[ERROR] Error message
+[FATAL] Fatal message".PHP_EOL
         );
     }
 
     public function testLogToFile() {
-        $logger = new TipyLogger(TipyLogger::DEBUG, __DIR__.'/test.log');
+        $logger = new TipyLogger(__DIR__.'/test.log');
         $logger->format = '[%level]';
         $logger->info("I am in file");
-        $this->assertTrue(file_exists($logger->filePath));
-        $log = file_get_contents($logger->filePath);
-        $this->assertEqual($log, "[info] I am in file".PHP_EOL);
+        $this->assertTrue(file_exists($this->getFilePath($logger)));
+        $log = file_get_contents($this->getFilePath($logger));
+        $this->assertEqual($log, "[INFO] I am in file".PHP_EOL);
     }
 
     public function testInfoThreshold() {
-        $logger = new TipyLogger(TipyLogger::INFO, 'php://memory');
+        $logger = new TipyLogger('php://memory');
+        $logger->threshold = TipyLogger::INFO;
         $logger->format = '[%level]';
         $this->logAllLevels($logger);
         $log = $this->getLogContents($logger);
-        $this->assertEqual($log, 
-"[info] Info message
-[notice] Notice message
-[warning] Warning message
-[error] Error message
-[critical] Critical message
-[alert] Alert message
-[emergency] Emergency message".PHP_EOL
+        $this->assertEqual($log,
+"[INFO] Info message
+[WARN] Warn message
+[ERROR] Error message
+[FATAL] Fatal message".PHP_EOL
         );
     }
 
-    public function testNoticeThreshold() {
-        $logger = new TipyLogger(TipyLogger::NOTICE, 'php://memory');
+    public function testWarnThreshold() {
+        $logger = new TipyLogger('php://memory');
+        $logger->threshold = TipyLogger::WARN;
         $logger->format = '[%level]';
         $this->logAllLevels($logger);
         $log = $this->getLogContents($logger);
-        $this->assertEqual($log, 
-"[notice] Notice message
-[warning] Warning message
-[error] Error message
-[critical] Critical message
-[alert] Alert message
-[emergency] Emergency message".PHP_EOL
-        );
-    }
-
-    public function testWarningThreshold() {
-        $logger = new TipyLogger(TipyLogger::WARNING, 'php://memory');
-        $logger->format = '[%level]';
-        $this->logAllLevels($logger);
-        $log = $this->getLogContents($logger);
-        $this->assertEqual($log, 
-"[warning] Warning message
-[error] Error message
-[critical] Critical message
-[alert] Alert message
-[emergency] Emergency message".PHP_EOL
+        $this->assertEqual($log,
+"[WARN] Warn message
+[ERROR] Error message
+[FATAL] Fatal message".PHP_EOL
         );
     }
 
     public function testErrorThreshold() {
-        $logger = new TipyLogger(TipyLogger::ERROR, 'php://memory');
+        $logger = new TipyLogger('php://memory');
+        $logger->threshold = TipyLogger::ERROR;
         $logger->format = '[%level]';
         $this->logAllLevels($logger);
         $log = $this->getLogContents($logger);
-        $this->assertEqual($log, 
-"[error] Error message
-[critical] Critical message
-[alert] Alert message
-[emergency] Emergency message".PHP_EOL
+        $this->assertEqual($log,
+"[ERROR] Error message
+[FATAL] Fatal message".PHP_EOL
         );
     }
 
-    public function testCriticalThreshold() {
-        $logger = new TipyLogger(TipyLogger::CRITICAL, 'php://memory');
+    public function testFatalThreshold() {
+        $logger = new TipyLogger('php://memory');
+        $logger->threshold = TipyLogger::FATAL;
         $logger->format = '[%level]';
         $this->logAllLevels($logger);
         $log = $this->getLogContents($logger);
-        $this->assertEqual($log, 
-"[critical] Critical message
-[alert] Alert message
-[emergency] Emergency message".PHP_EOL
-        );
-    }
-
-    public function testAlertThreshold() {
-        $logger = new TipyLogger(TipyLogger::ALERT, 'php://memory');
-        $logger->format = '[%level]';
-        $this->logAllLevels($logger);
-        $log = $this->getLogContents($logger);
-        $this->assertEqual($log, 
-"[alert] Alert message
-[emergency] Emergency message".PHP_EOL
-        );
-    }
-
-    public function testEmergencyThreshold() {
-        $logger = new TipyLogger(TipyLogger::EMERGENCY, 'php://memory');
-        $logger->format = '[%level]';
-        $this->logAllLevels($logger);
-        $log = $this->getLogContents($logger);
-        $this->assertEqual($log, "[emergency] Emergency message".PHP_EOL);
+        $this->assertEqual($log, "[FATAL] Fatal message".PHP_EOL);
     }
 
     // Helper functions
@@ -137,28 +90,36 @@ class LoggerTest extends TipyTestCase {
     private function logAllLevels($logger) {
         $logger->debug('Debug message');
         $logger->info('Info message');
-        $logger->notice('Notice message');
-        $logger->warning('Warning message');
+        $logger->warn('Warn message');
         $logger->error('Error message');
-        $logger->critical('Critical message');
-        $logger->alert('Alert message');
-        $logger->emergency('Emergency message');
+        $logger->fatal('Fatal message');
     }
 
     /**
-     * Get access to private TipyLogger::$fileHandler
+     * Get access to private TipyLogger::$handle
      */
-    private function getFileHandler($logger) {
+    private function getHandle($logger) {
         $ref = new ReflectionClass('TipyLogger');
-        $handler = $ref->getProperty('fileHandler');
-        $handler->setAccessible(true);
-        return $handler->getValue($logger);
+        $handle = $ref->getProperty('handle');
+        $handle->setAccessible(true);
+        return $handle->getValue($logger);
     }
 
+    /**
+     * Get access to private TipyLogger::$filePath
+     */
+    private function getFilePath($logger) {
+        $ref = new ReflectionClass('TipyLogger');
+        $filePath = $ref->getProperty('filePath');
+        $filePath->setAccessible(true);
+        return $filePath->getValue($logger);
+    }
+
+
     private function getLogContents($logger) {
-        $handler = $this->getFileHandler($logger);
-        fseek($handler, 0);
-        return stream_get_contents($handler);
+        $handle = $this->getHandle($logger);
+        fseek($handle, 0);
+        return stream_get_contents($handle);
     }
 
 }

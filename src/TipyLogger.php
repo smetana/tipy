@@ -8,38 +8,75 @@
 /**
  * Simple Logger
  *
+ * By default TipyLogger writes to *STDERR*
  * <code>
- * $logger = new TipyLogger(TipyLogger::WARNING);
- * $logger->error('Hello World');
- *
- * $myLogger = new TipyLogger(TipyLogger::DEBUG, 'project.log');
- * $myLogger->info('Hello World');
+ * // This will output to apache's error.log  something like
+ * // Fri Sep 13 12:22:20 2015 [23685] [INFO] Hello World! 
+ * $logger = new TipyLogger();
+ * $logger->info('Hello World');
  * </code>
+ *
+ * But it is possible to Create a logger to write to the file
+ * <code>
+ * $logger = new TipyLogger('/var/log/project.log');
+ * $logger->info('Hello World');
+ * </code>
+ *
+ * ## Threshold Level
+ *
+ * Default threshold level for new TipyLogger is {@link DEBUG}.
+ * This means that all messages are logged. 
+ *
+ * You can change {@link $threshold} to different threshold level 
+ * and then only messages with lower or equal severity level lower
+ * will be logged.
+ * <code>
+ * $logger = new TipyLogger('/var/log/project.log');
+ * $logger->threshold = TipyLogger::WARN;
+ * $logger->warn('I am logged :)'); // logged
+ * $logger->info('I am not :('); // ignored
+ * </code>
+
  */
 class TipyLogger {
 
     // Severity Levels
-    // https://tools.ietf.org/html/rfc5424
 
-    const EMERGENCY = 0;
-    const ALERT     = 1;
-    const CRITICAL  = 2;
-    const ERROR     = 3;
-    const WARNING   = 4;
-    const NOTICE    = 5;
-    const INFO      = 6;
-    const DEBUG     = 7;
+    /**
+     * An unhandleable error that results in a program crash
+     */
+    const FATAL = 1;
 
-    private $levelNames = [
-        'emergency',
-        'alert',
-        'critical',
-        'error',
-        'warning',
-        'notice',
-        'info',
-        'debug',
-    ];
+    /**
+     * A handleable error
+     */
+    const ERROR = 2;
+
+    /**
+     * A warning
+     */
+    const WARN = 3;
+
+    /**
+     * Useful information
+     */
+    const INFO = 4;
+
+    /**
+     * Low-level information for developers
+     */
+    const DEBUG = 5;
+
+    /**
+     * Logging is turned off
+     */
+    const OFF = 0;
+
+    /**
+     * Level names array for quick *level=>name* conversion
+     * @var array
+     */
+    private $levelNames = [null, 'FATAL', 'ERROR', 'WARN', 'INFO', 'DEBUG'];
 
     /**
      * Log level threshold
@@ -48,9 +85,7 @@ class TipyLogger {
     public $threshold = self::DEBUG;
 
     /**
-     * Log format
-     *
-     * Accept all strftime characters plus *%pid* and *%level*
+     * Log format. Accepts all strftime characters plus *%pid* and *%level*
      * @var string
      */
     public $format = '%c [%pid] [%level]';
@@ -59,28 +94,22 @@ class TipyLogger {
      * Path to the log file
      * @var string
      */
-    public $filePath = 'php://stderr';
+    private $filePath;
 
     /**
-     * Log file handler
+     * Log resource handler
      * @var resource
      */
-    private $fileHandler;
+    private $handle;
 
     /**
      * Create new TipyLogger instance
      *
-     * @param integer $threshold default {@link DEBUG}
      * @param string $filePath default {@link 'php://stderr'}
      */
-    public function __construct($threshold = null, $filePath = null) {
-        if ($threshold !== null) {
-            $this->threshold = $threshold;
-        }
-        if ($filePath !== null ) {
-            $this->filePath = $filePath;
-        }
-        $this->fileHandler = fopen($this->filePath, 'w');
+    public function __construct($filePath = 'php://stderr') {
+        $this->filePath = $filePath;
+        $this->handle = fopen($this->filePath, 'w');
     }
 
     /**
@@ -88,17 +117,16 @@ class TipyLogger {
      * @internal
      */
     public function __destruct() {
-        if ($this->fileHandler) {
-            fclose($this->fileHandler);
-        }
+        fclose($this->handle);
     }
 
     /**
      * Add log prefix to mesage
      * @param string $message
+     * @param integer $level
      * @return string
      */
-    private function formatLogLine($message, $level) {
+    private function formatMessage($message, $level) {
         $prefix = str_replace('%pid', posix_getpid(), $this->format);
         $prefix = str_replace('%level', $this->levelNames[$level], $prefix);
         $prefix = strftime($prefix);
@@ -106,46 +134,26 @@ class TipyLogger {
     }
 
     /**
-     * Output message to log
-     *
+     * Log message
      * @param string $message
-     * @param integer $level default {@link $threshold}
+     * @param integer $level
      */
-    public function log($message, $level = null) {
-        if ($level === NULL) {
-            $level = $this->threshold;
-        }
+    public function log($message, $level) {
         if ($level <= $this->threshold) {
-            fwrite($this->fileHandler, $this->formatLogLine($message, $level));
+            fwrite($this->handle, $this->formatMessage($message, $level));
         }
     }
 
     /**
-     * Output message to log with EMERGENCY severity level
+     * Log FATAL message
      * @param string $message
      */
-    public function emergency($message) {
-        $this->log($message, self::EMERGENCY);
+    public function fatal($message) {
+        $this->log($message, self::FATAL);
     }
 
     /**
-     * Output message to log with ALERT severity level
-     * @param string $message
-     */
-    public function alert($message) {
-        $this->log($message, self::ALERT);
-    }
-
-    /**
-     * Output message to log with CRITICAL severity level
-     * @param string $message
-     */
-    public function critical($message) {
-        $this->log($message, self::CRITICAL);
-    }
-
-    /**
-     * Output message to log with ERROR severity level
+     * Log ERROR message
      * @param string $message
      */
     public function error($message) {
@@ -153,23 +161,15 @@ class TipyLogger {
     }
 
     /**
-     * Output message to log with WARNING severity level
+     * Log WARN message
      * @param string $message
      */
-    public function warning($message) {
-        $this->log($message, self::WARNING);
+    public function warn($message) {
+        $this->log($message, self::WARN);
     }
 
     /**
-     * Output message to log with NOTICE severity level
-     * @param string $message
-     */
-    public function notice($message) {
-        $this->log($message, self::NOTICE);
-    }
-
-    /**
-     * Output message to log with INFO severity level
+     * Log INFO message
      * @param string $message
      */
     public function info($message) {
@@ -177,7 +177,7 @@ class TipyLogger {
     }
 
     /**
-     * Output message to log with DEBUG severity level
+     * Log DEBUG message
      * @param string $message
      */
     public function debug($message) {
