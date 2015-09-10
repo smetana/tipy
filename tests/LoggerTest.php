@@ -85,6 +85,14 @@ class LoggerTest extends TipyTestCase {
         $this->assertEqual($log, "[FATAL] Fatal message".PHP_EOL);
     }
 
+    public function testLoggerOff() {
+        $logger = new TipyLogger('php://memory');
+        $logger->threshold = TipyLogger::OFF;
+        $this->logAllLevels($logger);
+        $log = $this->getLogContents($logger);
+        $this->assertEqual($log, "");
+    }
+
     // Helper functions
 
     private function logAllLevels($logger) {
