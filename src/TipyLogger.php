@@ -28,8 +28,8 @@
  * This means that all messages are logged. 
  *
  * You can change {@link $threshold} to different threshold level 
- * and then only messages with lower or equal severity level lower
- * will be logged.
+ * and then only messages with lower or equal severity level will
+ * be logged.
  * <code>
  * $logger = new TipyLogger('/var/log/project.log');
  * $logger->threshold = TipyLogger::WARN;
