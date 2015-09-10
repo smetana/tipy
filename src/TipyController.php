@@ -9,13 +9,53 @@
  * C in MVC. Receive the request, fetch or save data from a models, and use a TipyView to create HTML output
  *
  * <code>
+ * // app/controllers/BlogController.php
  * class MyController extends TipyController {
  *     public function myAction() {
- *         // do things with $this->in, $this->out, etc...
- *         $this->renderView('my/myAction')
+ *         // your application logic
  *     }
  * }
  * </code>
+ *
+ * Application input is available in *$this->in*, application output goes to *$this->out*
+ *
+ * ## Default template rendering
+ *
+ * At the end of the action HTML template will be rendered automatically.
+ * Automatic template name is contructed from controller and action parameters recieved
+ * by {@link Tipy} router.
+ *
+ * <code>
+ * URL              Template Path
+ * ------------------------------------------
+ * /blog            /app/views/blog/index.php
+ * /blog/post       /app/views/blog/post.php
+ * </code>
+ *
+ * ## Custom template rendering
+ *
+ * You can explicitely render template with custom name
+ *
+ * <code>
+ * // app/controllers/BlogController.php
+ * class BlogController extends TipyController {
+ *     public function article() {
+ *         $this->out('title', 'Hello');
+ *         $this->out('message', 'World!');
+ *         $this->renderView('path/to/custom_template');
+ *     }
+ * }
+ * </code>
+ *
+ * ## Disable TipyView rendering
+ *
+ * If you use custom template engine or your action outputs formats different
+ * from text or HTML you may want to disable default tipy rendering
+ *
+ * <code>
+ * $this->skipRender = true;
+ * </code>
+ *
  */
 class TipyController {
 
@@ -65,6 +105,29 @@ class TipyController {
     protected $flash;
 
     /**
+     * @var string
+     */
+    private $templateName;
+
+    /**
+     * Set this to *true* to turn off TipyView template rendering
+     * @var boolean
+     */
+    public $skipRender = false;
+
+    /**
+     * Controller name as it first appears in $this-in
+     * @var string
+     */
+    private $controllerName;
+
+    /**
+     * Action name as it first appears in $this->in
+     * @var string
+     */
+    private $actionName;
+
+    /**
      * Instantiate controller with application context
      */
     public function __construct() {
@@ -79,6 +142,9 @@ class TipyController {
         $this->db       = $app->db;
         $this->session  = $app->session;
         $this->flash    = new TipyFlash($this->session);
+        // Save controller and action name to build template path
+        $this->controllerName = $this->in('controller');
+        $this->actionName = $this->in('action');
     }
 
     /**
@@ -106,18 +172,16 @@ class TipyController {
      * @return string
      */
     public function renderTemplate($templateName) {
-        $this->executeAfter();
         $this->view->bind($this->out->getAll());
-        $output = $this->view->processTemplate($templateName);
-        return $output;
+        return $this->view->processTemplate($templateName);
     }
 
     /**
-     * Render template to output buffer
+     * Set custom template name for rendering
      * @param string $templateName
      */
     public function renderView($templateName) {
-        echo $this->renderTemplate($templateName);
+        $this->templateName = $templateName;
     }
 
     /**
@@ -127,6 +191,14 @@ class TipyController {
     public function execute($action) {
         $this->executeBefore();
         $this->$action();
+        $this->executeAfter();
+        if (!$this->skipRender) {
+            if (!$this->templateName) {
+                $this->templateName = $this->controllerName.'/'.$this->actionName;
+            }
+            // Render template to output buffer
+            echo $this->renderTemplate($this->templateName);
+        }
     }
 
     /**

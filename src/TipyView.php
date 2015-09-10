@@ -14,18 +14,17 @@
  *   have access to application context except TipyView instance represented by $this (see note below)
  *
  * <code>
- * // app/controllers/HelloWorldController.php
- * class HelloWorldController extends TipyController {
+ * // app/controllers/BlogController.php
+ * class BlogController extends TipyController {
  *     public function article() {
  *         $this->out('title', 'Hello');
  *         $this->out('message', 'World!');
- *         $this->renderView('helloWorld');
  *     }
  * }
  * </code>
  *
  * <code>
- * // app/views/helloWorld.php
+ * // app/views/blog/article.php
  * <!DOCTYPE html>
  * <html>
  * <head>
@@ -37,7 +36,22 @@
  * </html>
  * </code>
  *
- * ### Note about $this
+ * ## Custom template names
+ *
+ * You can explicitely render views with custom names
+ *
+ * <code>
+ * // app/controllers/BlogController.php
+ * class BlogController extends TipyController {
+ *     public function article() {
+ *         $this->out('title', 'Hello');
+ *         $this->out('message', 'World!');
+ *         $this->renderView('path/to/custom_template');
+ *     }
+ * }
+ * </code>
+ *
+ * ## Note about $this
  *
  * $this is available inside template and gives access to
  * TipyView instance which renders current template.
