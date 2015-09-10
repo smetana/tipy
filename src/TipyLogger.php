@@ -16,7 +16,7 @@
  * $logger->info('Hello World');
  * </code>
  *
- * But it is possible to Create a logger to write to the file
+ * But it is possible to create a logger to write to the file
  * <code>
  * $logger = new TipyLogger('/var/log/project.log');
  * $logger->info('Hello World');
