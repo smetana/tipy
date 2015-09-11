@@ -1,6 +1,6 @@
 # tipy
 
-Tiny PHP MVC framework with own xUnit-like test framework
+Tiny PHP MVC + xUnit framework
 
 ## Installation
 
