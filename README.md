@@ -64,9 +64,9 @@ class BlogPost extends TipyModel {
 
 class BlogController extends TipyController {
 
-    public function article() {
-        $blogPost = BlogPost::load($this->in('id'));
-        $this->out('blogPost', $blogPost);
+    public function post() {
+        $post = BlogPost::load($this->in('id'));
+        $this->out('post', $post);
     }
 
 }
@@ -79,11 +79,11 @@ class BlogController extends TipyController {
 <!DOCTYPE html>
 <html>
 <head>
-    <title><?= $blogPost->title ></title>
+    <title><?= $post->title ></title>
 </head>
 <body>
-    <h1><?= $blogPost->title ?></p>
-    <p><?= $blogPost->body ?></p>
+    <h1><?= $post->title ?></p>
+    <p><?= $post->body ?></p>
 </body>
 </html>
 ```
