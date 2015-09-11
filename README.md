@@ -1,6 +1,6 @@
 # tipy
 
-Tiny PHP MVC framework.
+Tiny PHP MVC framework with own xUnit-like test framework
 
 ## Installation
 
@@ -44,9 +44,7 @@ config file for database connection.
 
 http://smetana.me/tipy-api - a reference to tipy classes with annotations.
 
-## tipy is MVC
-
-### Models
+## Models
 ```php
 // app/models/BlogPost.php
 
@@ -58,7 +56,7 @@ class BlogPost extends TipyModel {
 
 }
 ```
-### Controllers
+## Controllers
 ```php
 // app/controllers/BlogController.php
 
@@ -72,7 +70,7 @@ class BlogController extends TipyController {
 }
 ```
 
-### Views
+## Views
 ```html
 <!-- app/views/blog/post.php -->
 
@@ -87,7 +85,7 @@ class BlogController extends TipyController {
 </body>
 </html>
 ```
-## With Testing Framework
+## Tests
 
 ```php
 class BlogPostTest extends TipyTestCase {
