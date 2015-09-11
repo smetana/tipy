@@ -67,7 +67,6 @@ class BlogController extends TipyController {
     public function article() {
         $blogPost = BlogPost::load($this->in('id'));
         $this->out('blogPost', $blogPost);
-        $this->renderView('blog/article');
     }
 
 }
