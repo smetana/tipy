@@ -36,6 +36,14 @@ class TipyRequest extends TipyIOWrapper {
     }
 
     /**
+     * Request URI
+     * @return string
+     */
+    public function uri() {
+        return $this->get('REQUEST_URI');
+    }
+
+    /**
      * Return request method: GET,POST,DELETE,etc...
      * @return string
      */
