@@ -15,10 +15,20 @@ class TipyInflector extends Inflect {
 
     /**
      * Transform string in camelCase to snake_case
+     * @deprecated Use {@link snakeCase()} instead
      * @param string $str
      * @return string
      */
     public static function underscore($str) {
+        return self::snakeCase($str);
+    }
+
+    /**
+     * Transform string in camelCase to snake_case
+     * @param string $str
+     * @return string
+     */
+    public static function snakeCase($str) {
         $str = preg_replace("/([a-z0-9])([A-Z])/", "$1_$2", $str);
         return strtolower($str);
     }
@@ -61,7 +71,7 @@ class TipyInflector extends Inflect {
      */
     public static function tableize($str) {
         $str = self::pluralize($str);
-        return self::underscore($str);
+        return self::snakeCase($str);
     }
 
     /**
