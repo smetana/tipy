@@ -22,14 +22,14 @@
  * ## Default template rendering
  *
  * At the end of the action HTML template will be rendered automatically.
- * Automatic template name is contructed from controller and action parameters recieved
- * by {@link Tipy} router.
+ * Automatic template name is contructed from controller name (without "Controller")
+ * and action name
  *
  * <code>
- * URL              Template Path
+ * Action                    Template Path
  * ------------------------------------------
- * /blog            /app/views/blog/index.php
- * /blog/post       /app/views/blog/post.php
+ * BlogController::index()   /app/views/Blog/index.php
+ * BlogController::post()    /app/views/Blog/post.php
  * </code>
  *
  * ## Custom template rendering
@@ -42,7 +42,7 @@
  *     public function article() {
  *         $this->out('title', 'Hello');
  *         $this->out('message', 'World!');
- *         $this->renderView('path/to/custom_template');
+ *         $this->renderView('path/to/custom/template');
  *     }
  * }
  * </code>
@@ -116,18 +116,6 @@ class TipyController {
     public $skipRender = false;
 
     /**
-     * Controller name as it first appears in $this-in
-     * @var string
-     */
-    private $controllerName;
-
-    /**
-     * Action name as it first appears in $this->in
-     * @var string
-     */
-    private $actionName;
-
-    /**
      * Instantiate controller with application context
      */
     public function __construct() {
@@ -142,9 +130,6 @@ class TipyController {
         $this->db       = $app->db;
         $this->session  = $app->session;
         $this->flash    = new TipyFlash($this->session);
-        // Save controller and action name to build template path
-        $this->controllerName = $this->in('controller');
-        $this->actionName = $this->in('action');
     }
 
     /**
@@ -194,11 +179,22 @@ class TipyController {
         $this->executeAfter();
         if (!$this->skipRender) {
             if (!$this->templateName) {
-                $this->templateName = $this->controllerName.'/'.$this->actionName;
+                $this->template = $this->actionToTemplaName($action);
             }
             // Render template to output buffer
             echo $this->renderTemplate($this->templateName);
         }
+    }
+
+    /**
+     * Path to template
+     * @param string $action
+     * @return string
+     */
+    public function actionToTemplaName($action) {
+        $className = get_class($this);
+        $className = str_replace('Controller', '', $className);
+        $this->templateName = $className.'/'.$action;
     }
 
     /**

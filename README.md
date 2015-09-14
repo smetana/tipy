@@ -72,7 +72,7 @@ class BlogController extends TipyController {
 
 ## Views
 ```html
-<!-- app/views/blog/post.php -->
+<!-- app/views/Blog/post.php -->
 
 <!DOCTYPE html>
 <html>
