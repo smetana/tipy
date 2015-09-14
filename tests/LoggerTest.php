@@ -29,6 +29,7 @@ class LoggerTest extends TipyTestCase {
     }
 
     public function testLogToFile() {
+        unlink(__DIR__.'/test.log');
         $logger = new TipyLogger(__DIR__.'/test.log');
         $logger->format = '[%level]';
         $logger->info("I am in file");
