@@ -76,7 +76,7 @@ class TipyLogger {
      * Level names array for quick *level=>name* conversion
      * @var array
      */
-    private $levelNames = [null, 'FATAL', 'ERROR', 'WARN', 'INFO', 'DEBUG'];
+    private $levelNames = ['OFF', 'FATAL', 'ERROR', 'WARN', 'INFO', 'DEBUG'];
 
     /**
      * Log level threshold
@@ -109,7 +109,7 @@ class TipyLogger {
      */
     public function __construct($filePath = 'php://stderr') {
         $this->filePath = $filePath;
-        $this->handle = fopen($this->filePath, 'w');
+        $this->handle = fopen($this->filePath, 'a');
     }
 
     /**
@@ -118,6 +118,25 @@ class TipyLogger {
      */
     public function __destruct() {
         fclose($this->handle);
+    }
+
+    /**
+     * Set threshold level
+     * @param string|integer $level
+     */
+    public function setThreshold($level) {
+        if (is_int($level)) {
+            if ($level < TipyLogger::OFF or $level > TipyLogger::DEBUG) {
+                throw new TipyException("Unknown log level ".$level);
+            }
+            $this->threshold = $level;
+        } else {
+            $level = strtoupper($level);
+            if (!in_array($level, $this->levelNames)) {
+                throw new TipyException("Uknown log level ".$level);
+            }
+            $this->threshold = array_flip($this->levelNames)[$level];
+        }
     }
 
     /**
