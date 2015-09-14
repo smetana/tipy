@@ -29,8 +29,21 @@ class TipyInflector extends Inflect {
      * @return string
      */
     public static function snakeCase($str) {
-        $str = preg_replace("/([a-z0-9])([A-Z])/", "$1_$2", $str);
+        $str = preg_replace("/([A-Z\d]+)([A-Z][a-z])/", "$1_$2", $str);
+        $str = preg_replace("/([a-z\d]+)([A-Z])/", "$1_$2", $str);
         return strtolower($str);
+    }
+
+    /**
+     * Transform string in snake_case to TitleCase
+     * @param string $str
+     * @return string
+     */
+    public static function titleCase($str) {
+        $str = str_replace("_", " ", $str);
+        $str = ucwords($str);
+        $str = str_replace(" ", "", $str);
+        return $str;
     }
 
     /**
@@ -39,9 +52,7 @@ class TipyInflector extends Inflect {
      * @return string
      */
     public static function camelCase($str) {
-        $str = str_replace("_", " ", $str);
-        $str = ucwords($str);
-        $str = str_replace(" ", "", $str);
+        $str = self::titleCase($str);
         return lcfirst($str);
     }
 
@@ -87,9 +98,7 @@ class TipyInflector extends Inflect {
      */
     public static function controllerize($str) {
         $str = strtolower($str);
-        $str = str_replace("_", " ", $str);
-        $str = ucwords($str);
-        $str = str_replace(" ", "", $str);
+        $str = self::titleCase($str);
         return $str;
     }
 
