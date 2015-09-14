@@ -29,8 +29,11 @@ class LoggerTest extends TipyTestCase {
     }
 
     public function testLogToFile() {
-        unlink(__DIR__.'/test.log');
-        $logger = new TipyLogger(__DIR__.'/test.log');
+        $logFile = __DIR__.'/test.log';
+        if (file_exists($logFile)) {
+            unlink($logFile);
+        }
+        $logger = new TipyLogger($logFile);
         $logger->format = '[%level]';
         $logger->info("I am in file");
         $this->assertTrue(file_exists($this->getFilePath($logger)));
