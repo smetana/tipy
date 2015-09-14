@@ -69,6 +69,11 @@ class TipyApp {
     public $session;
 
     /**
+     * @var TipyLogger
+     */
+    public $logger;
+
+    /**
      * Path to your application's **public** directory
      * @var string
      */
@@ -100,6 +105,7 @@ class TipyApp {
         $cwd = getcwd();
         $this->documentRoot = $cwd;
         $this->view->setTemplatePath(realpath($cwd.'/../app/views'));
+        $this->setupLogger();
     }
 
     /**
@@ -127,6 +133,22 @@ class TipyApp {
     }
 
     /**
+     * Open log stream specified in config.ini and set threshold
+     */
+    private function setupLogger() {
+        $logFile = $this->config->get('log_file');
+        if (!$logFile || preg_match('/^\W*$/', $logFile)) {
+            $logFile = 'php://stderr';
+        }
+        $threshold = $this->config->get('log_level_threshold');
+        if (!$threshold || preg_match('/^\W*$/', $threshold)) {
+            $threshold = 'OFF';
+        }
+        $this->logger = new TipyLogger($logFile);
+        $this->logger->setThreshold($threshold);
+    }
+
+    /**
      * Initialize controller and run action
      *
      * Requires **$app->in('controller')** and **$app->in('action')**
@@ -136,6 +158,7 @@ class TipyApp {
      * @todo Different exceptions handling in production and development modes
      */
     public function run() {
+        $this->logger->debug('APP: '.$this->request->method().': '.$this->request->uri());
         try {
             // Get controller and action name
             $controllerName = $this->in->get('controller');
@@ -158,6 +181,7 @@ class TipyApp {
 
             $actionName = TipyInflector::camelCase($actionName);
             if (in_array($actionName, get_class_methods($controllerName))) {
+                    $this->logger->debug('APP: Executing '.$controllerName.'::'.$actionName.'();');
                     $controller->execute($actionName);
             } else {
                 throw new TipyException('Undefined action '.$controllerName.'::'.$actionName.'()');
