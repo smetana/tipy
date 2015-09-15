@@ -57,7 +57,7 @@ class TipyDAO {
             $dbUser = $config->get('db_user');
             $dbPassword = $config->get('db_password');
 
-            $this->logger->debug('DAO: Connect to database');
+            $this->logger->debug('Connect to database');
             $dbLink = new mysqli('p:'.$dbHost, $dbUser, $dbPassword, $dbName, $dbPort);
             if ($dbLink->connect_error) {
                 throw new TipyDaoException('DB connection error (' . $dbLink->connect_errno . ') '
@@ -65,7 +65,7 @@ class TipyDAO {
             } else {
                 if ($config->get('db_character_set')) {
                     $query = "set names '".$config->get('db_character_set')."'";
-                    $this->logger->debug('DAO: '.$query);
+                    $this->logger->debug($query);
                     $dbLink->query($query);
                 }
                 $app->db = $dbLink;
@@ -106,7 +106,7 @@ class TipyDAO {
         } else {
             $query = $sql;
         }
-        $this->logger->debug('DAO: '.$query);
+        $this->logger->debug($query);
         $result = $this->dbLink->query($query);
         self::$queryCount++;
         if (!$result) {
@@ -349,10 +349,10 @@ class TipyDAO {
     private static function startTransaction() {
         $app = TipyApp::getInstance();
         if (self::$openTransactionsCount == 0) {
-            $app->logger->debug('DAO: BEGIN');
+            $app->logger->debug('BEGIN');
             $result = $app->db->query('BEGIN');
         } else {
-            $app->logger->debug('DAO: SAVEPOINT '.self::newSavepointName());
+            $app->logger->debug('SAVEPOINT '.self::newSavepointName());
             $result = $app->db->query('SAVEPOINT '.self::newSavepointName());
         }
         if ($result) {
@@ -371,14 +371,14 @@ class TipyDAO {
         if (self::$openTransactionsCount == 0) {
             throw new TipyDaoException('No transaction in progress');
         } elseif (self::$openTransactionsCount == 1) {
-            $app->logger->debug('DAO: COMMIT');
+            $app->logger->debug('COMMIT');
             $result = $app->db->query('COMMIT');
             if ($result) {
                 self::$openTransactionsCount = 0;
             }
             return $result;
         } elseif (self::$openTransactionsCount > 1) {
-            $app->logger->debug('DAO: RELEASE SAVEPOINT '.self::currentSavepointName());
+            $app->logger->debug('RELEASE SAVEPOINT '.self::currentSavepointName());
             $result = $app->db->query('RELEASE SAVEPOINT '.self::currentSavepointName());
             if ($result) {
                 self::$openTransactionsCount--;
@@ -401,19 +401,19 @@ class TipyDAO {
             throw new TipyDaoException('No transaction in progress');
         } elseif ($kind == 'hard') {
             // rollback parent transaction with all nested savepoints
-            $app->logger->debug('DAO: ROLLBACK');
+            $app->logger->debug('ROLLBACK');
             $result = $app->db->query('ROLLBACK');
             if ($result) {
                 self::$openTransactionsCount = 0;
             }
         } elseif (self::$openTransactionsCount == 1) {
-            $app->logger->debug('DAO: ROLLBACK');
+            $app->logger->debug('ROLLBACK');
             $result = $app->db->query('ROLLBACK');
             if ($result) {
                 self::$openTransactionsCount = 0;
             }
         } elseif (self::$openTransactionsCount > 1) {
-            $app->logger->debug('DAO: ROLLBACK TO SAVEPOINT '.self::currentSavepointName());
+            $app->logger->debug('ROLLBACK TO SAVEPOINT '.self::currentSavepointName());
             $result = $app->db->query('ROLLBACK TO SAVEPOINT '.self::currentSavepointName());
             if ($result) {
                 self::$openTransactionsCount--;

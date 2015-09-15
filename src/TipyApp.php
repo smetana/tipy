@@ -158,7 +158,7 @@ class TipyApp {
      * @todo Different exceptions handling in production and development modes
      */
     public function run() {
-        $this->logger->debug('APP: '.$this->request->method().': '.$this->request->uri());
+        $this->logger->debug($this->request->method().': '.$this->request->uri());
         try {
             // Get controller and action name
             $controllerName = $this->in->get('controller');
@@ -181,7 +181,7 @@ class TipyApp {
 
             $actionName = TipyInflector::camelCase($actionName);
             if (in_array($actionName, get_class_methods($controllerName))) {
-                    $this->logger->debug('APP: Executing '.$controllerName.'::'.$actionName.'();');
+                    $this->logger->debug('Executing '.$controllerName.'::'.$actionName.'();');
                     $controller->execute($actionName);
             } else {
                 throw new TipyException('Undefined action '.$controllerName.'::'.$actionName.'()');
