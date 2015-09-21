@@ -991,7 +991,7 @@ class TipyModel extends TipyDAO {
             case 'float':
                 settype($value, 'float');
                 break;
-            case 'datettime':
+            case 'datetime':
                 $value = new DateTime($value);
                 break;
         }
