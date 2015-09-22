@@ -371,7 +371,7 @@ class ModelTest extends TipyTestCase {
     }
 
     public function testAssociationIsArray() {
-        $this->assertThrown('TipyModelException', "Associations definition should be an Array", function () {
+        $this->assertThrown('TipyModelException', "Association definition should be an Array", function () {
             $user = new BadModel();
         });
     }

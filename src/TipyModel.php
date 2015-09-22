@@ -1021,7 +1021,7 @@ class TipyModel extends TipyDAO {
                 continue;
             }
             if (!is_array($this->$assocType)) {
-                throw new TipyModelException("Associations definition should be an Array");
+                throw new TipyModelException("Association definition should be an Array");
             }
             $assocArray = $this->$assocType;
             foreach($assocArray as $name => $options) {

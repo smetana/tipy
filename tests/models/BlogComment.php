@@ -3,7 +3,7 @@
 class BlogComment extends TipyModel {
 
     protected $belongsTo = [
-        // Test both syntax
+        // Test both syntaxes
         'user',
         'post' => ['class' => 'BlogPost']
     ];
