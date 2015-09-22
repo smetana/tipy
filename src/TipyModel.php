@@ -141,9 +141,19 @@ class TipyValidationException extends Exception {}
  * To define define model associations you need to assign values to these properties.
  * <code>
  * class User extends TipyModel {
+ *    protected $hasMany = ['posts', 'comments'];
+ * }
+ * </code>
+ *
+ * Association class name is evaluated automatically by {@link TipyInflector->classify} inflection.
+ * If you wan't to specify class name different from association name you can pass association 
+ * options as arrays:
+ *
+ * <code>
+ * class User extends TipyModel {
  *    protected $hasMany = [
- *        'posts' => ['class' => 'BlogPost', 'dependent' => 'delete'],
- *        'comments' => ['class' => 'Comment', 'dependent' => 'delete']
+ *        'posts' => ['class' => 'BlogPost'],
+ *        'comments' => ['class' => 'BlogComment']
  *    ];
  * }
  * </code>
@@ -192,9 +202,7 @@ class TipyValidationException extends Exception {}
  *
  * <code>
  * class User extends TipyModel {
- *    protected $hasOne = [
- *        'account' => ['class' => 'Account']
- *    );
+ *    protected $hasOne = ['account'];
  * }
  * </code>
  *
@@ -220,9 +228,7 @@ class TipyValidationException extends Exception {}
  *
  * <code>
  * class BlogPost extends TipyModel {
- *    protected $belongsTo = [
- *        'user' => ['class' => 'User']
- *    );
+ *    protected $belongsTo = ['user'];
  * }
  * </code>
  *
@@ -321,7 +327,7 @@ class TipyValidationException extends Exception {}
  * </code>
  *
  * @todo Accept conditions and values in one array 'conditions' => ['id = ?', $id]
- * @todo Get associated class name by property name
+ * @todo Simple way to specify table name in model class
  * @todo Improve find() to accept arguments like Post::find('first', 'conditions' => ['created_at > ?', time()]);
  */
 class TipyModel extends TipyDAO {
@@ -483,6 +489,7 @@ class TipyModel extends TipyDAO {
         $this->table = $this->classNameToTableName($this->className);
         $this->makeReflection();
         $this->isDeletedRecord = false;
+        $this->checkAssociationClasses();
         $this->associationsCache = [];
         if ($attrs) {
             if (array_key_exists('id', $attrs)) {
@@ -997,6 +1004,42 @@ class TipyModel extends TipyDAO {
         }
         return $value;
     }
+
+
+    /**
+     * Check and fill missing association classes
+     * Recognize class names from association names
+     * This allows to define assiciations by specifying
+     * its name only
+     * <code>
+     *  $hasMany = ['comments', 'posts'];
+     * </cde>
+     */
+     private function checkAssociationClasses() {
+        foreach(['hasMany', 'hasOne', 'belongsTo', 'hasManyThrough'] as $assocType) {
+            if (!$this->$assocType) {
+                continue;
+            }
+            if (!is_array($this->$assocType)) {
+                throw new TipyModelException("Associations definition should be an Array");
+            }
+            $assocArray = $this->$assocType;
+            foreach($assocArray as $name => $options) {
+                // If $name is integer then this is assoc specified without options
+                // Make it array for future usage
+                if (is_int($name)) {
+                    // Transform ['post'] array to ['post' => []]
+                    unset($assocArray[$name]);
+                    $name = $options;
+                    $assocArray[$name] = [];
+                }
+                if (!array_key_exists('class', $assocArray[$name])) {
+                    $assocArray[$name]['class'] = TipyInflector::classify($name);
+                }
+            }
+            $this->$assocType = $assocArray;
+        }
+     }
 
     /**
      * Select from the database and instantiaate {@link $hasMany}

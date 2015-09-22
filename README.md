@@ -49,12 +49,17 @@ http://smetana.me/tipy-api - a reference to tipy classes with annotations.
 // app/models/BlogPost.php
 
 class BlogPost extends TipyModel {
-
-    protected $hasMany = [
-        'comments' => ['class' => 'Comment', 'dependent' => 'delete']
-    );
-
+    protected $hasMany = ['comments'];
 }
+
+// app/models/Comment.php
+
+class Comment extends TipyModel {
+    protected $belongsTo = [
+        'post' => ['class' => 'BlogPost', 'dependent' => 'delete']
+    ];
+}
+
 ```
 ## Controllers
 ```php

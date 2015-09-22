@@ -2,7 +2,5 @@
 
 class Profile extends TipyModel {
 
-    protected $belongsTo = [
-        'user' => ['class' => 'User']
-    ];
+    protected $belongsTo = ['user'];
 }

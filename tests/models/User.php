@@ -3,18 +3,16 @@ class User extends TipyModel {
 
     protected $hasMany = [
         'posts' => ['class' => 'BlogPost', 'dependent' => 'delete'],
-        'userAndGroupRelations' => ['class' => 'UserAndGroupRelation', 'dependent' => 'delete'],
+        'userAndGroupRelations' => ['dependent' => 'delete'],
         'friendRelations' => ['class' => 'Friend', 'foreign_key' => 'person_id', 'dependent' => 'delete']
     ];
 
     protected $hasManyThrough = [
-        'groups' => ['class' => 'Group', 'through' => 'UserAndGroupRelation', 'through_key' => 'group_id'],
+        'groups' => ['through' => 'UserAndGroupRelation', 'through_key' => 'group_id'],
         'friends' => ['class' => 'User', 'through' => 'Friend', 'foreign_key' => 'person_id', 'through_key' => 'friend_id']
     ];
 
-    protected $hasOne = [
-        'profile' => ['class' => 'Profile', 'dependent' => 'nullify']
-    ];
+    protected $hasOne = ['profile'];
 
     public function validate() {
         if (!$this->login) {

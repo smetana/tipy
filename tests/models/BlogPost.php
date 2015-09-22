@@ -6,9 +6,7 @@ class BlogPost extends TipyModel {
         'comments' => ['class' => 'BlogComment', 'dependent' => 'delete']
     ];
 
-    protected $belongsTo = [
-        'user' => ['class' => 'User']
-    ];
+    protected $belongsTo = ['user'];
 
     public function validate() {
         if (!$this->title) {

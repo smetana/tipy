@@ -370,6 +370,12 @@ class ModelTest extends TipyTestCase {
         });
     }
 
+    public function testAssociationIsArray() {
+        $this->assertThrown('TipyModelException', "Associations definition should be an Array", function () {
+            $user = new BadModel();
+        });
+    }
+
     // methods that have names not starting whith 'test' are for seeding DB
     public function createUsersWithAsocs($count) {
         for ($i=1; $i<=$count; $i++) {

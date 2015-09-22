@@ -62,3 +62,7 @@ CREATE TABLE `blog_comments` (
 PRIMARY KEY ( `id` )
 ) ENGINE = InnoDB DEFAULT CHARSET=utf8;
 
+CREATE TABLE `bad_models` (
+`id` BIGINT( 20 ) NOT NULL AUTO_INCREMENT,
+PRIMARY KEY ( `id` )
+) ENGINE = InnoDB DEFAULT CHARSET=utf8;
