@@ -4,11 +4,11 @@ class AssociationsTest extends TipyTestCase {
 
     public function testHasMany() {
         $this->createPostsWithComments(5, 10);
-        $this->assertEqual(TipyTestBlogPost::count(), 5);
-        $this->assertEqual(TipyTestBlogComment::count(), 50);
+        $this->assertEqual(BlogPost::count(), 5);
+        $this->assertEqual(BlogComment::count(), 50);
 
         // Get last post
-        $post = TipyTestBlogPost::findFirst([
+        $post = BlogPost::findFirst([
             "order" => "created_at desc"
         ]);
         $this->assertEqual($post->title, 'Post 5');
@@ -44,9 +44,9 @@ class AssociationsTest extends TipyTestCase {
 
     public function testBelongTo() {
         $this->createPostsWithComments(5, 10);
-        $this->assertEqual(TipyTestBlogPost::count(), 5);
-        $this->assertEqual(TipyTestBlogComment::count(), 50);
-        $comment = TipyTestBlogComment::findFirst([
+        $this->assertEqual(BlogPost::count(), 5);
+        $this->assertEqual(BlogComment::count(), 50);
+        $comment = BlogComment::findFirst([
             'conditions' => 'title = ?',
             'values' => ['Comment 4 to Post 3']
         ]);
@@ -75,10 +75,10 @@ class AssociationsTest extends TipyTestCase {
 
     public function testHasManyThrough() {
         $this->createUsersWithGroups(10, 5);
-        $this->assertEqual(TipyTestUser::count(), 10);
-        $this->assertEqual(TipyTestGroup::count(), 5);
-        $this->assertEqual(TipyTestUserAndGroupRelation::count(), 14);
-        $user = TipyTestUser::findFirst(['conditions' => "login = 'login_1'"]);
+        $this->assertEqual(User::count(), 10);
+        $this->assertEqual(Group::count(), 5);
+        $this->assertEqual(UserAndGroupRelation::count(), 14);
+        $user = User::findFirst(['conditions' => "login = 'login_1'"]);
 
         // Test has_many_through collection
         $queryCount =  TipyDAO::$queryCount;
@@ -113,11 +113,11 @@ class AssociationsTest extends TipyTestCase {
 
     public function testHasOne() {
         $this->createUsersWithProfiles(10);
-        $this->assertEqual(TipyTestUser::count(), 10);
-        $this->assertEqual(TipyTestProfile::count(), 10);
+        $this->assertEqual(User::count(), 10);
+        $this->assertEqual(Profile::count(), 10);
 
         // Get last user
-        $user = TipyTestUser::findFirst([
+        $user = User::findFirst([
             "order" => "id desc"
         ]);
         $this->assertEqual($user->login, 'login_10');
@@ -146,14 +146,14 @@ class AssociationsTest extends TipyTestCase {
     public function createPostsWithComments($postsCount, $commentsCount) {
         $userId = 2;
         for ($i=1; $i<=$postsCount; $i++) {
-            $post = TipyTestBlogPost::create([
+            $post = BlogPost::create([
                 'userId' => $userId,
                 'title' => "Post $i",
                 'message' => "This is a message $i!",
                 'createdAt' => time() + $i
             ]);
             for ($j=1; $j<=$commentsCount; $j++) {
-                $comment = TipyTestBlogComment::create([
+                $comment = BlogComment::create([
                     'userId' => $userId,
                     'blogPostId' => $post->id,
                     'title' => "Comment $j to post $i",
@@ -170,28 +170,28 @@ class AssociationsTest extends TipyTestCase {
         // group name_1 contains all users
 
         for ($i=1; $i<=$groupsCount; $i++) {
-            $group = TipyTestGroup::create([
+            $group = Group::create([
                 'name' => 'name_'.$i
             ]);
         }
-        $group1 = TipyTestGroup::findFirst(['conditions' => "name = 'name_1'"]);
+        $group1 = Group::findFirst(['conditions' => "name = 'name_1'"]);
 
         for ($i=1; $i<=$usersCount; $i++) {
-            $user = TipyTestUser::create([
+            $user = User::create([
                 'login' => 'login_'.$i,
                 'password' => 'password_'.$i,
                 'email' => 'email_'.$i.'@example.com'
             ]);
             if ($i == 1) {
                 for ($j = 1; $j <= $groupsCount; $j++) {
-                    $group = TipyTestGroup::findFirst(['conditions' => "name = 'name_".$j."'"]);
-                    $relation = TipyTestUserAndGroupRelation::create([
+                    $group = Group::findFirst(['conditions' => "name = 'name_".$j."'"]);
+                    $relation = UserAndGroupRelation::create([
                         'userId' => $user->id,
                         'groupId' => $group->id
                     ]);
                 }
             } else {
-                $relation = TipyTestUserAndGroupRelation::create([
+                $relation = UserAndGroupRelation::create([
                     'userId' => $user->id,
                     'groupId' => $group1->id
                 ]);
@@ -202,12 +202,12 @@ class AssociationsTest extends TipyTestCase {
     // methods that have names not starting whith 'test' are for seeding DB
     public function createUsersWithProfiles($count) {
         for ($i=1; $i<=$count; $i++) {
-            $user = TipyTestUser::create([
+            $user = User::create([
                 'login' => 'login_'.$i,
                 'password' => 'password_'.$i,
                 'email' => 'email_'.$i.'@example.com'
             ]);
-            $profile = TipyTestProfile::create([
+            $profile = Profile::create([
                 'userId' => $user->id,
                 'sign' => 'signature of user '.$user->login
             ]);

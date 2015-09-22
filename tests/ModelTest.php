@@ -5,7 +5,7 @@ class ModelTest extends TipyTestCase {
     public function testJustForExample() {
         // Just example of assertThrown method
         $this->assertThrown('TipyModelException', "Unable to save deleted model", function () {
-            $post = new TipyTestBlogPost;
+            $post = new BlogPost;
             $post->userId = 2;
             $post->title = "Hello World!";
             $post->message = "This is a blog post!";
@@ -21,7 +21,7 @@ class ModelTest extends TipyTestCase {
         });
         
         // This should not raise exceptions
-        $post = new TipyTestBlogPost;
+        $post = new BlogPost;
         $post->userId = 2;
         $post->title = "Hello World!";
         $post->message = "This is a blog post!";
@@ -36,7 +36,7 @@ class ModelTest extends TipyTestCase {
     }
 
     public function testCRUD() {
-        $post = new TipyTestBlogPost;
+        $post = new BlogPost;
         $post->userId = 2;
         $post->title = "Hello World!";
         $post->message = "This is a blog post!";
@@ -51,7 +51,7 @@ class ModelTest extends TipyTestCase {
         $id = $post->id;
 
         // Load and update post but to another variable
-        $post2 = TipyTestBlogPost::load($id);
+        $post2 = BlogPost::load($id);
         $this->assertEqual($post2->isNewRecord(), false);
         $this->assertNotEqual($post2, null);
         $this->assertEqual($post2->message, "This is a blog post!");
@@ -88,7 +88,7 @@ class ModelTest extends TipyTestCase {
     }
 
     public function testDataTypes() {
-        $post = TipyTestBlogPost::create([
+        $post = BlogPost::create([
             'userId' => 2,
             'title' => 'This is a title',
             'message' => 'This is a message!'
@@ -111,12 +111,12 @@ class ModelTest extends TipyTestCase {
     }
 
     public function testTypeCastNulls() {
-        $post = TipyTestBlogPost::create([
+        $post = BlogPost::create([
             'userId' => 2,
             'title' => 'This is a title',
             'message' => 'This is a message!'
         ]);
-        $comment = TipyTestBlogComment::create([
+        $comment = BlogComment::create([
             'userId'     => 0,
             'blogPostId' => $post->id,
             'title'      => '',
@@ -132,7 +132,7 @@ class ModelTest extends TipyTestCase {
     }
 
     public function testReloadNewRecord() {
-        $post = new TipyTestBlogPost;
+        $post = new BlogPost;
         try {
             $post->reload();
         } catch (Exception $e) {
@@ -143,7 +143,7 @@ class ModelTest extends TipyTestCase {
     }
 
     public function testNewWithAttributes() {
-        $post = new TipyTestBlogPost([
+        $post = new BlogPost([
             'userId' => 2,
             'title' => 'This is a title',
             'message' => 'This is a message!'
@@ -155,7 +155,7 @@ class ModelTest extends TipyTestCase {
     }
 
     public function testCreate() {
-        $post = TipyTestBlogPost::create([
+        $post = BlogPost::create([
             'userId' => 2,
             'title' => 'This is a title',
             'message' => 'This is a message!'
@@ -164,23 +164,23 @@ class ModelTest extends TipyTestCase {
         $this->assertEqual($post->userId, 2);
         $this->assertEqual($post->title, "This is a title");
         $this->assertEqual($post->message, "This is a message!");
-        $this->assertEqual(TipyTestBlogPost::count(), 1);
+        $this->assertEqual(BlogPost::count(), 1);
     }
 
     public function testFind() {
-        TipyTestBlogPost::create([
+        BlogPost::create([
             'userId' => 2,
             'title' => 'This is a title',
             'message' => 'This is a message!'
         ]);
-        TipyTestBlogPost::create([
+        BlogPost::create([
             'userId' => 2,
             'title' => 'This is another title',
             'message' => 'This is another  message!'
         ]);
 
         // Test find all
-        $result = TipyTestBlogPost::find();
+        $result = BlogPost::find();
         $this->assertEqual(sizeof($result), 2);
         $post = $result[0];
         $this->assertEqual($post->title, 'This is a title');
@@ -188,25 +188,25 @@ class ModelTest extends TipyTestCase {
         $this->assertEqual($post->title, 'This is another title');
 
         for ($i=1; $i<=10; $i++) {
-            TipyTestBlogPost::create([
+            BlogPost::create([
                 'userId' => $i,
                 'title' => "Title $i",
                 'message' => "This is a message $i!"
             ]);
         }
-        $count = TipyTestBlogPost::count();
+        $count = BlogPost::count();
         $this->assertTrue(is_int($count));
         $this->assertEqual($count, 12);
 
         // Test find by condition
-        $result = TipyTestBlogPost::find([
+        $result = BlogPost::find([
             "conditions" => "user_id >=?",
             "values" => [7]
         ]);
         $this->assertEqual(sizeof($result), 4);
 
         // Test order
-        $result = TipyTestBlogPost::find([
+        $result = BlogPost::find([
             "conditions" => "user_id >=?",
             "values" => [7],
             "order" => "title desc"
@@ -218,7 +218,7 @@ class ModelTest extends TipyTestCase {
         $this->assertEqual($result[3]->title, "Title 10");
 
         // Test limit
-        $result = TipyTestBlogPost::find([
+        $result = BlogPost::find([
             "conditions" => "user_id >=?",
             "values" => [7],
             "order" => "title desc",
@@ -229,7 +229,7 @@ class ModelTest extends TipyTestCase {
         $this->assertEqual($result[1]->title, "Title 8");
 
         // Test offset
-        $result = TipyTestBlogPost::find([
+        $result = BlogPost::find([
             "conditions" => "user_id >=?",
             "values" => [7],
             "order" => "title desc",
@@ -242,18 +242,18 @@ class ModelTest extends TipyTestCase {
     }
 
     public function testAttributes() {
-        $post = new TipyTestBlogPost();
+        $post = new BlogPost();
         try {
              $post->unknown = "Bang!";
         } catch (TipyModelException $e) {
         }
         $this->assertNotEqual($e, null);
-        $this->assertEqual($e->getMessage(), "Unknown property 'unknown' for TipyTestBlogPost");
+        $this->assertEqual($e->getMessage(), "Unknown property 'unknown' for BlogPost");
     }
 
     public function testValidationOnCreate() {
         $this->assertThrown('TipyValidationException', "Post should belongs to user", function () {
-            $post = TipyTestBlogPost::create([
+            $post = BlogPost::create([
                 'title' => 'This is a title',
                 'message' => 'This is a message!'
             ]);
@@ -265,7 +265,7 @@ class ModelTest extends TipyTestCase {
 
     public function testValidation() {
         $this->assertThrown('TipyValidationException', "Post should belongs to user", function () {
-            $post = new TipyTestBlogPost;
+            $post = new BlogPost;
             $post->title = 'This is a title';
             $post->message = 'This is a message!';
             $post->save();
@@ -281,28 +281,28 @@ class ModelTest extends TipyTestCase {
 
     public function testDependent() {
         $this->createUsersWithAsocs(5);
-        $this->assertEqual(TipyTestUser::count(), 5);
-        $this->assertEqual(TipyTestProfile::count(), 5);
-        $this->assertEqual(TipyTestUserAndGroupRelation::count(), 25);
-        $this->assertEqual(TipyTestBlogPost::count(), 25);
-        $this->assertEqual(TipyTestBlogComment::count(), 125);
+        $this->assertEqual(User::count(), 5);
+        $this->assertEqual(Profile::count(), 5);
+        $this->assertEqual(UserAndGroupRelation::count(), 25);
+        $this->assertEqual(BlogPost::count(), 25);
+        $this->assertEqual(BlogComment::count(), 125);
 
-        $user = TipyTestUser::findFirst();
+        $user = User::findFirst();
         $user->delete();
-        $this->assertEqual(TipyTestUser::count(), 4);
-        $this->assertEqual(TipyTestProfile::count(), 5);
-        $this->assertEqual(TipyTestUserAndGroupRelation::count(), 20);
-        $this->assertEqual(TipyTestBlogPost::count(), 20);
-        $this->assertEqual(TipyTestBlogComment::count(), 100);
+        $this->assertEqual(User::count(), 4);
+        $this->assertEqual(Profile::count(), 5);
+        $this->assertEqual(UserAndGroupRelation::count(), 20);
+        $this->assertEqual(BlogPost::count(), 20);
+        $this->assertEqual(BlogComment::count(), 100);
     }
 
     public function testForeignKeys() {
         $this->createUsersWithFriends(10);
-        $this->assertEqual(TipyTestUser::count(), 10);
-        $this->assertEqual(TipyTestFriend::count(), 45);
+        $this->assertEqual(User::count(), 10);
+        $this->assertEqual(Friend::count(), 45);
 
         // Get last user
-        $user = TipyTestUser::findFirst([
+        $user = User::findFirst([
             "order" => "id desc"
         ]);
         // Check assocs
@@ -310,40 +310,40 @@ class ModelTest extends TipyTestCase {
         $this->assertEqual(sizeof($user->friends), 9);
         // Test delete
         $user->delete();
-        $this->assertEqual(TipyTestUser::count(), 9);
-        $this->assertEqual(TipyTestFriend::count(), 36);
+        $this->assertEqual(User::count(), 9);
+        $this->assertEqual(Friend::count(), 36);
     }
 
     public function testTransactions() {
         $this->createUsersWithFriends(10);
-        $this->assertEqual(TipyTestUser::count(), 10);
+        $this->assertEqual(User::count(), 10);
         TipyModel::transaction(function() {
             $this->createUsersWithFriends(10);
-            $user = TipyTestUser::findFirst();
+            $user = User::findFirst();
             $user->lockForUpdate();
-            $this->assertEqual(TipyTestUser::count(), 20);
-            $this->assertEqual(TipyTestFriend::count(), 90);
+            $this->assertEqual(User::count(), 20);
+            $this->assertEqual(Friend::count(), 90);
             TipyModel::rollback();
         });
-        $this->assertEqual(TipyTestUser::count(), 10);
-        $this->assertEqual(TipyTestFriend::count(), 45);
+        $this->assertEqual(User::count(), 10);
+        $this->assertEqual(Friend::count(), 45);
         TipyModel::transaction(function() {
             $this->createUsersWithFriends(10);
-            $this->assertEqual(TipyTestUser::count(), 20);
-            $this->assertEqual(TipyTestFriend::count(), 90);
+            $this->assertEqual(User::count(), 20);
+            $this->assertEqual(Friend::count(), 90);
         });
-        $this->assertEqual(TipyTestUser::count(), 20);
-        $this->assertEqual(TipyTestFriend::count(), 90);
+        $this->assertEqual(User::count(), 20);
+        $this->assertEqual(Friend::count(), 90);
     }
 
     public function testCreatedUpdatedAt() {
-        $user = TipyTestUser::create([
+        $user = User::create([
             'login' => 'some login',
             'password' => 'some password',
             'email' => 'some_email@example.com'
         ]);
         $time1 = time();
-        $post = TipyTestBlogPost::create([
+        $post = BlogPost::create([
                 'userId' => $user->id,
                 'title' => "Post",
                 'message' => "This is a message!",
@@ -360,8 +360,8 @@ class ModelTest extends TipyTestCase {
     }
 
     public function testUnknownAttribute() {
-        $this->assertThrown('TipyModelException', "Unknown property 'name' for TipyTestUser", function () {
-            $user = TipyTestUser::create([
+        $this->assertThrown('TipyModelException', "Unknown property 'name' for User", function () {
+            $user = User::create([
                 'name' => 'James Bond',
                 'login' => 'some login',
                 'password' => 'some password',
@@ -373,28 +373,28 @@ class ModelTest extends TipyTestCase {
     // methods that have names not starting whith 'test' are for seeding DB
     public function createUsersWithAsocs($count) {
         for ($i=1; $i<=$count; $i++) {
-            $user = TipyTestUser::create([
+            $user = User::create([
                 'login' => 'login_'.$i,
                 'password' => 'password_'.$i,
                 'email' => 'email_'.$i.'@example.com'
             ]);
-            $profile = TipyTestProfile::create([
+            $profile = Profile::create([
                 'userId' => $user->id,
                 'sign' => 'signature of user '.$user->id
             ]);
             for ($j=1; $j<=$count; $j++) {
-                $relation = TipyTestUserAndGroupRelation::create([
+                $relation = UserAndGroupRelation::create([
                     'userId' => $user->id,
                     'groupId' => $j
                 ]);
-                $post = TipyTestBlogPost::create([
+                $post = BlogPost::create([
                 'userId' => $user->id,
                 'title' => "Post $i",
                 'message' => "This is a message $i!",
                 'createdAt' => time() + $i
                 ]);
                 for ($k=1; $k<=$count; $k++) {
-                    $comment = TipyTestBlogComment::create([
+                    $comment = BlogComment::create([
                         'userId' => $user->id,
                         'blogPostId' => $post->id,
                         'title' => "Comment $j to post $i",
@@ -410,14 +410,14 @@ class ModelTest extends TipyTestCase {
     public function createUsersWithFriends($count) {
         $ids = [];
         for ($i=1; $i<=$count; $i++) {
-            $user = TipyTestUser::create([
+            $user = User::create([
                 'login' => 'login_'.$i,
                 'password' => 'password_'.$i,
                 'email' => 'email_'.$i.'@example.com'
             ]);
             $ids[$i] = $user->id;
             for ($j = 1; $j < $i; $j++) {
-                $friend = TipyTestFriend::create([
+                $friend = Friend::create([
                     'personId' => $user->id,
                     'friendId' => $ids[$j]
                 ]);

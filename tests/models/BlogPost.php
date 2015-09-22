@@ -1,13 +1,13 @@
 <?php
 
-class TipyTestBlogPost extends TipyModel {
+class BlogPost extends TipyModel {
 
     protected $hasMany = [
-        'comments' => ['class' => 'TipyTestBlogComment', 'foreign_key' => 'blog_post_id', 'dependent' => 'delete']
+        'comments' => ['class' => 'BlogComment', 'dependent' => 'delete']
     ];
 
     protected $belongsTo = [
-        'user' => ['class' => 'TipyTestUser', 'foreign_key' => 'user_id']
+        'user' => ['class' => 'User']
     ];
 
     public function validate() {
