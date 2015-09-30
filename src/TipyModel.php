@@ -327,7 +327,6 @@ class TipyValidationException extends Exception {}
  * </code>
  *
  * @todo Accept conditions and values in one array 'conditions' => ['id = ?', $id]
- * @todo Simple way to specify table name in model class
  * @todo Improve find() to accept arguments like Post::find('first', 'conditions' => ['created_at > ?', time()]);
  */
 class TipyModel extends TipyDAO {
