@@ -376,6 +376,14 @@ class ModelTest extends TipyTestCase {
         });
     }
 
+    public function testCustomTableName() {
+        $foo = Foo::create([
+            'value' => 'Test'
+        ]);
+        $foo = Foo::findFirst(['conditions' => "value='Test'"]);
+        $this->assertNotNull($foo);
+    }
+
     // methods that have names not starting whith 'test' are for seeding DB
     public function createUsersWithAsocs($count) {
         for ($i=1; $i<=$count; $i++) {

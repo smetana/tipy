@@ -486,7 +486,9 @@ class TipyModel extends TipyDAO {
     public function __construct($attrs = null) {
         parent::__construct();
         $this->className = get_class($this);
-        $this->table = $this->classNameToTableName($this->className);
+        if (!$this->table) {
+            $this->table = $this->classNameToTableName($this->className);
+        }
         $this->makeReflection();
         $this->isDeletedRecord = false;
         $this->checkAssociationClasses();
