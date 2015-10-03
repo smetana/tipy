@@ -33,8 +33,6 @@ Add virtual host to apache2
     </Directory>
 </VirtualHost>
 ```
-You can also use [tipy-example](https://github.com/smetana/tipy-example) as a demo.
-
 ## Convention over Configuration
 
 Tipy follows "Convention over Configuration" software design paradigm so there is
