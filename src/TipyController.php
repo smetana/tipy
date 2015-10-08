@@ -162,7 +162,9 @@ class TipyController {
     }
 
     /**
-     * Set custom template name for rendering
+     * Set custom template name for rendering.
+     * This method force controller to render template
+     * even if {@link $skipRender} is set to true
      * @param string $templateName
      */
     public function renderView($templateName) {
