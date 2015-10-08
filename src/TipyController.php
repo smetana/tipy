@@ -166,6 +166,7 @@ class TipyController {
      * @param string $templateName
      */
     public function renderView($templateName) {
+        $this->skipRender = true;
         $this->templateName = $templateName;
     }
 
