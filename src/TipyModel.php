@@ -364,6 +364,15 @@ class TipyModel extends TipyDAO {
     ];
 
     /**
+     * Default DateTime string format
+     * Since MySQL driver accepts date/time values only as strings
+     * all DateTime type properties should be converted to strings
+     * before CREATE or UPDATE statements are executed
+     * @var string
+     */
+    public $dateTimeFormat = 'Y-m-d H:i:s';
+
+    /**
      * Global models<->tables reflections cache
      *
      * One for all models
@@ -759,7 +768,11 @@ class TipyModel extends TipyDAO {
             if ($field != "id" && array_key_exists($attr, $this->data)) {
                 $fields[] = $field;
                 $questions[] = "?";
-                $values[] = $this->data[$attr];
+                if (is_a($this->data[$attr], 'DateTime')) {
+                    $values[] = $this->data[$attr]->format($this->dateTimeFormat);
+                } else {
+                    $values[] = $this->data[$attr];
+                }
             }
         }
         $fieldList = implode(",", $fields);
@@ -789,7 +802,11 @@ class TipyModel extends TipyDAO {
             // Skip attrs that doesn't set
             if ($field != "id" && array_key_exists($attr, $this->data)) {
                 $updatePart[] = "$field=?";
-                $values[] = $this->$attr;
+                if (is_a($this->$attr, 'DateTime')) {
+                    $values[] = $this->$attr->format($this->dateTimeFormat);
+                } else {
+                    $values[] = $this->$attr;
+                }
             }
         }
         $query .= implode(", ", $updatePart)." where id = ?";

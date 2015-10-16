@@ -385,16 +385,34 @@ class ModelTest extends TipyTestCase {
     }
 
     public function testDateTimeTypes() {
-        $dao = new TipyDAO();
-        $result = $dao->query("insert into date_time_types(date_property, datetime_property, timestamp_property) 
-            values ('2015-01-01', '2015-01-01 01:01', '2015-01-01 02:02')");
+        # Test Create
+        $model = new DateTimeType();
+        $model->dateProperty = new DateTime('2015-01-01');
+        $model->datetimeProperty = new DateTime('2015-01-01 01:01');
+        $model->timestampProperty = new DateTime('2015-01-01 02:02');
+        $model->save();
+
         $model = DateTimeType::findFirst();
         $this->assertEqual(get_class($model->dateProperty), 'DateTime');
+        $this->assertEqual(new DateTime('2015-01-01 00:00'), $model->dateProperty);
         $this->assertEqual(get_class($model->datetimeProperty), 'DateTime');
+        $this->assertEqual(new DateTime('2015-01-01 01:01'), $model->datetimeProperty);
         $this->assertEqual(get_class($model->timestampProperty), 'DateTime');
-        $this->assertThrown('WarningException', 'mysqli::real_escape_string() expects parameter 1 to be string, object given', function () use ($model) {
-            $model->save();
-        });
+        $this->assertEqual(new DateTime('2015-01-01 02:02'), $model->timestampProperty);
+
+        # Test update
+        $model->dateProperty->setTime(3,3); # This will work, but time will be stripped
+        $model->datetimeProperty->setTime(4,4);
+        $model->timestampProperty->setTime(5,5);
+        $this->assertNotNull($model->save());
+
+        $model = DateTimeType::findFirst();
+        $this->assertEqual(get_class($model->dateProperty), 'DateTime');
+        $this->assertEqual(new DateTime('2015-01-01 00:00'), $model->dateProperty);
+        $this->assertEqual(get_class($model->datetimeProperty), 'DateTime');
+        $this->assertEqual(new DateTime('2015-01-01 04:04'), $model->datetimeProperty);
+        $this->assertEqual(get_class($model->timestampProperty), 'DateTime');
+        $this->assertEqual(new DateTime('2015-01-01 05:05'), $model->timestampProperty);
     }
 
     // methods that have names not starting whith 'test' are for seeding DB
