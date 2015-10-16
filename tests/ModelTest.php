@@ -384,6 +384,19 @@ class ModelTest extends TipyTestCase {
         $this->assertNotNull($foo);
     }
 
+    public function testDateTimeTypes() {
+        $dao = new TipyDAO();
+        $result = $dao->query("insert into date_time_types(date_property, datetime_property, timestamp_property) 
+            values ('2015-01-01', '2015-01-01 01:01', '2015-01-01 02:02')");
+        $model = DateTimeType::findFirst();
+        $this->assertEqual(get_class($model->dateProperty), 'DateTime');
+        $this->assertEqual(get_class($model->datetimeProperty), 'DateTime');
+        $this->assertEqual(get_class($model->timestampProperty), 'DateTime');
+        $this->assertThrown('WarningException', 'mysqli::real_escape_string() expects parameter 1 to be string, object given', function () use ($model) {
+            $model->save();
+        });
+    }
+
     // methods that have names not starting whith 'test' are for seeding DB
     public function createUsersWithAsocs($count) {
         for ($i=1; $i<=$count; $i++) {
