@@ -1,0 +1,16 @@
+language: php
+
+php:
+  - 5.5
+  - 5.6
+  - 7.0
+
+before_script:
+  - mysql -e "create database IF NOT EXISTS tipy_test" -uroot
+
+script: ./bin/test
+
+notifications:
+  email:
+    - serge.smetana@gmail.com
+    - zhbadynskyi@gmail.com

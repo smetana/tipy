@@ -477,6 +477,10 @@ class TipyTestRunner {
             define('INI_FILE', $this->workingDir.'/config.ini.ci');
             return;
         }
+        if (getenv('TRAVIS') && file_exists($this->workingDir.'/config.ini.travis')) {
+            define('INI_FILE', $this->workingDir.'/config.ini.travis');
+            return;
+        }
         if (file_exists($this->workingDir.'/config.ini')) {
             define('INI_FILE', $this->workingDir.'/config.ini');
             return;

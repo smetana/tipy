@@ -1,0 +1,13 @@
+; This is a config file to use with TravisCI
+[DB]
+db_host = localhost
+db_port =
+db_name = tipy_test
+db_test_name = tipy_test
+db_user = root
+db_password =
+db_character_set = utf8
+
+[Mail]
+mail_from = "Tipy Admin" <tipy@localhost>
+mail_sendmail_path = /usr/sbin/sendmail
