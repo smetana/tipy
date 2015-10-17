@@ -12,5 +12,8 @@ script: ./bin/test
 
 notifications:
   email:
-    - serge.smetana@gmail.com
-    - zhbadynskyi@gmail.com
+    recipients:
+      - serge.smetana@gmail.com
+      - zhbadynskyi@gmail.com
+    on_success: always
+    on_failure: always
