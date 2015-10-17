@@ -1,7 +1,0 @@
-machine:
-  php:
-    version: 5.5.9
-
-test:
-  override:
-    - ./bin/test
