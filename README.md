@@ -2,6 +2,8 @@
 
 Tiny PHP MVC + xUnit framework
 
+[![Build Status](https://travis-ci.org/smetana/tipy.svg?branch=master)](https://travis-ci.org/smetana/tipy)
+
 ## Installation
 
 Prerequisites:
