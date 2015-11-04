@@ -56,7 +56,7 @@ class TipyRequest extends TipyIOWrapper {
      * @return boolean
      */
     public function isGet() {
-        return $this->method == 'GET';
+        return $this->method() == 'GET';
     }
 
     /**
@@ -64,7 +64,7 @@ class TipyRequest extends TipyIOWrapper {
      * @return boolean
      */
     public function isPost() {
-        return $this->method == 'POST';
+        return $this->method() == 'POST';
     }
 
     /**
@@ -80,7 +80,7 @@ class TipyRequest extends TipyIOWrapper {
      * @return boolean
      */
     public function isPut() {
-        return $this->method == 'PUT';
+        return $this->method() == 'PUT';
     }
 
     /**
@@ -88,7 +88,7 @@ class TipyRequest extends TipyIOWrapper {
      * @return boolean
      */
     public function isDelete() {
-        return $this->method == 'DELETE';
+        return $this->method() == 'DELETE';
     }
 
     /**
@@ -96,7 +96,7 @@ class TipyRequest extends TipyIOWrapper {
      * @return boolean
      */
     public function isOptions() {
-        return $this->method == 'OPTIONS';
+        return $this->method() == 'OPTIONS';
     }
 
     /**
@@ -104,7 +104,7 @@ class TipyRequest extends TipyIOWrapper {
      * @return boolean
      */
     public function isHead() {
-        return $this->method == 'HEAD';
+        return $this->method() == 'HEAD';
     }
 
     /**
