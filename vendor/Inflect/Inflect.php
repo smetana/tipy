@@ -50,7 +50,6 @@ class Inflect
         '/(tomat|potat|ech|her|vet)o$/i'=> "$1oes",
         '/(bu)s$/i'                => "$1ses",
         '/(alias)$/i'              => "$1es",
-        '/(octop)us$/i'            => "$1i",
         '/(ax|test)is$/i'          => "$1es",
         '/(us)$/i'                 => "$1es",
         '/s$/i'                    => "s",
@@ -63,7 +62,6 @@ class Inflect
         '/(vert|ind)ices$/i'        => "$1ex",
         '/^(ox)en$/i'               => "$1",
         '/(alias)es$/i'             => "$1",
-        '/(octop|vir)i$/i'          => "$1us",
         '/(cris|ax|test)es$/i'      => "$1is",
         '/(shoe)s$/i'               => "$1",
         '/(o)es$/i'                 => "$1",
@@ -85,6 +83,7 @@ class Inflect
         '/(h|bl)ouses$/i'           => "$1ouse",
         '/(corpse)s$/i'             => "$1",
         '/(us)es$/i'                => "$1",
+        '/(vir|stat|octop)us$/i'    => "$1us",
         '/s$/i'                     => ""
     );
 
