@@ -9,6 +9,7 @@ CREATE TABLE `users` (
 `login` VARCHAR( 20 ) NULL ,
 `password` VARCHAR( 20 ) NULL ,
 `email` VARCHAR( 60 ) NULL,
+`user_status_id` BIGINT( 20 ) NOT NULL DEFAULT 0,
 PRIMARY KEY ( `id` )
 ) ENGINE = InnoDB DEFAULT CHARSET=utf8;
 
@@ -81,4 +82,8 @@ CREATE TABLE `date_time_types` (
 PRIMARY KEY ( `id` )
 ) ENGINE = InnoDB DEFAULT CHARSET=utf8;
 
-
+CREATE TABLE `user_statuses` (
+`id` BIGINT( 20 ) NOT NULL AUTO_INCREMENT,
+`name` VARCHAR( 355 ) NULL,
+PRIMARY KEY ( `id` )
+) ENGINE = InnoDB DEFAULT CHARSET=utf8;

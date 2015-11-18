@@ -14,6 +14,8 @@ class User extends TipyModel {
 
     protected $hasOne = ['profile'];
 
+    protected $belongsTo = ['userStatus'];
+
     public function validate() {
         if (!$this->login) {
             throw new TipyValidationException('Login should not be blank!');

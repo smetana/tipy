@@ -71,6 +71,16 @@ class AssociationsTest extends TipyTestCase {
         // no more queries
         $this->assertEqual(TipyDAO::$queryCount, $queryCount);
         $this->assertEqual($post, $postAgain);
+
+        // belongsTo crash
+        $status = UserStatus::create(['name' => 'Some status']);
+        $user = User::create([
+            'login' => 'login',
+            'password' => 'password',
+            'email' => 'email@example.com',
+            'userStatusId' => $status->id
+        ]);
+        $this->assertEqual($user->userStatus->name, 'Some status');
     }
 
     public function testHasManyThrough() {
