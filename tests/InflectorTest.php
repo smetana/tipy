@@ -50,6 +50,7 @@ class InflectorTest extends TipyTestCase {
         $this->assertEqual(TipyInflector::classify('projects'), 'Project');
         $this->assertEqual(TipyInflector::classify('big_projects'), 'BigProject');
         $this->assertEqual(TipyInflector::classify('mice'), 'Mouse');
+        $this->assertEqual(TipyInflector::classify('userStatus'), 'UserStatus');
     }
 
     public function testClassifySelf() {
