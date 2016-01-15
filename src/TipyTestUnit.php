@@ -503,13 +503,10 @@ class TipyTestRunner {
 
     private function findFixtureFiles($filename) {
         if (is_dir($filename)) {
-            if ($handle = opendir($filename)) {
-                while (false !== ($f = readdir($handle))) {
-                    if (!preg_match('/\.$/', $f)) {
-                        $this->findFixtureFiles($filename.'/'.$f);
-                    }
+            foreach (scandir($filename) as $file) {
+                if ($file != '.' && $file != '..') {
+                    $this->findFixtureFiles($filename.'/'.$file);
                 }
-                closedir($handle);
             }
         } else if (preg_match('/\.sql$/', $filename)) {
             $this->fixtureFiles[] = $filename;
