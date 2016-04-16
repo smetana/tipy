@@ -146,7 +146,7 @@ class TipyValidationException extends Exception {}
  * </code>
  *
  * Association class name is evaluated automatically by {@link TipyInflector->classify} inflection.
- * If you wan't to specify class name different from association name you can pass association 
+ * If you wan't to specify class name different from association name you can pass association
  * options as arrays:
  *
  * <code>
@@ -403,6 +403,22 @@ class TipyModel extends TipyDAO {
     public $attributes;
 
     /**
+     * Attributes that have been changed
+     *
+     * filled automatically
+     * @var array
+     */
+    public $touchedAttributes = [];
+
+    /**
+     * DateTime initial values
+     *
+     * filled automatically
+     * @var array
+     */
+    public $dateTimeValues = [];
+
+    /**
      * Table column names list
      *
      * fields autmatically
@@ -531,6 +547,9 @@ class TipyModel extends TipyDAO {
      */
     public function __set($name, $value) {
         $this->checkAttribute($name);
+        if (!in_array($name, $this->touchedAttributes)) {
+            $this->touchedAttributes[] = $name;
+        }
         $this->data[$name] = $value;
     }
 
@@ -693,6 +712,8 @@ class TipyModel extends TipyDAO {
             }
             $result = $this->updateRecord();
         }
+        $this->touchedAttributes = [];
+        $this->dateTimeValues = [];
         return $result;
     }
 
@@ -794,24 +815,34 @@ class TipyModel extends TipyDAO {
             throw new TipyModelException("Cannot update record without an id");
         }
         $this->beforeUpdate();
-        $query = "update ".$this->table." set ";
-        $values = [];
-        $updatePart = [];
-        foreach ($this->reflections as $field => $attr) {
-            // No need to update id
-            // Skip attrs that doesn't set
-            if ($field != "id" && array_key_exists($attr, $this->data)) {
-                $updatePart[] = "$field=?";
-                if (is_a($this->$attr, 'DateTime')) {
-                    $values[] = $this->$attr->format($this->dateTimeFormat);
-                } else {
-                    $values[] = $this->$attr;
-                }
+        $result = true;
+        // Detect changed DateTime attributes
+        foreach ($this->dateTimeValues as $attr => $value) {
+            if ($this->data[$attr] != $value && !in_array($attr, $this->touchedAttributes)) {
+                $this->touchedAttributes[] = $attr;
             }
         }
-        $query .= implode(", ", $updatePart)." where id = ?";
-        $values[] = $this->id;
-        $result = $this->query($query, $values);
+        // Just execute beforUpdate and afterUpdate if no data changed
+        if ($this->touchedAttributes) {
+            $query = "update ".$this->table." set ";
+            $values = [];
+            $updatePart = [];
+            foreach ($this->reflections as $field => $attr) {
+                // No need to update id
+                // Skip attrs that doesn't changed
+                if ($field != "id" && in_array($attr, $this->touchedAttributes)) {
+                    $updatePart[] = "$field=?";
+                    if (is_a($this->$attr, 'DateTime')) {
+                        $values[] = $this->data[$attr]->format($this->dateTimeFormat);
+                    } else {
+                        $values[] = $this->data[$attr];
+                    }
+                }
+            }
+            $query .= implode(", ", $updatePart)." where id = ?";
+            $values[] = $this->id;
+            $result = $this->query($query, $values);
+        }
         $this->afterUpdate();
         return $result;
     }
@@ -987,7 +1018,7 @@ class TipyModel extends TipyDAO {
     protected static function instanceFromResult($instance, $result) {
         foreach ($instance->reflections as $field => $attr) {
             if (array_key_exists($field, $result) && $result[$field] !== null) {
-                $instance->data[$attr] = $instance->typeCast($field, $result[$field]);
+                $instance->data[$attr] = $instance->typeCast($field, $result[$field], $instance);
             } else {
                 $instance->data[$attr] = null;
             }
@@ -1006,7 +1037,7 @@ class TipyModel extends TipyDAO {
      * @param mixed $value
      * @return mixed
      */
-    protected function typeCast($field, $value) {
+    protected function typeCast($field, $value, $instance) {
         $type = $this->fieldTypes[$field];
         switch (self::$mysqlToPhpTypes[$type]) {
             // $value is already string so we don't typecast to string
@@ -1018,6 +1049,7 @@ class TipyModel extends TipyDAO {
                 break;
             case 'datetime':
                 $value = new DateTime($value);
+                $instance->dateTimeValues[$instance->reflections[$field]] = clone $value;
                 break;
         }
         return $value;
@@ -1033,8 +1065,8 @@ class TipyModel extends TipyDAO {
      *  $hasMany = ['comments', 'posts'];
      * </cde>
      */
-     private function checkAssociationClasses() {
-        foreach(['hasMany', 'hasOne', 'belongsTo', 'hasManyThrough'] as $assocType) {
+    private function checkAssociationClasses() {
+        foreach (['hasMany', 'hasOne', 'belongsTo', 'hasManyThrough'] as $assocType) {
             if (!$this->$assocType) {
                 continue;
             }
@@ -1042,7 +1074,7 @@ class TipyModel extends TipyDAO {
                 throw new TipyModelException("Association definition should be an Array");
             }
             $assocArray = $this->$assocType;
-            foreach($assocArray as $name => $options) {
+            foreach ($assocArray as $name => $options) {
                 // If $name is integer then this is assoc specified without options
                 // Make it array for future usage
                 if (is_int($name)) {
@@ -1057,7 +1089,7 @@ class TipyModel extends TipyDAO {
             }
             $this->$assocType = $assocArray;
         }
-     }
+    }
 
     /**
      * Select from the database and instantiaate {@link $hasMany}

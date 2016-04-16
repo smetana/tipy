@@ -19,7 +19,7 @@ class ModelTest extends TipyTestCase {
             $post->delete();
             $post->save();
         });
-        
+
         // This should not raise exceptions
         $post = new BlogPost;
         $post->userId = 2;
@@ -85,6 +85,26 @@ class ModelTest extends TipyTestCase {
         $this->assertNotEqual($e, null);
         $this->assertEqual(get_class($e), 'TipyModelException');
         $this->assertEqual($e->getMessage(), "Unable to reload deleted model");
+    }
+
+    public function testUpdateOnlyTouched() {
+        $post = new BlogPost;
+        $post->userId = 2;
+        $post->title = "Hello World!";
+        $post->message = "This is a blog post!";
+        $this->assertEqual($post->save(), true);
+        $id = $post->id;
+
+        $post1 = BlogPost::load($id);
+        $post1->title = "Not this World";
+        $post->message = "This is an another blog post!";
+
+        $post->save();
+        $post1->save();
+
+        $post2 = BlogPost::load($id);
+        $this->assertEqual($post2->title, "Not this World");
+        $this->assertEqual($post2->message, "This is an another blog post!");
     }
 
     public function testDataTypes() {
@@ -317,7 +337,7 @@ class ModelTest extends TipyTestCase {
     public function testTransactions() {
         $this->createUsersWithFriends(10);
         $this->assertEqual(User::count(), 10);
-        TipyModel::transaction(function() {
+        TipyModel::transaction(function () {
             $this->createUsersWithFriends(10);
             $user = User::findFirst();
             $user->lockForUpdate();
@@ -327,7 +347,7 @@ class ModelTest extends TipyTestCase {
         });
         $this->assertEqual(User::count(), 10);
         $this->assertEqual(Friend::count(), 45);
-        TipyModel::transaction(function() {
+        TipyModel::transaction(function () {
             $this->createUsersWithFriends(10);
             $this->assertEqual(User::count(), 20);
             $this->assertEqual(Friend::count(), 90);
@@ -401,15 +421,16 @@ class ModelTest extends TipyTestCase {
         $this->assertEqual(new DateTime('2015-01-01 02:02'), $model->timestampProperty);
 
         # Test update
-        $model->dateProperty->setTime(3,3); # This will work, but time will be stripped
-        $model->datetimeProperty->setTime(4,4);
-        $model->timestampProperty->setTime(5,5);
+        $model->dateProperty->setTime(3, 3); # This will work, but time will be stripped
+        $model->datetimeProperty->setTime(4, 4);
+        $model->timestampProperty->setTime(5, 5);
         $this->assertNotNull($model->save());
 
         $model = DateTimeType::findFirst();
         $this->assertEqual(get_class($model->dateProperty), 'DateTime');
         $this->assertEqual(new DateTime('2015-01-01 00:00'), $model->dateProperty);
         $this->assertEqual(get_class($model->datetimeProperty), 'DateTime');
+        //$this->assertEqual('', $model->dateTimeValues);
         $this->assertEqual(new DateTime('2015-01-01 04:04'), $model->datetimeProperty);
         $this->assertEqual(get_class($model->timestampProperty), 'DateTime');
         $this->assertEqual(new DateTime('2015-01-01 05:05'), $model->timestampProperty);
