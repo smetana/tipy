@@ -791,6 +791,8 @@ class TipyModel extends TipyDAO {
                 $questions[] = "?";
                 if (is_a($this->data[$attr], 'DateTime')) {
                     $values[] = $this->data[$attr]->format($this->dateTimeFormat);
+                } elseif (is_bool($this->data[$attr])) {
+                    $values[] = (int) $this->data[$attr];
                 } else {
                     $values[] = $this->data[$attr];
                 }
@@ -834,6 +836,8 @@ class TipyModel extends TipyDAO {
                     $updatePart[] = "$field=?";
                     if (is_a($this->$attr, 'DateTime')) {
                         $values[] = $this->data[$attr]->format($this->dateTimeFormat);
+                    } elseif (is_bool($this->data[$attr])) {
+                        $values[] = (int) $this->data[$attr];
                     } else {
                         $values[] = $this->data[$attr];
                     }
