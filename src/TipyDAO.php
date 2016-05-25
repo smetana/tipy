@@ -64,9 +64,10 @@ class TipyDAO {
                     . $dbLink->connect_error);
             } else {
                 if ($config->get('db_character_set')) {
-                    $query = "set names '".$config->get('db_character_set')."'";
-                    $this->logger->debug($query);
-                    $dbLink->query($query);
+                    $this->logger->debug('DB setting charset '.$config->get('db_character_set'));
+                    if (!$dbLink->set_charset($config->get('db_character_set'))) {
+                        throw new TipyDaoException('DB error setting charset '.$config->get('db_character_set'));
+                    }
                 }
                 $app->db = $dbLink;
             }
